@@ -71,9 +71,9 @@ export default function SetupForm() {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="mb-6"
+            className="mb-6 flex flex-col items-center"
           >
-            <InvocaLogo className="mb-2" />
+            <InvocaLogo size="lg" className="mb-3" />
             <span className="text-sm font-semibold text-primary">AI Messaging Agent</span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
