@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Building2, Target, Zap } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X } from 'lucide-react';
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
+import { generateMockPages } from '@/lib/mock-pages';
 
 const INDUSTRIES = [
   'Window Cleaning',
@@ -38,12 +39,17 @@ export default function SetupForm() {
   });
   const [customIndustry, setCustomIndustry] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [presencePage, setPresencePage] = useState('');
+  const [presencePages, setPresencePages] = useState<string[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showPresenceList, setShowPresenceList] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalConfig = {
+    const finalConfig: BusinessConfig = {
       ...config,
       industry: config.industry === 'Other' ? customIndustry : config.industry,
+      presencePage: presencePage || undefined,
     };
     setIsAnalyzing(true);
     await new Promise(r => setTimeout(r, 2000));
@@ -179,6 +185,78 @@ export default function SetupForm() {
                 rows={4}
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
               />
+            </div>
+
+            {/* Add Presence */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Radio className="w-4 h-4 text-muted-foreground" />
+                Add Presence
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </label>
+              {!showPresenceList ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const industry = config.industry === 'Other' ? customIndustry : config.industry;
+                    if (!industry) return;
+                    setIsScanning(true);
+                    setShowPresenceList(false);
+                    setTimeout(() => {
+                      setPresencePages(generateMockPages(industry, config.websiteUrl));
+                      setIsScanning(false);
+                      setShowPresenceList(true);
+                    }, 1500);
+                  }}
+                  disabled={isScanning || (!config.industry)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-secondary border border-border text-sm text-muted-foreground hover:text-foreground disabled:opacity-40 transition-all"
+                >
+                  {isScanning ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                      Scanning website pages…
+                    </>
+                  ) : (
+                    <>
+                      <Search className="w-4 h-4" />
+                      Scan for drop-off pages
+                    </>
+                  )}
+                </button>
+              ) : (
+                <div className="space-y-1.5 max-h-[200px] overflow-y-auto rounded-lg border border-border p-2 bg-secondary">
+                  {presencePages.map(page => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => setPresencePage(prev => prev === page ? '' : page)}
+                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all flex items-center justify-between ${
+                        presencePage === page
+                          ? 'bg-primary/20 text-primary'
+                          : 'text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      <span>{page}</span>
+                      {presencePage === page && <Check className="w-4 h-4 text-primary" />}
+                    </button>
+                  ))}
+                  {presencePage && (
+                    <button
+                      type="button"
+                      onClick={() => { setPresencePage(''); setShowPresenceList(false); setPresencePages([]); }}
+                      className="w-full text-center text-xs text-muted-foreground hover:text-foreground mt-1 py-1 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <X className="w-3 h-3" />
+                      Remove presence
+                    </button>
+                  )}
+                </div>
+              )}
+              {presencePage && (
+                <p className="text-xs text-primary">
+                  Intro will say: "Hi! I noticed you were checking out our {presencePage} page…"
+                </p>
+              )}
             </div>
           </div>
 
