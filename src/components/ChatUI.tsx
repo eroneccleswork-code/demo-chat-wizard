@@ -154,7 +154,7 @@ export default function ChatUI({ config }: Props) {
             <div className="w-10 h-10 rounded-full bg-[hsl(220,14%,20%)] flex items-center justify-center mb-0.5">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(220,14%,40%)"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
             </div>
-            <span className="text-[13px] font-semibold text-foreground">{config.companyName}</span>
+            <span className="text-[13px] font-semibold text-white">{config.companyName}</span>
           </div>
           <button onClick={handleReset} className="text-sms-agent">
             <RotateCcw className="w-4 h-4" />
