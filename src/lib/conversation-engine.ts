@@ -130,7 +130,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   };
 
   const defaultFlow: ConversationStep[] = [
-    { question: `Thanks for contacting ${name}. I'm an AI agent here to help you. Would you like to get started?` },
+    { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help you. Would you like to get started?` },
     { question: "Perfect. What specifically are you looking for help with?" },
     { question: "How large is the scope of what you need?" },
     { question: "What's your timeline for this?" },
