@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { BusinessConfig, ChatMessage } from '@/lib/types';
 import { analyzeWebsite, generatePersona, getNextAgentMessage, getInitialState, ConversationState } from '@/lib/conversation-engine';
 import TypingIndicator from './TypingIndicator';
+import ScreenRecorder from './ScreenRecorder';
 
 interface Props {
   config: BusinessConfig;
