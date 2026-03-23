@@ -73,7 +73,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   const name = capitalizeWords(config.companyName);
   const flows: Record<string, ConversationStep[]> = {
     'Window Cleaning': [
-      { question: `Thanks for contacting ${config.companyName}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
+      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
       { question: "Perfect. How many windows are you looking to have cleaned?" },
       { question: "Are these standard-size windows, or do you have any large or specialty windows?" },
       { question: "Is this a single-story or multi-story home?" },
