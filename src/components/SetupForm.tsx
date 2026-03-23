@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Building2, Target, Zap, MessageSquare } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap } from 'lucide-react';
+import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 
 const INDUSTRIES = [
