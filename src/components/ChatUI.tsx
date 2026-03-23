@@ -138,8 +138,8 @@ export default function ChatUI({ config }: Props) {
             <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.5" opacity="0.4"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" opacity="0.6"/><rect x="9" y="2" width="3" height="10" rx="0.5" opacity="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
             <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 3.6c1.7 0 3.2.7 4.3 1.8l1.1-1.1C11.4 2.8 9.6 2 7.5 2S3.6 2.8 2.1 4.3l1.1 1.1C4.3 4.3 5.8 3.6 7.5 3.6zm0 3c.9 0 1.8.4 2.4 1l1.1-1.1c-.9-.9-2.1-1.4-3.5-1.4s-2.6.5-3.5 1.4l1.1 1.1c.6-.6 1.5-1 2.4-1zm0 3c.4 0 .7.1 1 .4l1.5-1.5c-.7-.6-1.5-1-2.5-1s-1.8.4-2.5 1L6.5 10c.3-.3.6-.4 1-.4z"/></svg>
             <div className="flex items-center">
-              <div className="w-[22px] h-[10px] rounded-[3px] border border-foreground/40 flex items-center p-[1px]">
-                <div className="h-full w-[60%] bg-foreground rounded-[1.5px]" />
+              <div className="w-[22px] h-[10px] rounded-[3px] border border-white/40 flex items-center p-[1px]">
+                <div className="h-full w-[60%] bg-white rounded-[1.5px]" />
               </div>
             </div>
           </div>
