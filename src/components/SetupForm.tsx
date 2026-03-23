@@ -39,6 +39,10 @@ export default function SetupForm() {
   });
   const [customIndustry, setCustomIndustry] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [presencePage, setPresencePage] = useState('');
+  const [presencePages, setPresencePages] = useState<string[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showPresenceList, setShowPresenceList] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
