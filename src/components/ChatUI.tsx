@@ -81,7 +81,7 @@ export default function ChatUI({ config }: Props) {
     const delay = 1000 + Math.random() * 1500;
     setIsTyping(true);
     setTimeout(() => {
-      const { message, newState } = getNextAgentMessage(activeConfig, currentState, userText);
+      const { message, newState } = getNextAgentMessage(config, currentState, userText);
       const agentMsg: ChatMessage = {
         id: Date.now().toString(), role: 'agent', content: message, timestamp: new Date(),
       };
@@ -89,7 +89,7 @@ export default function ChatUI({ config }: Props) {
       setConvState(newState);
       setIsTyping(false);
     }, delay);
-  }, [activeConfig]);
+  }, [config]);
 
   const handleSend = () => {
     const content = input.trim();
