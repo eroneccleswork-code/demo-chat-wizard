@@ -71,10 +71,10 @@ export default function SetupForm() {
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6"
+            className="mb-6"
           >
-            <MessageSquare className="w-4 h-4" />
-            Invoca AI Messaging Agent
+            <InvocaLogo className="mb-2" />
+            <span className="text-sm font-semibold text-primary">AI Messaging Agent</span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
             Configure your agent
