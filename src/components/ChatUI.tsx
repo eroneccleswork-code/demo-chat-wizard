@@ -1,26 +1,26 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, Send, RotateCcw } from 'lucide-react';
+import { ChevronLeft, Send, RotateCcw, Plus, Mic } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { BusinessConfig, ChatMessage, SpeedMode, DemoScenario } from '@/lib/types';
-import { analyzeWebsite, generatePersona, generateAgentResponse, getThinkingSteps, getScenarioMessages } from '@/lib/conversation-engine';
+import { BusinessConfig, ChatMessage } from '@/lib/types';
+import { analyzeWebsite, generatePersona, getNextAgentMessage, getInitialState, ConversationState } from '@/lib/conversation-engine';
 import TypingIndicator from './TypingIndicator';
 
 interface Props {
   config: BusinessConfig;
 }
 
-function IMessageBubble({ message }: { message: ChatMessage }) {
+function IMessageBubble({ message, isLast }: { message: ChatMessage; isLast: boolean }) {
   const isAgent = message.role === 'agent';
   return (
     <motion.div
       initial={{ opacity: 0, y: 8, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`flex ${isAgent ? 'justify-start' : 'justify-end'}`}
+      className={`flex flex-col ${isAgent ? 'items-start' : 'items-end'}`}
     >
       <div
-        className={`max-w-[75%] px-3.5 py-2 text-[15px] leading-[1.35] ${
+        className={`max-w-[75%] px-3.5 py-2 text-[15px] leading-[1.4] ${
           isAgent
             ? 'bg-sms-user text-sms-user-foreground rounded-2xl rounded-bl-[4px]'
             : 'bg-sms-agent text-sms-agent-foreground rounded-2xl rounded-br-[4px]'
@@ -28,20 +28,21 @@ function IMessageBubble({ message }: { message: ChatMessage }) {
       >
         {message.content}
       </div>
+      {/* Show "Delivered" under the last user message */}
+      {!isAgent && isLast && (
+        <span className="text-[11px] text-muted-foreground mt-0.5 mr-1">Delivered</span>
+      )}
     </motion.div>
   );
 }
 
 export default function ChatUI({ config }: Props) {
   const navigate = useNavigate();
-  const insights = analyzeWebsite(config);
-  const persona = generatePersona(config, insights);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [speedMode] = useState<SpeedMode>('realistic');
-  const [questionIndex, setQuestionIndex] = useState(0);
+  const [convState, setConvState] = useState<ConversationState>(getInitialState());
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -51,52 +52,70 @@ export default function ChatUI({ config }: Props) {
 
   useEffect(() => { scrollToBottom(); }, [messages, isTyping]);
 
+  // Send initial greeting
   useEffect(() => {
-    const greeting = generateAgentResponse(config, persona, insights, [], 0);
     setIsTyping(true);
+    const { message, newState } = getNextAgentMessage(config, getInitialState());
     const timer = setTimeout(() => {
-      setMessages([{
-        id: '0', role: 'agent', content: greeting, timestamp: new Date(),
-      }]);
+      setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
+      setConvState(newState);
       setIsTyping(false);
-      setQuestionIndex(1);
     }, 1200);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const addAgentResponse = useCallback((history: ChatMessage[], qIdx: number) => {
+  const addAgentResponse = useCallback((currentState: ConversationState, userText: string) => {
     const delay = 1000 + Math.random() * 1500;
     setIsTyping(true);
     setTimeout(() => {
-      const response = generateAgentResponse(config, persona, insights, history, qIdx);
+      const { message, newState } = getNextAgentMessage(config, currentState, userText);
       const agentMsg: ChatMessage = {
-        id: Date.now().toString(), role: 'agent', content: response, timestamp: new Date(),
+        id: Date.now().toString(), role: 'agent', content: message, timestamp: new Date(),
       };
       setMessages(prev => [...prev, agentMsg]);
+      setConvState(newState);
       setIsTyping(false);
-      setQuestionIndex(prev => prev + 1);
     }, delay);
-  }, [config, persona, insights]);
+  }, [config]);
 
-  const handleSend = (text?: string) => {
-    const content = text || input.trim();
+  const handleSend = () => {
+    const content = input.trim();
     if (!content) return;
     const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', content, timestamp: new Date() };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
-    addAgentResponse(newMessages, questionIndex);
+    addAgentResponse(convState, content);
+  };
+
+  const handleReset = () => {
+    const initialState = getInitialState();
+    setMessages([]);
+    setConvState(initialState);
+    setInput('');
+    setIsTyping(true);
+    setTimeout(() => {
+      const { message, newState } = getNextAgentMessage(config, initialState);
+      setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
+      setConvState(newState);
+      setIsTyping(false);
+    }, 800);
   };
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
+  // Find last user message index for "Delivered" label
+  let lastUserIdx = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === 'user') { lastUserIdx = i; break; }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       {/* iPhone frame */}
       <div className="w-full max-w-[390px] h-[780px] rounded-[44px] border-[3px] border-[hsl(220,14%,18%)] bg-[hsl(0,0%,0%)] flex flex-col overflow-hidden relative shadow-2xl">
-        {/* Notch / Dynamic Island */}
+        {/* Dynamic Island */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-[hsl(0,0%,0%)] rounded-full z-20" />
 
         {/* Status bar */}
@@ -116,8 +135,8 @@ export default function ChatUI({ config }: Props) {
 
         {/* Navigation header */}
         <div className="flex items-center px-4 py-2 relative">
-          <button onClick={() => navigate('/')} className="flex items-center gap-0.5 text-sms-agent text-[17px]">
-            <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+          <button onClick={() => navigate('/')} className="flex items-center text-sms-agent text-[17px]">
+            <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
           </button>
           <div className="flex-1 flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-[hsl(220,14%,20%)] flex items-center justify-center mb-0.5">
@@ -125,17 +144,7 @@ export default function ChatUI({ config }: Props) {
             </div>
             <span className="text-[13px] font-semibold text-foreground">{config.companyName}</span>
           </div>
-          <button onClick={() => {
-            setMessages([]);
-            setQuestionIndex(0);
-            setIsTyping(true);
-            setTimeout(() => {
-              const greeting = generateAgentResponse(config, persona, insights, [], 0);
-              setMessages([{ id: '0', role: 'agent', content: greeting, timestamp: new Date() }]);
-              setIsTyping(false);
-              setQuestionIndex(1);
-            }, 800);
-          }} className="text-sms-agent">
+          <button onClick={handleReset} className="text-sms-agent">
             <RotateCcw className="w-4 h-4" />
           </button>
         </div>
@@ -148,10 +157,10 @@ export default function ChatUI({ config }: Props) {
         </div>
 
         {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 space-y-1.5 pb-2">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 space-y-2 pb-2">
           <AnimatePresence>
-            {messages.map(msg => (
-              <IMessageBubble key={msg.id} message={msg} />
+            {messages.map((msg, idx) => (
+              <IMessageBubble key={msg.id} message={msg} isLast={msg.role === 'user' && idx === lastUserIdx} />
             ))}
           </AnimatePresence>
           <AnimatePresence>
@@ -159,27 +168,31 @@ export default function ChatUI({ config }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* Input bar */}
-        <div className="px-3 pb-8 pt-2">
-          <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center bg-[hsl(220,14%,12%)] rounded-full border border-[hsl(220,14%,20%)] px-4 py-2">
-              <input
-                type="text"
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSend()}
-                placeholder="Text Message"
-                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-[15px]"
-              />
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={() => handleSend()}
-              disabled={!input.trim()}
-              className="w-8 h-8 rounded-full bg-sms-agent flex items-center justify-center disabled:opacity-30 transition-opacity"
-            >
-              <Send className="w-4 h-4 text-sms-agent-foreground" />
-            </motion.button>
+        {/* Input bar — iOS style */}
+        <div className="px-3 pb-8 pt-2 flex items-center gap-2">
+          <button className="w-8 h-8 rounded-full bg-[hsl(220,14%,18%)] flex items-center justify-center text-muted-foreground flex-shrink-0">
+            <Plus className="w-5 h-5" />
+          </button>
+          <div className="flex-1 flex items-center bg-transparent rounded-full border border-[hsl(220,14%,22%)] px-4 py-2">
+            <input
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSend()}
+              placeholder="iMessage"
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-[15px]"
+            />
+            {input.trim() ? (
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={handleSend}
+                className="ml-2 w-7 h-7 rounded-full bg-sms-agent flex items-center justify-center flex-shrink-0"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(0,0%,100%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+              </motion.button>
+            ) : (
+              <Mic className="w-5 h-5 text-muted-foreground ml-2 flex-shrink-0" />
+            )}
           </div>
         </div>
       </div>
