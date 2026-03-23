@@ -124,7 +124,7 @@ export default function ChatUI({ config }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[hsl(240,5%,84%)]">
       {/* iPhone frame */}
       <div className="w-full max-w-[390px] h-[780px] rounded-[44px] border-[3px] border-[hsl(220,14%,18%)] bg-[hsl(0,0%,0%)] flex flex-col overflow-hidden relative shadow-2xl">
         {/* Dynamic Island */}

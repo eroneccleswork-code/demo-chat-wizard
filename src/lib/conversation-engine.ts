@@ -208,7 +208,7 @@ function generateConfirmation(config: BusinessConfig): string {
 
   const phoneNum = '805-888-2424';
 
-  return `Great. Your virtual consultation is confirmed for ${dayName}, ${monthName} ${dateNum} at ${hour}:00 ${ampm} Pacific Time. You'll receive a text message 5 minutes before the appointment with a reminder and the number to call: ${phoneNum}. Thank you for choosing ${config.companyName}. We look forward to working with you.`;
+  return `Great. Your virtual consultation is confirmed for ${dayName}, ${monthName} ${dateNum} at ${hour}:00 ${ampm} Pacific Time. You'll receive a text message 5 minutes before the appointment with a reminder and the number to call: ${phoneNum}. Thank you for choosing ${capitalizeWords(config.companyName)}. We look forward to working with you.`;
 }
 
 // State machine for conversation
