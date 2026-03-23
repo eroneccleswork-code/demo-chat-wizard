@@ -131,7 +131,7 @@ export default function ChatUI({ config }: Props) {
         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-[hsl(0,0%,0%)] rounded-full z-20" />
 
         {/* Status bar */}
-        <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-foreground z-10">
+        <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-white z-10">
           <span>{timeStr}</span>
           <div className="w-[120px]" />
           <div className="flex items-center gap-1">
