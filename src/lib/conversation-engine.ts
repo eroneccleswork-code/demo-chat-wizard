@@ -90,7 +90,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm the closest location?" },
     ],
     'Real Estate': [
-      { question: `Thanks for contacting ${config.companyName}. I'm an AI agent here to help you with your real estate needs. Would you like to get started?` },
+      { question: `Thanks for contacting ${name}. I'm an AI agent here to help you with your real estate needs. Would you like to get started?` },
       { question: "Perfect. Are you looking to buy, sell, or both?" },
       { question: "What area or neighborhood are you most interested in?" },
       { question: "Do you have a budget range in mind?" },
