@@ -55,6 +55,7 @@ export default function SetupForm() {
       industry: config.industry === 'Other' ? customIndustry : config.industry,
       presencePage: presencePage || undefined,
       enableRecording,
+      customQuestions: customQuestions.filter(q => q.trim()) || undefined,
     };
     setIsAnalyzing(true);
     await new Promise(r => setTimeout(r, 2000));
