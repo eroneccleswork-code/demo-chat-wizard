@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Zap, Globe, Building2, Target } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap, MessageSquare } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 
 const INDUSTRIES = [
@@ -15,6 +15,7 @@ const INDUSTRIES = [
   'Auto Repair',
   'Insurance',
   'Fitness',
+  'Blinds',
 ];
 
 const CTAS = [
@@ -32,6 +33,7 @@ export default function SetupForm() {
     industry: '',
     cta: '',
     websiteUrl: '',
+    customContext: '',
   });
   const [customIndustry, setCustomIndustry] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -43,10 +45,7 @@ export default function SetupForm() {
       industry: config.industry === 'Other' ? customIndustry : config.industry,
     };
     setIsAnalyzing(true);
-    
-    // Simulate website analysis
     await new Promise(r => setTimeout(r, 2000));
-    
     navigate('/demo', { state: { config: finalConfig } });
   };
 
@@ -54,22 +53,29 @@ export default function SetupForm() {
     (config.industry !== 'Other' || customIndustry);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Invoca watermark background */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+        <span className="text-[20vw] font-bold tracking-tight text-foreground/[0.03] whitespace-nowrap">
+          invoca
+        </span>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="w-full max-w-lg"
+        className="w-full max-w-lg relative z-10"
       >
         <div className="text-center mb-10">
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-6"
           >
-            <Zap className="w-3.5 h-3.5" />
-            AI SMS Agent Demo
+            <MessageSquare className="w-4 h-4" />
+            Invoca AI Messaging Agent
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
             Configure your agent
@@ -197,6 +203,12 @@ export default function SetupForm() {
             )}
           </motion.button>
         </form>
+
+        {/* Invoca footer branding */}
+        <div className="mt-8 text-center">
+          <span className="text-muted-foreground text-xs tracking-wider uppercase">Powered by</span>
+          <p className="text-foreground font-semibold text-lg tracking-tight mt-0.5">invoca</p>
+        </div>
       </motion.div>
     </div>
   );
