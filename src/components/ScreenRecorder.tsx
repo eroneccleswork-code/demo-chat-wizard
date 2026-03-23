@@ -1,14 +1,23 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, Square, Download, Circle } from 'lucide-react';
+import { Video, Download } from 'lucide-react';
 
 export default function ScreenRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-  const [duration, setDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Stop recording with Escape key
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && mediaRecorderRef.current?.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
 
   const startRecording = useCallback(async () => {
     try {
@@ -46,8 +55,6 @@ export default function ScreenRecorder() {
         const url = URL.createObjectURL(blob);
         setRecordedUrl(url);
         setIsRecording(false);
-        if (timerRef.current) clearInterval(timerRef.current);
-        // Stop all tracks
         combinedStream.getTracks().forEach(t => t.stop());
       };
 
@@ -60,16 +67,8 @@ export default function ScreenRecorder() {
       mediaRecorderRef.current = recorder;
       setIsRecording(true);
       setRecordedUrl(null);
-      setDuration(0);
-      timerRef.current = setInterval(() => setDuration(d => d + 1), 1000);
     } catch (err) {
       console.error('Recording failed:', err);
-    }
-  }, []);
-
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop();
     }
   }, []);
 
@@ -81,16 +80,13 @@ export default function ScreenRecorder() {
     a.click();
   }, [recordedUrl]);
 
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
+  // Hide completely while recording
+  if (isRecording) return null;
 
   return (
     <div className="flex items-center gap-2">
       <AnimatePresence mode="wait">
-        {!isRecording && !recordedUrl && (
+        {!recordedUrl && (
           <motion.button
             key="start"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -104,29 +100,7 @@ export default function ScreenRecorder() {
           </motion.button>
         )}
 
-        {isRecording && (
-          <motion.div
-            key="recording"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="flex items-center gap-3"
-          >
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-medium">
-              <Circle className="w-3 h-3 fill-red-500 text-red-500 animate-pulse" />
-              {formatTime(duration)}
-            </div>
-            <button
-              onClick={stopRecording}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 text-sm font-medium transition-all"
-            >
-              <Square className="w-3.5 h-3.5 fill-current" />
-              Stop
-            </button>
-          </motion.div>
-        )}
-
-        {!isRecording && recordedUrl && (
+        {recordedUrl && (
           <motion.div
             key="done"
             initial={{ opacity: 0, scale: 0.9 }}
@@ -142,7 +116,7 @@ export default function ScreenRecorder() {
               Download
             </button>
             <button
-              onClick={() => { setRecordedUrl(null); }}
+              onClick={() => setRecordedUrl(null)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(220,14%,18%)] text-white/70 hover:text-white border border-[hsl(220,14%,22%)] text-sm font-medium transition-all"
             >
               <Video className="w-4 h-4" />
