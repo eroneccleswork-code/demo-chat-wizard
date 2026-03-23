@@ -5,6 +5,7 @@ export interface BusinessConfig {
   websiteUrl: string;
   customContext?: string;
   presencePage?: string;
+  enableRecording?: boolean;
 }
 
 export interface WebsiteInsights {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X } from 'lucide-react';
@@ -43,6 +44,7 @@ export default function SetupForm() {
   const [presencePages, setPresencePages] = useState<string[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [showPresenceList, setShowPresenceList] = useState(false);
+  const [enableRecording, setEnableRecording] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +52,7 @@ export default function SetupForm() {
       ...config,
       industry: config.industry === 'Other' ? customIndustry : config.industry,
       presencePage: presencePage || undefined,
+      enableRecording,
     };
     setIsAnalyzing(true);
     await new Promise(r => setTimeout(r, 2000));
@@ -258,6 +261,24 @@ export default function SetupForm() {
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Record Pitch toggle */}
+          <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Video className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <span className="text-sm font-medium">Record Pitch</span>
+                <p className="text-xs text-muted-foreground">Enable screen recording on the demo page</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEnableRecording(v => !v)}
+              className={`relative w-11 h-6 rounded-full transition-colors ${enableRecording ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${enableRecording ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
           </div>
 
           <motion.button
