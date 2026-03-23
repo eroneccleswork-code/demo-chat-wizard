@@ -42,7 +42,7 @@ function IMessageBubble({ message, isLast }: { message: ChatMessage; isLast: boo
       </div>
       {/* Show "Delivered" under the last user message */}
       {!isAgent && isLast && (
-        <span className="text-[11px] text-muted-foreground mt-0.5 mr-1">Delivered</span>
+        <span className="text-[11px] text-white/40 mt-0.5 mr-1">Delivered</span>
       )}
     </motion.div>
   );
@@ -131,15 +131,15 @@ export default function ChatUI({ config }: Props) {
         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-[hsl(0,0%,0%)] rounded-full z-20" />
 
         {/* Status bar */}
-        <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-foreground z-10">
+        <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-white z-10">
           <span>{timeStr}</span>
           <div className="w-[120px]" />
           <div className="flex items-center gap-1">
             <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.5" opacity="0.4"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" opacity="0.6"/><rect x="9" y="2" width="3" height="10" rx="0.5" opacity="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
             <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 3.6c1.7 0 3.2.7 4.3 1.8l1.1-1.1C11.4 2.8 9.6 2 7.5 2S3.6 2.8 2.1 4.3l1.1 1.1C4.3 4.3 5.8 3.6 7.5 3.6zm0 3c.9 0 1.8.4 2.4 1l1.1-1.1c-.9-.9-2.1-1.4-3.5-1.4s-2.6.5-3.5 1.4l1.1 1.1c.6-.6 1.5-1 2.4-1zm0 3c.4 0 .7.1 1 .4l1.5-1.5c-.7-.6-1.5-1-2.5-1s-1.8.4-2.5 1L6.5 10c.3-.3.6-.4 1-.4z"/></svg>
             <div className="flex items-center">
-              <div className="w-[22px] h-[10px] rounded-[3px] border border-foreground/40 flex items-center p-[1px]">
-                <div className="h-full w-[60%] bg-foreground rounded-[1.5px]" />
+              <div className="w-[22px] h-[10px] rounded-[3px] border border-white/40 flex items-center p-[1px]">
+                <div className="h-full w-[60%] bg-white rounded-[1.5px]" />
               </div>
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function ChatUI({ config }: Props) {
             <div className="w-10 h-10 rounded-full bg-[hsl(220,14%,20%)] flex items-center justify-center mb-0.5">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(220,14%,40%)"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
             </div>
-            <span className="text-[13px] font-semibold text-foreground">{config.companyName}</span>
+            <span className="text-[13px] font-semibold text-white">{config.companyName}</span>
           </div>
           <button onClick={handleReset} className="text-sms-agent">
             <RotateCcw className="w-4 h-4" />
@@ -163,9 +163,9 @@ export default function ChatUI({ config }: Props) {
 
         {/* iMessage / Today label */}
         <div className="text-center py-1.5">
-          <span className="text-[11px] text-muted-foreground">iMessage</span>
+          <span className="text-[11px] text-white/50">iMessage</span>
           <br />
-          <span className="text-[11px] text-muted-foreground">Today {timeStr}</span>
+          <span className="text-[11px] text-white/50">Today {timeStr}</span>
         </div>
 
         {/* Messages */}
