@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, Send, RotateCcw, Plus, Mic } from 'lucide-react';
+import { ChevronLeft, Send, RotateCcw, Plus, Mic, Radio } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BusinessConfig, ChatMessage } from '@/lib/types';
 import { analyzeWebsite, generatePersona, getNextAgentMessage, getInitialState, ConversationState } from '@/lib/conversation-engine';
 import TypingIndicator from './TypingIndicator';
+import PresenceModal from './PresenceModal';
 
 interface Props {
   config: BusinessConfig;
