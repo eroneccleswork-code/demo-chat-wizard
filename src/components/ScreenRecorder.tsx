@@ -107,22 +107,14 @@ export default function ScreenRecorder() {
         {isRecording && (
           <motion.div
             key="recording"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="flex items-center gap-3"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 0 }}
+            transition={{ delay: 2, duration: 0.5 }}
+            className="flex items-center gap-3 pointer-events-auto"
+            style={{ pointerEvents: 'auto' }}
+            onHoverStart={(e) => { (e.target as HTMLElement).closest('.recorder-fade')?.classList.add('recorder-visible'); }}
           >
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-medium">
-              <Circle className="w-3 h-3 fill-red-500 text-red-500 animate-pulse" />
-              {formatTime(duration)}
-            </div>
-            <button
-              onClick={stopRecording}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 text-sm font-medium transition-all"
-            >
-              <Square className="w-3.5 h-3.5 fill-current" />
-              Stop
-            </button>
+            <div className="text-xs text-muted-foreground">Recording… hover here to stop</div>
           </motion.div>
         )}
 
