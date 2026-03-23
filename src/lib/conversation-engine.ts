@@ -120,7 +120,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm jurisdiction?" },
     ],
     'Blinds': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Schedule a consultation today to save 10% on wood blinds. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Schedule a consultation today to save 10% on wood blinds. Would you like to get started?` },
       { question: "Perfect. How many windows are you looking to cover with blinds?" },
       { question: "What are the approximate measurements of each window?" },
       { question: "What material are you considering for the blinds?" },
