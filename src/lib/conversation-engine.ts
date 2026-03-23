@@ -103,7 +103,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can match you with a local agent?" },
     ],
     'HVAC': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your heating and cooling needs. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your heating and cooling needs. Would you like to get started?` },
       { question: "Perfect. Is this for heating, cooling, or both?" },
       { question: "How old is your current system?" },
       { question: "What's the approximate square footage of your home?" },
