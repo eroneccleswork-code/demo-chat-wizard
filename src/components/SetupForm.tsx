@@ -43,6 +43,7 @@ export default function SetupForm() {
   const [presencePages, setPresencePages] = useState<string[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [showPresenceList, setShowPresenceList] = useState(false);
+  const [enableRecording, setEnableRecording] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +51,7 @@ export default function SetupForm() {
       ...config,
       industry: config.industry === 'Other' ? customIndustry : config.industry,
       presencePage: presencePage || undefined,
+      enableRecording,
     };
     setIsAnalyzing(true);
     await new Promise(r => setTimeout(r, 2000));
