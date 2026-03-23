@@ -71,9 +71,13 @@ function capitalizeWords(str: string): string {
 
 function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   const name = capitalizeWords(config.companyName);
+  const presenceIntro = config.presencePage
+    ? `Hi! I noticed you were checking out our ${config.presencePage} page. I'm an AI agent with ${name} — can I help answer any questions or get you set up?`
+    : null;
+
   const flows: Record<string, ConversationStep[]> = {
     'Window Cleaning': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
       { question: "Perfect. How many windows are you looking to have cleaned?" },
       { question: "Are these standard-size windows, or do you have any large or specialty windows?" },
       { question: "Is this a single-story or multi-story home?" },
