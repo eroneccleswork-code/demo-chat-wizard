@@ -163,9 +163,9 @@ export default function ChatUI({ config }: Props) {
 
         {/* iMessage / Today label */}
         <div className="text-center py-1.5">
-          <span className="text-[11px] text-muted-foreground">iMessage</span>
+          <span className="text-[11px] text-white/50">iMessage</span>
           <br />
-          <span className="text-[11px] text-muted-foreground">Today {timeStr}</span>
+          <span className="text-[11px] text-white/50">Today {timeStr}</span>
         </div>
 
         {/* Messages */}
