@@ -112,7 +112,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm service availability?" },
     ],
     'Legal': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help connect you with the right attorney. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help connect you with the right attorney. Would you like to get started?` },
       { question: "Perfect. What type of legal matter is this regarding?" },
       { question: "Has anything been filed yet, or is this a new matter?" },
       { question: "What's the timeline we're working with?" },
