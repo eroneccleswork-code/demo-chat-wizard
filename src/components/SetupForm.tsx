@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X } from 'lucide-react';
