@@ -159,6 +159,22 @@ export default function SetupForm() {
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
+
+            {/* Custom Context */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Target className="w-4 h-4 text-muted-foreground" />
+                Custom Training Context
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </label>
+              <textarea
+                value={config.customContext || ''}
+                onChange={e => setConfig(c => ({ ...c, customContext: e.target.value }))}
+                placeholder="Add any specific instructions, product details, pricing info, or conversation guidelines for the AI agent..."
+                rows={4}
+                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+              />
+            </div>
           </div>
 
           <motion.button
