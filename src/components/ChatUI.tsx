@@ -107,25 +107,7 @@ export default function ChatUI({ config }: Props) {
     setInput('');
     setIsTyping(true);
     setTimeout(() => {
-      const { message, newState } = getNextAgentMessage(activeConfig, initialState);
-      setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
-      setConvState(newState);
-      setIsTyping(false);
-    }, 800);
-  };
-
-  const handlePresenceSelect = (page: string) => {
-    setPresencePage(page);
-    const newConfig = { ...config, presencePage: page };
-    setActiveConfig(newConfig);
-    // Reset conversation with new presence
-    const initialState = getInitialState();
-    setMessages([]);
-    setConvState(initialState);
-    setInput('');
-    setIsTyping(true);
-    setTimeout(() => {
-      const { message, newState } = getNextAgentMessage(newConfig, initialState);
+      const { message, newState } = getNextAgentMessage(config, initialState);
       setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
       setConvState(newState);
       setIsTyping(false);
