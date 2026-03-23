@@ -65,7 +65,12 @@ interface ConversationStep {
   contextual?: boolean; // uses previous answers
 }
 
+function capitalizeWords(str: string): string {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function getConversationFlow(config: BusinessConfig): ConversationStep[] {
+  const name = capitalizeWords(config.companyName);
   const flows: Record<string, ConversationStep[]> = {
     'Window Cleaning': [
       { question: `Thanks for contacting ${config.companyName}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
