@@ -45,6 +45,8 @@ export default function SetupForm() {
   const [isScanning, setIsScanning] = useState(false);
   const [showPresenceList, setShowPresenceList] = useState(false);
   const [enableRecording, setEnableRecording] = useState(true);
+  const [customQuestions, setCustomQuestions] = useState<string[]>([]);
+  const [showCustomQuestions, setShowCustomQuestions] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
