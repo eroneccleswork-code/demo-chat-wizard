@@ -4,6 +4,7 @@ export interface BusinessConfig {
   cta: string;
   websiteUrl: string;
   customContext?: string;
+  presencePage?: string;
 }
 
 export interface WebsiteInsights {
