@@ -26,7 +26,7 @@ function IMessageBubble({ message, isLast }: { message: ChatMessage; isLast: boo
             : 'bg-sms-agent text-sms-agent-foreground rounded-2xl rounded-br-[4px]'
         }`}
       >
-        {message.content}
+        {renderMessageContent(message.content)}
       </div>
       {/* Show "Delivered" under the last user message */}
       {!isAgent && isLast && (
