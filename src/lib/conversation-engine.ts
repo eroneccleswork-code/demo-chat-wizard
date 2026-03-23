@@ -71,9 +71,13 @@ function capitalizeWords(str: string): string {
 
 function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   const name = capitalizeWords(config.companyName);
+  const presenceIntro = config.presencePage
+    ? `Hi! I noticed you were checking out our ${config.presencePage} page. I'm an AI agent with ${name} — can I help answer any questions or get you set up?`
+    : null;
+
   const flows: Record<string, ConversationStep[]> = {
     'Window Cleaning': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Would you like to get started?` },
       { question: "Perfect. How many windows are you looking to have cleaned?" },
       { question: "Are these standard-size windows, or do you have any large or specialty windows?" },
       { question: "Is this a single-story or multi-story home?" },
@@ -82,7 +86,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm service availability?" },
     ],
     'Dental': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help you schedule your appointment. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help you schedule your appointment. Would you like to get started?` },
       { question: "Perfect. Is this for a routine checkup, or is there something specific you'd like addressed?" },
       { question: "When was your last dental visit?" },
       { question: "Are you currently experiencing any pain or discomfort?" },
@@ -90,7 +94,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm the closest location?" },
     ],
     'Real Estate': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help you with your real estate needs. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help you with your real estate needs. Would you like to get started?` },
       { question: "Perfect. Are you looking to buy, sell, or both?" },
       { question: "What area or neighborhood are you most interested in?" },
       { question: "Do you have a budget range in mind?" },
@@ -99,7 +103,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can match you with a local agent?" },
     ],
     'HVAC': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your heating and cooling needs. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your heating and cooling needs. Would you like to get started?` },
       { question: "Perfect. Is this for heating, cooling, or both?" },
       { question: "How old is your current system?" },
       { question: "What's the approximate square footage of your home?" },
@@ -108,7 +112,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm service availability?" },
     ],
     'Legal': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help connect you with the right attorney. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help connect you with the right attorney. Would you like to get started?` },
       { question: "Perfect. What type of legal matter is this regarding?" },
       { question: "Has anything been filed yet, or is this a new matter?" },
       { question: "What's the timeline we're working with?" },
@@ -116,7 +120,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm jurisdiction?" },
     ],
     'Blinds': [
-      { question: `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Schedule a consultation today to save 10% on wood blinds. Would you like to get started?` },
+      { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help with your personalized quote. Schedule a consultation today to save 10% on wood blinds. Would you like to get started?` },
       { question: "Perfect. How many windows are you looking to cover with blinds?" },
       { question: "What are the approximate measurements of each window?" },
       { question: "What material are you considering for the blinds?" },
@@ -126,7 +130,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   };
 
   const defaultFlow: ConversationStep[] = [
-    { question: `Thanks for contacting ${name}. I'm an AI agent here to help you. Would you like to get started?` },
+    { question: presenceIntro || `Thanks for contacting ${name}. I'm an AI agent here to help you. Would you like to get started?` },
     { question: "Perfect. What specifically are you looking for help with?" },
     { question: "How large is the scope of what you need?" },
     { question: "What's your timeline for this?" },

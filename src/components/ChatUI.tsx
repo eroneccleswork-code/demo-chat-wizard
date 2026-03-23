@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, Send, RotateCcw, Plus, Mic } from 'lucide-react';
+import { ChevronLeft, Send, RotateCcw, Plus, Mic, Radio } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BusinessConfig, ChatMessage } from '@/lib/types';
 import { analyzeWebsite, generatePersona, getNextAgentMessage, getInitialState, ConversationState } from '@/lib/conversation-engine';
 import TypingIndicator from './TypingIndicator';
+import PresenceModal from './PresenceModal';
 
 interface Props {
   config: BusinessConfig;
@@ -55,6 +56,9 @@ export default function ChatUI({ config }: Props) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [convState, setConvState] = useState<ConversationState>(getInitialState());
+  const [presencePage, setPresencePage] = useState(config.presencePage || '');
+  const [showPresenceModal, setShowPresenceModal] = useState(false);
+  const [activeConfig, setActiveConfig] = useState(config);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -67,7 +71,7 @@ export default function ChatUI({ config }: Props) {
   // Send initial greeting
   useEffect(() => {
     setIsTyping(true);
-    const { message, newState } = getNextAgentMessage(config, getInitialState());
+    const { message, newState } = getNextAgentMessage(activeConfig, getInitialState());
     const timer = setTimeout(() => {
       setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
       setConvState(newState);
@@ -81,7 +85,7 @@ export default function ChatUI({ config }: Props) {
     const delay = 1000 + Math.random() * 1500;
     setIsTyping(true);
     setTimeout(() => {
-      const { message, newState } = getNextAgentMessage(config, currentState, userText);
+      const { message, newState } = getNextAgentMessage(activeConfig, currentState, userText);
       const agentMsg: ChatMessage = {
         id: Date.now().toString(), role: 'agent', content: message, timestamp: new Date(),
       };
@@ -89,7 +93,7 @@ export default function ChatUI({ config }: Props) {
       setConvState(newState);
       setIsTyping(false);
     }, delay);
-  }, [config]);
+  }, [activeConfig]);
 
   const handleSend = () => {
     const content = input.trim();
@@ -107,7 +111,25 @@ export default function ChatUI({ config }: Props) {
     setInput('');
     setIsTyping(true);
     setTimeout(() => {
-      const { message, newState } = getNextAgentMessage(config, initialState);
+      const { message, newState } = getNextAgentMessage(activeConfig, initialState);
+      setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
+      setConvState(newState);
+      setIsTyping(false);
+    }, 800);
+  };
+
+  const handlePresenceSelect = (page: string) => {
+    setPresencePage(page);
+    const newConfig = { ...config, presencePage: page };
+    setActiveConfig(newConfig);
+    // Reset conversation with new presence
+    const initialState = getInitialState();
+    setMessages([]);
+    setConvState(initialState);
+    setInput('');
+    setIsTyping(true);
+    setTimeout(() => {
+      const { message, newState } = getNextAgentMessage(newConfig, initialState);
       setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
       setConvState(newState);
       setIsTyping(false);
@@ -125,89 +147,113 @@ export default function ChatUI({ config }: Props) {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[hsl(240,5%,84%)]">
-      {/* iPhone frame */}
-      <div className="w-full max-w-[390px] h-[780px] rounded-[44px] border-[3px] border-[hsl(220,14%,18%)] bg-[hsl(0,0%,0%)] flex flex-col overflow-hidden relative shadow-2xl">
-        {/* Dynamic Island */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-[hsl(0,0%,0%)] rounded-full z-20" />
+      <div className="flex flex-col items-center gap-4">
+        {/* Add Presence button */}
+        <button
+          onClick={() => setShowPresenceModal(true)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            presencePage
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-[hsl(220,14%,18%)] text-white/70 hover:text-white border border-[hsl(220,14%,22%)]'
+          }`}
+        >
+          <Radio className="w-4 h-4" />
+          {presencePage ? `Presence: ${presencePage}` : 'Add Presence'}
+        </button>
 
-        {/* Status bar */}
-        <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-white z-10">
-          <span>{timeStr}</span>
-          <div className="w-[120px]" />
-          <div className="flex items-center gap-1">
-            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.5" opacity="0.4"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" opacity="0.6"/><rect x="9" y="2" width="3" height="10" rx="0.5" opacity="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
-            <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 3.6c1.7 0 3.2.7 4.3 1.8l1.1-1.1C11.4 2.8 9.6 2 7.5 2S3.6 2.8 2.1 4.3l1.1 1.1C4.3 4.3 5.8 3.6 7.5 3.6zm0 3c.9 0 1.8.4 2.4 1l1.1-1.1c-.9-.9-2.1-1.4-3.5-1.4s-2.6.5-3.5 1.4l1.1 1.1c.6-.6 1.5-1 2.4-1zm0 3c.4 0 .7.1 1 .4l1.5-1.5c-.7-.6-1.5-1-2.5-1s-1.8.4-2.5 1L6.5 10c.3-.3.6-.4 1-.4z"/></svg>
-            <div className="flex items-center">
-              <div className="w-[22px] h-[10px] rounded-[3px] border border-white/40 flex items-center p-[1px]">
-                <div className="h-full w-[60%] bg-white rounded-[1.5px]" />
+        {/* iPhone frame */}
+        <div className="w-full max-w-[390px] h-[780px] rounded-[44px] border-[3px] border-[hsl(220,14%,18%)] bg-[hsl(0,0%,0%)] flex flex-col overflow-hidden relative shadow-2xl">
+          {/* Dynamic Island */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-[hsl(0,0%,0%)] rounded-full z-20" />
+
+          {/* Status bar */}
+          <div className="flex items-center justify-between px-8 pt-4 pb-1 text-[12px] font-semibold text-white z-10">
+            <span>{timeStr}</span>
+            <div className="w-[120px]" />
+            <div className="flex items-center gap-1">
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><rect x="0" y="6" width="3" height="6" rx="0.5" opacity="0.4"/><rect x="4.5" y="4" width="3" height="8" rx="0.5" opacity="0.6"/><rect x="9" y="2" width="3" height="10" rx="0.5" opacity="0.8"/><rect x="13.5" y="0" width="3" height="12" rx="0.5"/></svg>
+              <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor"><path d="M7.5 3.6c1.7 0 3.2.7 4.3 1.8l1.1-1.1C11.4 2.8 9.6 2 7.5 2S3.6 2.8 2.1 4.3l1.1 1.1C4.3 4.3 5.8 3.6 7.5 3.6zm0 3c.9 0 1.8.4 2.4 1l1.1-1.1c-.9-.9-2.1-1.4-3.5-1.4s-2.6.5-3.5 1.4l1.1 1.1c.6-.6 1.5-1 2.4-1zm0 3c.4 0 .7.1 1 .4l1.5-1.5c-.7-.6-1.5-1-2.5-1s-1.8.4-2.5 1L6.5 10c.3-.3.6-.4 1-.4z"/></svg>
+              <div className="flex items-center">
+                <div className="w-[22px] h-[10px] rounded-[3px] border border-white/40 flex items-center p-[1px]">
+                  <div className="h-full w-[60%] bg-white rounded-[1.5px]" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Navigation header */}
-        <div className="flex items-center px-4 py-2 relative">
-          <button onClick={() => navigate('/')} className="flex items-center text-sms-agent text-[17px]">
-            <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
-          </button>
-          <div className="flex-1 flex flex-col items-center">
-            <div className="w-10 h-10 rounded-full bg-[hsl(220,14%,20%)] flex items-center justify-center mb-0.5">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(220,14%,40%)"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+          {/* Navigation header */}
+          <div className="flex items-center px-4 py-2 relative">
+            <button onClick={() => navigate('/')} className="flex items-center text-sms-agent text-[17px]">
+              <ChevronLeft className="w-6 h-6" strokeWidth={2.5} />
+            </button>
+            <div className="flex-1 flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-[hsl(220,14%,20%)] flex items-center justify-center mb-0.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="hsl(220,14%,40%)"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z"/></svg>
+              </div>
+              <span className="text-[13px] font-semibold text-white">{config.companyName}</span>
             </div>
-            <span className="text-[13px] font-semibold text-white">{config.companyName}</span>
+            <button onClick={handleReset} className="text-sms-agent">
+              <RotateCcw className="w-4 h-4" />
+            </button>
           </div>
-          <button onClick={handleReset} className="text-sms-agent">
-            <RotateCcw className="w-4 h-4" />
-          </button>
-        </div>
 
-        {/* iMessage / Today label */}
-        <div className="text-center py-1.5">
-          <span className="text-[11px] text-white/50">iMessage</span>
-          <br />
-          <span className="text-[11px] text-white/50">Today {timeStr}</span>
-        </div>
+          {/* iMessage / Today label */}
+          <div className="text-center py-1.5">
+            <span className="text-[11px] text-white/50">iMessage</span>
+            <br />
+            <span className="text-[11px] text-white/50">Today {timeStr}</span>
+          </div>
 
-        {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 space-y-2 pb-2">
-          <AnimatePresence>
-            {messages.map((msg, idx) => (
-              <IMessageBubble key={msg.id} message={msg} isLast={msg.role === 'user' && idx === lastUserIdx} />
-            ))}
-          </AnimatePresence>
-          <AnimatePresence>
-            {isTyping && <TypingIndicator />}
-          </AnimatePresence>
-        </div>
+          {/* Messages */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 space-y-2 pb-2">
+            <AnimatePresence>
+              {messages.map((msg, idx) => (
+                <IMessageBubble key={msg.id} message={msg} isLast={msg.role === 'user' && idx === lastUserIdx} />
+              ))}
+            </AnimatePresence>
+            <AnimatePresence>
+              {isTyping && <TypingIndicator />}
+            </AnimatePresence>
+          </div>
 
-        {/* Input bar — iOS style */}
-        <div className="px-3 pb-8 pt-2 flex items-center gap-2">
-          <button className="w-8 h-8 rounded-full bg-[hsl(220,14%,18%)] flex items-center justify-center text-white/40 flex-shrink-0">
-            <Plus className="w-5 h-5" />
-          </button>
-          <div className="flex-1 flex items-center bg-transparent rounded-full border border-[hsl(220,14%,22%)] px-4 py-2">
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="iMessage"
-              className="flex-1 bg-transparent text-white placeholder:text-white/30 focus:outline-none text-[15px]"
-            />
-            {input.trim() ? (
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={handleSend}
-                className="ml-2 w-7 h-7 rounded-full bg-sms-agent flex items-center justify-center flex-shrink-0"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(0,0%,100%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
-              </motion.button>
-            ) : (
-              <Mic className="w-5 h-5 text-white/30 ml-2 flex-shrink-0" />
-            )}
+          {/* Input bar — iOS style */}
+          <div className="px-3 pb-8 pt-2 flex items-center gap-2">
+            <button className="w-8 h-8 rounded-full bg-[hsl(220,14%,18%)] flex items-center justify-center text-white/40 flex-shrink-0">
+              <Plus className="w-5 h-5" />
+            </button>
+            <div className="flex-1 flex items-center bg-transparent rounded-full border border-[hsl(220,14%,22%)] px-4 py-2">
+              <input
+                type="text"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSend()}
+                placeholder="iMessage"
+                className="flex-1 bg-transparent text-white placeholder:text-white/30 focus:outline-none text-[15px]"
+              />
+              {input.trim() ? (
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={handleSend}
+                  className="ml-2 w-7 h-7 rounded-full bg-sms-agent flex items-center justify-center flex-shrink-0"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(0,0%,100%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
+                </motion.button>
+              ) : (
+                <Mic className="w-5 h-5 text-white/30 ml-2 flex-shrink-0" />
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      <PresenceModal
+        open={showPresenceModal}
+        onClose={() => setShowPresenceModal(false)}
+        onSelect={handlePresenceSelect}
+        industry={config.industry}
+        websiteUrl={config.websiteUrl}
+        currentPage={presencePage}
+      />
     </div>
   );
 }
