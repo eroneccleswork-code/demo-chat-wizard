@@ -266,6 +266,73 @@ export default function SetupForm() {
             </div>
           </div>
 
+          {/* Custom Qualification Questions */}
+          <div className="glass-surface rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                Custom Questions
+                <span className="text-muted-foreground text-xs">(optional)</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCustomQuestions(v => !v);
+                  if (!showCustomQuestions && customQuestions.length === 0) {
+                    setCustomQuestions(['']);
+                  }
+                }}
+                className={`relative w-11 h-6 rounded-full transition-colors ${showCustomQuestions ? 'bg-primary' : 'bg-muted'}`}
+              >
+                <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${showCustomQuestions ? 'translate-x-5' : 'translate-x-0'}`} />
+              </button>
+            </div>
+            {showCustomQuestions && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="space-y-2"
+              >
+                <p className="text-xs text-muted-foreground">
+                  Define up to 5 qualification questions the agent will ask. Leave blank to use industry defaults.
+                </p>
+                {customQuestions.map((q, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground w-5 text-right flex-shrink-0">{i + 1}.</span>
+                    <input
+                      type="text"
+                      value={q}
+                      onChange={e => {
+                        const updated = [...customQuestions];
+                        updated[i] = e.target.value;
+                        setCustomQuestions(updated);
+                      }}
+                      placeholder={`Question ${i + 1}…`}
+                      className="flex-1 px-3 py-2 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCustomQuestions(customQuestions.filter((_, j) => j !== i))}
+                      className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {customQuestions.length < 5 && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomQuestions([...customQuestions, ''])}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add question
+                  </button>
+                )}
+              </motion.div>
+            )}
+          </div>
+
           {/* Record Pitch toggle */}
           <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
