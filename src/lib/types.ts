@@ -6,6 +6,7 @@ export interface BusinessConfig {
   customContext?: string;
   presencePage?: string;
   enableRecording?: boolean;
+  customQuestions?: string[];
 }
 
 export interface WebsiteInsights {
