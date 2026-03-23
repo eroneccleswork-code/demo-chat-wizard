@@ -56,10 +56,8 @@ export default function SetupForm() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Invoca watermark background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-        <span className="text-[20vw] font-bold tracking-tight text-foreground/[0.03] whitespace-nowrap">
-          invoca
-        </span>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden opacity-[0.03]">
+        <InvocaLogo className="scale-[5]" />
       </div>
 
       <motion.div
