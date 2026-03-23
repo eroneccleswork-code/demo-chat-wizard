@@ -202,12 +202,6 @@ export default function SetupForm() {
             )}
           </motion.button>
         </form>
-
-        {/* Invoca footer branding */}
-        <div className="mt-8 flex flex-col items-center">
-          <span className="text-muted-foreground text-xs tracking-wider uppercase mb-1">Powered by</span>
-          <InvocaLogo className="scale-75" />
-        </div>
       </motion.div>
     </div>
   );
