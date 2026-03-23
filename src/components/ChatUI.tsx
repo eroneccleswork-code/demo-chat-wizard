@@ -67,7 +67,7 @@ export default function ChatUI({ config }: Props) {
   // Send initial greeting
   useEffect(() => {
     setIsTyping(true);
-    const { message, newState } = getNextAgentMessage(activeConfig, getInitialState());
+    const { message, newState } = getNextAgentMessage(config, getInitialState());
     const timer = setTimeout(() => {
       setMessages([{ id: '0', role: 'agent', content: message, timestamp: new Date() }]);
       setConvState(newState);
