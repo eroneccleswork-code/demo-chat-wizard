@@ -55,9 +55,6 @@ export default function ChatUI({ config }: Props) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [convState, setConvState] = useState<ConversationState>(getInitialState());
-  const [presencePage, setPresencePage] = useState(config.presencePage || '');
-  const [showPresenceModal, setShowPresenceModal] = useState(false);
-  const [activeConfig, setActiveConfig] = useState(config);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
