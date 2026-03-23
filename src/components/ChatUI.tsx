@@ -42,7 +42,7 @@ function IMessageBubble({ message, isLast }: { message: ChatMessage; isLast: boo
       </div>
       {/* Show "Delivered" under the last user message */}
       {!isAgent && isLast && (
-        <span className="text-[11px] text-muted-foreground mt-0.5 mr-1">Delivered</span>
+        <span className="text-[11px] text-white/40 mt-0.5 mr-1">Delivered</span>
       )}
     </motion.div>
   );
