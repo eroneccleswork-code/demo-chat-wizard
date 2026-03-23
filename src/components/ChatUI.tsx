@@ -182,7 +182,7 @@ export default function ChatUI({ config }: Props) {
 
         {/* Input bar — iOS style */}
         <div className="px-3 pb-8 pt-2 flex items-center gap-2">
-          <button className="w-8 h-8 rounded-full bg-[hsl(220,14%,18%)] flex items-center justify-center text-muted-foreground flex-shrink-0">
+          <button className="w-8 h-8 rounded-full bg-[hsl(220,14%,18%)] flex items-center justify-center text-white/40 flex-shrink-0">
             <Plus className="w-5 h-5" />
           </button>
           <div className="flex-1 flex items-center bg-transparent rounded-full border border-[hsl(220,14%,22%)] px-4 py-2">
@@ -192,7 +192,7 @@ export default function ChatUI({ config }: Props) {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder="iMessage"
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-[15px]"
+              className="flex-1 bg-transparent text-white placeholder:text-white/30 focus:outline-none text-[15px]"
             />
             {input.trim() ? (
               <motion.button
@@ -203,7 +203,7 @@ export default function ChatUI({ config }: Props) {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="hsl(0,0%,100%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
               </motion.button>
             ) : (
-              <Mic className="w-5 h-5 text-muted-foreground ml-2 flex-shrink-0" />
+              <Mic className="w-5 h-5 text-white/30 ml-2 flex-shrink-0" />
             )}
           </div>
         </div>
