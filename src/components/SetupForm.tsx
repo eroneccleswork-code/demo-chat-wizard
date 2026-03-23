@@ -46,9 +46,10 @@ export default function SetupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalConfig = {
+    const finalConfig: BusinessConfig = {
       ...config,
       industry: config.industry === 'Other' ? customIndustry : config.industry,
+      presencePage: presencePage || undefined,
     };
     setIsAnalyzing(true);
     await new Promise(r => setTimeout(r, 2000));
