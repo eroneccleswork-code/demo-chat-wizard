@@ -204,9 +204,9 @@ export default function SetupForm() {
         </form>
 
         {/* Invoca footer branding */}
-        <div className="mt-8 text-center">
-          <span className="text-muted-foreground text-xs tracking-wider uppercase">Powered by</span>
-          <p className="text-foreground font-semibold text-lg tracking-tight mt-0.5">invoca</p>
+        <div className="mt-8 flex flex-col items-center">
+          <span className="text-muted-foreground text-xs tracking-wider uppercase mb-1">Powered by</span>
+          <InvocaLogo className="scale-75" />
         </div>
       </motion.div>
     </div>
