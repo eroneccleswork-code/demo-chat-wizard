@@ -176,6 +176,14 @@ interface QualificationStep {
 }
 
 function getQualificationSteps(config: BusinessConfig): QualificationStep[] {
+  // If custom questions are provided, use those instead of industry defaults
+  if (config.customQuestions && config.customQuestions.filter(q => q.trim()).length > 0) {
+    return config.customQuestions
+      .filter(q => q.trim())
+      .slice(0, 5)
+      .map((q, i) => ({ question: q, topic: `custom-${i}` }));
+  }
+
   const name = capitalizeWords(config.companyName);
   const industry = config.industry;
 
