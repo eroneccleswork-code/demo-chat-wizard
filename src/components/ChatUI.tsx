@@ -10,6 +10,18 @@ interface Props {
   config: BusinessConfig;
 }
 
+function renderMessageContent(content: string) {
+  const phoneRegex = /(\d{3}-\d{3}-\d{4})/g;
+  const parts = content.split(phoneRegex);
+  return parts.map((part, i) =>
+    phoneRegex.test(part) ? (
+      <span key={i} className="text-blue-400 underline">{part}</span>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
 function IMessageBubble({ message, isLast }: { message: ChatMessage; isLast: boolean }) {
   const isAgent = message.role === 'agent';
   return (
