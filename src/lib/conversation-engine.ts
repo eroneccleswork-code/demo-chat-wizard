@@ -82,7 +82,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
       { question: "Can you share your ZIP code so I can confirm service availability?" },
     ],
     'Dental': [
-      { question: `Thanks for contacting ${config.companyName}. I'm an AI agent here to help you schedule your appointment. Would you like to get started?` },
+      { question: `Thanks for contacting ${name}. I'm an AI agent here to help you schedule your appointment. Would you like to get started?` },
       { question: "Perfect. Is this for a routine checkup, or is there something specific you'd like addressed?" },
       { question: "When was your last dental visit?" },
       { question: "Are you currently experiencing any pain or discomfort?" },
