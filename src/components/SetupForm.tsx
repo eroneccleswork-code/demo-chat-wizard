@@ -263,6 +263,24 @@ export default function SetupForm() {
             </div>
           </div>
 
+          {/* Record Pitch toggle */}
+          <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Video className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <span className="text-sm font-medium">Record Pitch</span>
+                <p className="text-xs text-muted-foreground">Enable screen recording on the demo page</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEnableRecording(v => !v)}
+              className={`relative w-11 h-6 rounded-full transition-colors ${enableRecording ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${enableRecording ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           <motion.button
             type="submit"
             disabled={!isValid || isAnalyzing}
