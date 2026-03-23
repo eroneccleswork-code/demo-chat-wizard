@@ -126,7 +126,7 @@ function getConversationFlow(config: BusinessConfig): ConversationStep[] {
   };
 
   const defaultFlow: ConversationStep[] = [
-    { question: `Thanks for contacting ${config.companyName}. I'm an AI agent here to help you. ${config.cta ? `We can help you ${config.cta.toLowerCase()}.` : ''} Would you like to get started?` },
+    { question: `Thanks for contacting ${name}. I'm an AI agent here to help you. ${config.cta ? `We can help you ${config.cta.toLowerCase()}.` : ''} Would you like to get started?` },
     { question: "Perfect. What specifically are you looking for help with?" },
     { question: "How large is the scope of what you need?" },
     { question: "What's your timeline for this?" },
