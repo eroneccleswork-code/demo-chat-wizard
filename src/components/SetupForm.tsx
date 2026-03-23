@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, MessageSquare, Plus, Trash2 } from 'lucide-react';
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 import { generateMockPages } from '@/lib/mock-pages';
