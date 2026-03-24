@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Phone } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 
 interface Props {
