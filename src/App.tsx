@@ -10,6 +10,7 @@ import JourneySetup from "./pages/JourneySetup.tsx";
 import Journey from "./pages/Journey.tsx";
 import CallJourneySetup from "./pages/CallJourneySetup.tsx";
 import CallJourneyPage from "./pages/CallJourneyPage.tsx";
+import IntegrationsPage from "./pages/IntegrationsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/call-journey-setup" element={<CallJourneySetup />} />
           <Route path="/call-journey" element={<CallJourneyPage />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/integrations" element={<IntegrationsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

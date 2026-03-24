@@ -123,6 +123,19 @@ export default function ChatUI({ config }: Props) {
     if (messages[i].role === 'user') { lastUserIdx = i; break; }
   }
 
+  // Arrow right to go to integrations page
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in the input
+      if ((e.target as HTMLElement)?.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight') {
+        navigate('/integrations', { state: { config } });
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [navigate, config]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[hsl(240,5%,84%)] gap-4">
 
