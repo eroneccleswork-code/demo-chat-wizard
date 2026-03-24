@@ -6,10 +6,9 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import CallJourneyDialing from './call-journey/CallJourneyDialing';
 import CallJourneyActive from './call-journey/CallJourneyActive';
-import CallJourneyInvocaDashboard from './call-journey/CallJourneyInvocaDashboard';
 import ScreenRecorder from './ScreenRecorder';
 
-type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call' | 'invoca-dashboard';
+type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call';
 
 interface Props {
   config: BusinessConfig;
@@ -21,10 +20,9 @@ const STEP_LABELS: Record<CallStep, string> = {
   'website': 'Lands on your website',
   'dialing': 'Customer calls the business',
   'active-call': 'Invoca captures the call',
-  'invoca-dashboard': 'Invoca delivers insights',
 };
 
-const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call', 'invoca-dashboard'];
+const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call'];
 
 export default function CallJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
@@ -114,9 +112,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
           )}
           {currentStep === 'active-call' && (
             <CallJourneyActive key="call" config={config} onNext={goNext} />
-          )}
-          {currentStep === 'invoca-dashboard' && (
-            <CallJourneyInvocaDashboard key="dash" config={config} />
           )}
         </AnimatePresence>
       </div>
