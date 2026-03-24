@@ -1,20 +1,46 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Clock, AlertTriangle } from 'lucide-react';
+import { Clock, AlertTriangle, Phone, TrendingUp, DollarSign, Users } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 
 interface Props {
   config: BusinessConfig;
-  onNext: () => void;
+  onStartDemo: () => void;
 }
 
-export default function JourneyWaiting({ config, onNext }: Props) {
+const DATA_POINTS = [
+  { icon: Clock, label: 'Avg. Response Time (Without Invoca)', value: '24–48 hrs', color: 'text-destructive' },
+  { icon: TrendingUp, label: 'Lead Drop-off During Wait', value: '67%', color: 'text-destructive' },
+  { icon: Users, label: 'Customers Who Go to Competitor', value: '78%', color: 'text-destructive' },
+  { icon: DollarSign, label: 'Revenue Lost Per Month (est.)', value: '$12,400+', color: 'text-destructive' },
+  { icon: Phone, label: 'Invoca SMS Response Time', value: '< 30 sec', color: 'text-primary' },
+];
+
+export default function JourneyWaiting({ config, onStartDemo }: Props) {
   const [elapsed, setElapsed] = useState(0);
+  const [visibleStats, setVisibleStats] = useState(0);
+  const [showCta, setShowCta] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setElapsed(e => e + 1), 200);
     return () => clearInterval(interval);
   }, []);
+
+  // Show stats after danger zone appears
+  useEffect(() => {
+    if (elapsed < 12) return;
+    const interval = setInterval(() => {
+      setVisibleStats(v => {
+        if (v >= DATA_POINTS.length) {
+          clearInterval(interval);
+          setTimeout(() => setShowCta(true), 600);
+          return v;
+        }
+        return v + 1;
+      });
+    }, 700);
+    return () => clearInterval(interval);
+  }, [elapsed >= 12]);
 
   const minutes = Math.min(elapsed, 30);
 
@@ -24,13 +50,13 @@ export default function JourneyWaiting({ config, onNext }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-md text-center space-y-6"
+      className="w-full max-w-lg text-center space-y-5"
     >
       {/* Email confirmation */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 text-left"
+        className="bg-white rounded-xl shadow-lg border border-gray-200 p-5 text-left"
       >
         <div className="flex items-center gap-2 text-gray-400 text-xs mb-3">
           <div className="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-[10px]">📧</div>
@@ -47,7 +73,7 @@ export default function JourneyWaiting({ config, onNext }: Props) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         <div className="flex items-center justify-center gap-2">
           <Clock className="w-5 h-5 text-muted-foreground" />
@@ -75,14 +101,42 @@ export default function JourneyWaiting({ config, onNext }: Props) {
         </motion.div>
       )}
 
-      {elapsed > 15 && (
+      {/* Data points */}
+      {visibleStats > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="glass-surface rounded-xl p-4 space-y-2 text-left"
+        >
+          {DATA_POINTS.map((point, i) => (
+            i < visibleStats && (
+              <motion.div
+                key={point.label}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center justify-between py-1.5 border-b border-border/30 last:border-0"
+              >
+                <div className="flex items-center gap-2">
+                  <point.icon className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">{point.label}</span>
+                </div>
+                <span className={`text-sm font-semibold ${point.color}`}>{point.value}</span>
+              </motion.div>
+            )
+          ))}
+        </motion.div>
+      )}
+
+      {/* CTA — starts demo directly */}
+      {showCta && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="pt-2"
+          className="pt-1"
         >
           <button
-            onClick={onNext}
+            onClick={onStartDemo}
             className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm glow-primary transition-all hover:scale-[1.02]"
           >
             Enter Invoca SMS Agent →
