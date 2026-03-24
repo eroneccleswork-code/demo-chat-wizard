@@ -6,9 +6,10 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import JourneyFormFill from './journey/JourneyFormFill';
 import JourneyWaiting from './journey/JourneyWaiting';
+import JourneyIntegrations from './journey/JourneyIntegrations';
 import ScreenRecorder from './ScreenRecorder';
 
-type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting';
+type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting' | 'integrations';
 
 interface Props {
   config: BusinessConfig;
@@ -20,9 +21,10 @@ const STEP_LABELS: Record<JourneyStep, string> = {
   'website': 'Lands on your website',
   'form-fill': 'Fills out a form',
   'waiting': 'Waiting for a response…',
+  'integrations': 'Invoca powers the full stack',
 };
 
-const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting'];
+const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting', 'integrations'];
 
 export default function CustomerJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
@@ -123,6 +125,9 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
           )}
           {currentStep === 'waiting' && (
             <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />
+          )}
+          {currentStep === 'integrations' && (
+            <JourneyIntegrations key="integrations" config={config} />
           )}
         </AnimatePresence>
       </div>
