@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Video, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 
 export default function ScreenRecorder() {
   const [isRecording, setIsRecording] = useState(false);
@@ -8,7 +8,6 @@ export default function ScreenRecorder() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
-  // Stop recording with Escape key
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && mediaRecorderRef.current?.state === 'recording') {
@@ -30,7 +29,7 @@ export default function ScreenRecorder() {
       try {
         audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       } catch {
-        // Mic access denied — continue with display audio only
+        // Mic denied
       }
 
       const tracks = [...displayStream.getTracks()];
@@ -58,7 +57,6 @@ export default function ScreenRecorder() {
         combinedStream.getTracks().forEach(t => t.stop());
       };
 
-      // If user stops sharing via browser UI
       displayStream.getVideoTracks()[0].onended = () => {
         if (recorder.state === 'recording') recorder.stop();
       };
@@ -80,47 +78,48 @@ export default function ScreenRecorder() {
     a.click();
   }, [recordedUrl]);
 
-  // Hide completely while recording
+  // Hidden while recording
   if (isRecording) return null;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="fixed top-4 right-4 z-[9999] flex items-center gap-2">
       <AnimatePresence mode="wait">
         {!recordedUrl && (
           <motion.button
-            key="start"
-            initial={{ opacity: 0, scale: 0.9 }}
+            key="rec"
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ scale: 1.15 }}
             onClick={startRecording}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(220,14%,18%)] text-white/70 hover:text-white border border-[hsl(220,14%,22%)] text-sm font-medium transition-all"
+            title="Record Pitch"
+            className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-400 shadow-lg shadow-red-500/30 flex items-center justify-center transition-colors"
           >
-            <Video className="w-4 h-4" />
-            Record Pitch
+            <div className="w-3 h-3 rounded-full bg-white" />
           </motion.button>
         )}
 
         {recordedUrl && (
           <motion.div
             key="done"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.8 }}
             className="flex items-center gap-2"
           >
             <button
               onClick={downloadRecording}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-medium shadow-lg"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-3.5 h-3.5" />
               Download
             </button>
             <button
               onClick={() => setRecordedUrl(null)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(220,14%,18%)] text-white/70 hover:text-white border border-[hsl(220,14%,22%)] text-sm font-medium transition-all"
+              title="New Recording"
+              className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-400 shadow-lg shadow-red-500/30 flex items-center justify-center transition-colors"
             >
-              <Video className="w-4 h-4" />
-              New Recording
+              <div className="w-3 h-3 rounded-full bg-white" />
             </button>
           </motion.div>
         )}
