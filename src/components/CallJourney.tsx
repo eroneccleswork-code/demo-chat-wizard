@@ -6,9 +6,10 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import CallJourneyDialing from './call-journey/CallJourneyDialing';
 import CallJourneyActive from './call-journey/CallJourneyActive';
+import JourneyIntegrations from './journey/JourneyIntegrations';
 import ScreenRecorder from './ScreenRecorder';
 
-type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call';
+type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call' | 'integrations';
 
 interface Props {
   config: BusinessConfig;
