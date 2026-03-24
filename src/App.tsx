@@ -8,6 +8,8 @@ import Demo from "./pages/Demo.tsx";
 import Setup from "./pages/Setup.tsx";
 import JourneySetup from "./pages/JourneySetup.tsx";
 import Journey from "./pages/Journey.tsx";
+import CallJourneySetup from "./pages/CallJourneySetup.tsx";
+import CallJourneyPage from "./pages/CallJourneyPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/setup" element={<Setup />} />
           <Route path="/journey-setup" element={<JourneySetup />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/call-journey-setup" element={<CallJourneySetup />} />
+          <Route path="/call-journey" element={<CallJourneyPage />} />
           <Route path="/demo" element={<Demo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

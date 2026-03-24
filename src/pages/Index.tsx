@@ -7,7 +7,7 @@ import heroImage from '@/assets/hero-blinds.jpg';
 const USE_CASES = [
   { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' },
   { label: 'Customer Journey | Ad to SMS', active: true, path: '/journey-setup' },
-  { label: 'Use Case 3 | Coming Soon', active: false, path: '' },
+  { label: 'Call Journey | Ad to Phone Call', active: true, path: '/call-journey-setup' },
   { label: 'Use Case 4 | Coming Soon', active: false, path: '' },
 ];
 
