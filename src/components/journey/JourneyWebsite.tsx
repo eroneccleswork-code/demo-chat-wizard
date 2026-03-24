@@ -10,10 +10,20 @@ interface Props {
 
 export default function JourneyWebsite({ config, onNext, variant = 'form' }: Props) {
   const domain = config.websiteUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'example.com';
-  const fullUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
+  const baseUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
   const [iframeError, setIframeError] = useState(false);
+  const [contactPathIndex, setContactPathIndex] = useState(0);
 
   const isCallVariant = variant === 'call';
+
+  // For call variant, try contact pages where the phone number is likely visible
+  const CONTACT_PATHS = ['/contact', '/contact-us', '/about', '/about-us', '/locations', ''];
+  const iframeSrc = isCallVariant
+    ? `${baseUrl.replace(/\/$/, '')}${CONTACT_PATHS[contactPathIndex]}`
+    : baseUrl;
+  const displayPath = isCallVariant && CONTACT_PATHS[contactPathIndex]
+    ? `${domain}${CONTACT_PATHS[contactPathIndex]}`
+    : domain;
 
   return (
     <motion.div
