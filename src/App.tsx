@@ -20,6 +20,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <ScreenRecorder />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
