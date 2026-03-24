@@ -53,17 +53,23 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
         <div className="relative w-full" style={{ height: '480px' }}>
           {!iframeError ? (
             <iframe
-              src={fullUrl}
+              src={iframeSrc}
               title={`${config.companyName} website`}
               className="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin"
-              onError={() => setIframeError(true)}
+              onError={() => {
+                // If a contact path fails, try next one
+                if (isCallVariant && contactPathIndex < CONTACT_PATHS.length - 1) {
+                  setContactPathIndex(i => i + 1);
+                } else {
+                  setIframeError(true);
+                }
+              }}
               style={{ pointerEvents: 'none' }}
             />
           ) : (
-            /* Fallback: screenshot via thum.io */
             <img
-              src={`https://image.thum.io/get/width/1280/crop/960/${fullUrl}`}
+              src={`https://image.thum.io/get/width/1280/crop/960/${iframeSrc}`}
               alt={`${config.companyName} website screenshot`}
               className="w-full h-full object-cover object-top"
             />
