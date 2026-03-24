@@ -21,9 +21,10 @@ const STEP_LABELS: Record<JourneyStep, string> = {
   'website': 'Lands on your website',
   'form-fill': 'Fills out a form',
   'waiting': 'Waiting for a response…',
+  'integrations': 'Invoca powers the full stack',
 };
 
-const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting'];
+const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting', 'integrations'];
 
 export default function CustomerJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
