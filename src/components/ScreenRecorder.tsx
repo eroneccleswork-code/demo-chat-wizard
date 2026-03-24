@@ -5,6 +5,7 @@ import { Download } from 'lucide-react';
 export default function ScreenRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [fileExt, setFileExt] = useState<'mp4' | 'webm'>('mp4');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
