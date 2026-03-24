@@ -137,22 +137,15 @@ export default function SetupForm() {
               )}
             </div>
 
-            {/* CTA */}
+            {/* CTA — fixed to Request Callback */}
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Zap className="w-4 h-4 text-muted-foreground" />
                 Primary Call-To-Action
               </label>
-              <select
-                value={config.cta}
-                onChange={e => setConfig(c => ({ ...c, cta: e.target.value }))}
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none"
-              >
-                <option value="">Select CTA…</option>
-                {CTAS.map(c => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+              <div className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground">
+                Request Callback
+              </div>
             </div>
 
             {/* Website */}
