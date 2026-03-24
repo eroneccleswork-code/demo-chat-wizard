@@ -83,9 +83,9 @@ export default function ScreenRecorder() {
     if (!recordedUrl) return;
     const a = document.createElement('a');
     a.href = recordedUrl;
-    a.download = `invoca-demo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.webm`;
+    a.download = `invoca-demo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${fileExt}`;
     a.click();
-  }, [recordedUrl]);
+  }, [recordedUrl, fileExt]);
 
   // Hidden while recording
   if (isRecording) return null;
