@@ -21,9 +21,10 @@ const STEP_LABELS: Record<CallStep, string> = {
   'website': 'Lands on your website',
   'dialing': 'Customer calls the business',
   'active-call': 'Invoca captures the call',
+  'integrations': 'Invoca powers the full stack',
 };
 
-const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call'];
+const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call', 'integrations'];
 
 export default function CallJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
