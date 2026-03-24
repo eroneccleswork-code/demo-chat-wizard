@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BusinessConfig } from '@/lib/types';
 
@@ -8,6 +9,8 @@ interface Props {
 
 export default function JourneyWebsite({ config, onNext }: Props) {
   const domain = config.websiteUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'example.com';
+  const fullUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
+  const [iframeError, setIframeError] = useState(false);
 
   return (
     <motion.div
@@ -15,7 +18,7 @@ export default function JourneyWebsite({ config, onNext }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-3xl"
+      className="w-full max-w-4xl"
     >
       {/* Browser chrome */}
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
@@ -33,59 +36,42 @@ export default function JourneyWebsite({ config, onNext }: Props) {
           </div>
         </div>
 
-        {/* Website content mock */}
-        <div className="p-8 space-y-6 min-h-[400px]">
-          {/* Nav */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-primary/20" />
-              <span className="font-bold text-gray-800 text-lg">{config.companyName}</span>
-            </div>
-            <div className="flex items-center gap-6">
-              {['Services', 'About', 'Reviews', 'Contact'].map(item => (
-                <span key={item} className="text-sm text-gray-500">{item}</span>
-              ))}
-            </div>
-          </div>
+        {/* Real website iframe */}
+        <div className="relative w-full" style={{ height: '480px' }}>
+          {!iframeError ? (
+            <iframe
+              src={fullUrl}
+              title={`${config.companyName} website`}
+              className="w-full h-full border-0"
+              sandbox="allow-scripts allow-same-origin"
+              onError={() => setIframeError(true)}
+              style={{ pointerEvents: 'none' }}
+            />
+          ) : (
+            /* Fallback: screenshot via thum.io */
+            <img
+              src={`https://image.thum.io/get/width/1280/crop/960/${fullUrl}`}
+              alt={`${config.companyName} website screenshot`}
+              className="w-full h-full object-cover object-top"
+            />
+          )}
 
-          {/* Hero */}
+          {/* Click overlay to advance */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-8 text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute inset-0 flex items-end justify-center pb-6 bg-gradient-to-t from-black/40 via-transparent to-transparent cursor-pointer"
+            onClick={onNext}
           >
-            <h2 className="text-2xl font-bold mb-2">
-              Professional {config.industry} Services
-            </h2>
-            <p className="text-gray-300 text-sm mb-4">
-              Trusted by thousands of customers. Get your free quote today.
-            </p>
-            <motion.button
-              onClick={onNext}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="px-5 py-2 bg-primary text-white text-sm font-medium rounded-lg"
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="px-5 py-2.5 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium text-gray-800 flex items-center gap-2"
             >
-              Get a Free Quote →
-            </motion.button>
+              Customer finds the contact form →
+            </motion.div>
           </motion.div>
-
-          {/* Features */}
-          <div className="grid grid-cols-3 gap-4">
-            {['Licensed & Insured', '5-Star Reviews', 'Free Estimates'].map((feature, i) => (
-              <motion.div
-                key={feature}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + i * 0.15 }}
-                className="bg-gray-50 rounded-lg p-4 text-center"
-              >
-                <div className="text-2xl mb-1">{['🛡️', '⭐', '💰'][i]}</div>
-                <span className="text-xs font-medium text-gray-700">{feature}</span>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -96,7 +82,7 @@ export default function JourneyWebsite({ config, onNext }: Props) {
         className="text-center mt-4"
       >
         <span className="text-xs text-muted-foreground">
-          Customer browses the website and clicks "Get a Free Quote"…
+          Customer browses the real website…
         </span>
       </motion.div>
     </motion.div>
