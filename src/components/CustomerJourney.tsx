@@ -126,6 +126,9 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
           {currentStep === 'waiting' && (
             <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />
           )}
+          {currentStep === 'integrations' && (
+            <JourneyIntegrations key="integrations" config={config} />
+          )}
         </AnimatePresence>
       </div>
     </div>
