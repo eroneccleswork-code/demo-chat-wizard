@@ -6,7 +6,6 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import CallJourneyDialing from './call-journey/CallJourneyDialing';
 import CallJourneyActive from './call-journey/CallJourneyActive';
-import CallJourneyInvocaDashboard from './call-journey/CallJourneyInvocaDashboard';
 import ScreenRecorder from './ScreenRecorder';
 
 type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call' | 'invoca-dashboard';
