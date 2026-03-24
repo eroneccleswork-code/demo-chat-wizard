@@ -6,9 +6,8 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import JourneyFormFill from './journey/JourneyFormFill';
 import JourneyWaiting from './journey/JourneyWaiting';
-import JourneySmsTransition from './journey/JourneySmsTransition';
 
-type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting' | 'sms-transition';
+type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting';
 
 interface Props {
   config: BusinessConfig;
@@ -19,10 +18,9 @@ const STEP_LABELS: Record<JourneyStep, string> = {
   'website': 'Lands on your website',
   'form-fill': 'Fills out a form',
   'waiting': 'Waiting for a response…',
-  'sms-transition': 'Invoca SMS Agent engages',
 };
 
-const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting', 'sms-transition'];
+const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting'];
 
 export default function CustomerJourney({ config }: Props) {
   const navigate = useNavigate();
@@ -38,27 +36,7 @@ export default function CustomerJourney({ config }: Props) {
     }
   }, [currentStep]);
 
-  // Auto-advance timers
-  useEffect(() => {
-    if (!autoPlay) return;
-
-    const durations: Record<JourneyStep, number> = {
-      'google-ad': 4000,
-      'website': 3500,
-      'form-fill': 6000,
-      'waiting': 5000,
-      'sms-transition': 0, // stays here
-    };
-
-    const duration = durations[currentStep];
-    if (duration === 0) return;
-
-    const timer = setTimeout(goNext, duration);
-    return () => clearTimeout(timer);
-  }, [currentStep, autoPlay, goNext]);
-
-  const handleSmsStart = () => {
-    // Navigate to the SMS demo with the config
+  const handleStartDemo = () => {
     navigate('/demo', {
       state: {
         config: {
@@ -68,6 +46,24 @@ export default function CustomerJourney({ config }: Props) {
       },
     });
   };
+
+  // Auto-advance timers
+  useEffect(() => {
+    if (!autoPlay) return;
+
+    const durations: Record<JourneyStep, number> = {
+      'google-ad': 4000,
+      'website': 3500,
+      'form-fill': 6000,
+      'waiting': 0, // stays here — final stop
+    };
+
+    const duration = durations[currentStep];
+    if (duration === 0) return;
+
+    const timer = setTimeout(goNext, duration);
+    return () => clearTimeout(timer);
+  }, [currentStep, autoPlay, goNext]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -94,9 +90,9 @@ export default function CustomerJourney({ config }: Props) {
       <div className="px-6 py-3">
         <div className="flex items-center gap-1">
           {STEPS.map((step, i) => (
-            <div key={step} className="flex-1 flex items-center gap-1">
+            <div key={step} className="flex-1">
               <div
-                className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                className={`h-1.5 rounded-full transition-all duration-500 ${
                   i <= stepIndex ? 'bg-primary' : 'bg-muted'
                 }`}
               />
@@ -126,10 +122,7 @@ export default function CustomerJourney({ config }: Props) {
             <JourneyFormFill key="form" config={config} onNext={goNext} />
           )}
           {currentStep === 'waiting' && (
-            <JourneyWaiting key="wait" config={config} onNext={goNext} />
-          )}
-          {currentStep === 'sms-transition' && (
-            <JourneySmsTransition key="sms" config={config} onStart={handleSmsStart} />
+            <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />
           )}
         </AnimatePresence>
       </div>
@@ -143,7 +136,7 @@ export default function CustomerJourney({ config }: Props) {
         >
           Previous
         </button>
-        {currentStep !== 'sms-transition' ? (
+        {currentStep !== 'waiting' ? (
           <button
             onClick={goNext}
             className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all"
@@ -152,7 +145,7 @@ export default function CustomerJourney({ config }: Props) {
           </button>
         ) : (
           <button
-            onClick={handleSmsStart}
+            onClick={handleStartDemo}
             className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all glow-primary"
           >
             Start SMS Demo →
