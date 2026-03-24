@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BusinessConfig } from '@/lib/types';
@@ -27,7 +27,6 @@ const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call', 'in
 export default function CallJourney({ config }: Props) {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<CallStep>('google-ad');
-  const [autoPlay, setAutoPlay] = useState(true);
 
   const stepIndex = STEPS.indexOf(currentStep);
 
@@ -38,23 +37,22 @@ export default function CallJourney({ config }: Props) {
     }
   }, [currentStep]);
 
+  const goPrev = useCallback(() => {
+    const idx = STEPS.indexOf(currentStep);
+    if (idx > 0) {
+      setCurrentStep(STEPS[idx - 1]);
+    }
+  }, [currentStep]);
+
+  // Arrow key navigation
   useEffect(() => {
-    if (!autoPlay) return;
-
-    const durations: Record<CallStep, number> = {
-      'google-ad': 4000,
-      'website': 3500,
-      'dialing': 5000,
-      'active-call': 8000,
-      'invoca-dashboard': 0,
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
     };
-
-    const duration = durations[currentStep];
-    if (duration === 0) return;
-
-    const timer = setTimeout(goNext, duration);
-    return () => clearTimeout(timer);
-  }, [currentStep, autoPlay, goNext]);
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [goNext, goPrev]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -67,14 +65,7 @@ export default function CallJourney({ config }: Props) {
           ← Back
         </button>
         <span className="text-sm font-medium text-foreground">{config.companyName} — Call Journey</span>
-        <button
-          onClick={() => setAutoPlay(v => !v)}
-          className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-            autoPlay ? 'border-primary text-primary' : 'border-border text-muted-foreground'
-          }`}
-        >
-          {autoPlay ? 'Auto-playing' : 'Paused'}
-        </button>
+        <span className="text-xs text-muted-foreground">Use ← → arrow keys</span>
       </div>
 
       {/* Progress bar */}
@@ -124,18 +115,18 @@ export default function CallJourney({ config }: Props) {
       {/* Manual controls */}
       <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-border">
         <button
-          onClick={() => stepIndex > 0 && setCurrentStep(STEPS[stepIndex - 1])}
+          onClick={goPrev}
           disabled={stepIndex === 0}
           className="px-4 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 transition-all"
         >
-          Previous
+          ← Previous
         </button>
         {currentStep !== 'invoca-dashboard' ? (
           <button
             onClick={goNext}
             className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all"
           >
-            Next Step
+            Next Step →
           </button>
         ) : (
           <button
