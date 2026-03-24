@@ -30,6 +30,7 @@ const App = () => (
           <Route path="/call-journey-setup" element={<CallJourneySetup />} />
           <Route path="/call-journey" element={<CallJourneyPage />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/integrations" element={<IntegrationsPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
