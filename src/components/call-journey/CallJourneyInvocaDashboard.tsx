@@ -14,37 +14,35 @@ interface DataPoint {
 
 function generateConversationProfile(config: BusinessConfig): DataPoint[] {
   const industry = config.industry?.toLowerCase() || '';
-  const company = config.companyName || 'Company';
 
-  // Industry-specific data points
   if (industry.includes('health') || industry.includes('medical') || industry.includes('ortho')) {
     return [
-      { label: 'Search Keyword', value: `"${industry} near me"` },
-      { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
-      { label: 'Campaign', value: `${config.industry} — Regional` },
-      { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+      { label: 'Search keyword', value: '"knee pain"' },
+      { label: 'Google Click ID', value: '542186921' },
+      { label: 'Campaign', value: `${config.industry} - SoCal` },
+      { label: 'Web Visitor ID', value: 'X854962' },
       { label: 'Insurance', value: 'United Healthcare' },
       { label: 'Calling Page URL', value: '/scheduling-availability' },
-      { label: 'Caller ID', value: '(404) 464-0231' },
-      { label: 'Interest Driver', value: 'Consultation' },
+      { label: 'Caller ID', value: '404-464-0231' },
+      { label: 'Interest Driver', value: 'Knee replacement' },
       { label: 'Manager Escalation', value: 'False' },
       { label: 'Outcome', value: 'Consultation booked' },
       { label: 'Agent', value: 'Candace Yen' },
-      { label: 'Validated Patient Info', value: 'False' },
+      { label: 'Validated patient info', value: 'False' },
       { label: 'Call Quality Score', value: '6.6 / 10.0' },
     ];
   }
 
   if (industry.includes('internet') || industry.includes('telecom') || industry.includes('cable')) {
     return [
-      { label: 'Search Keyword', value: '"high speed internet"' },
-      { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
+      { label: 'Search keyword', value: '"high speed internet"' },
+      { label: 'Google Click ID', value: '542186921' },
       { label: 'Campaign', value: 'Bundle & Save' },
-      { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+      { label: 'Web Visitor ID', value: 'X854962' },
       { label: 'Serviceable Address', value: 'True' },
       { label: 'Product in Cart', value: 'Internet & TV' },
       { label: 'Calling Page URL', value: '/checkout' },
-      { label: 'Caller ID', value: '(404) 464-0231' },
+      { label: 'Caller ID', value: '404-464-0231' },
       { label: 'Interest Driver', value: 'Moving' },
       { label: 'Manager Escalation', value: 'False' },
       { label: 'Outcome', value: 'New service activation' },
@@ -54,14 +52,31 @@ function generateConversationProfile(config: BusinessConfig): DataPoint[] {
     ];
   }
 
-  // Default / generic
+  if (industry.includes('spa') || industry.includes('massage') || industry.includes('beauty') || industry.includes('salon')) {
+    return [
+      { label: 'Search keyword', value: `"${industry} near me"` },
+      { label: 'Google Click ID', value: '542186921' },
+      { label: 'Campaign', value: `${config.industry} — Brand` },
+      { label: 'Web Visitor ID', value: 'X854962' },
+      { label: 'Calling Page URL', value: '/book-appointment' },
+      { label: 'Caller ID', value: '404-464-0231' },
+      { label: 'Interest Driver', value: 'First visit' },
+      { label: 'Manager Escalation', value: 'False' },
+      { label: 'Outcome', value: 'Appointment booked' },
+      { label: 'Agent', value: 'Candace Yen' },
+      { label: 'Mentioned Promotion', value: 'True' },
+      { label: 'Call Quality Score', value: '6.6 / 10.0' },
+    ];
+  }
+
+  // Default
   return [
-    { label: 'Search Keyword', value: `"${industry} services"` },
-    { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
+    { label: 'Search keyword', value: `"${config.industry} services"` },
+    { label: 'Google Click ID', value: '542186921' },
     { label: 'Campaign', value: `${config.industry} — Brand` },
-    { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+    { label: 'Web Visitor ID', value: 'X854962' },
     { label: 'Calling Page URL', value: '/contact' },
-    { label: 'Caller ID', value: '(404) 464-0231' },
+    { label: 'Caller ID', value: '404-464-0231' },
     { label: 'Interest Driver', value: config.industry },
     { label: 'Manager Escalation', value: 'False' },
     { label: 'Outcome', value: 'New customer acquired' },
@@ -71,11 +86,9 @@ function generateConversationProfile(config: BusinessConfig): DataPoint[] {
   ];
 }
 
-const PARTNER_LOGOS = ['Google', 'Adobe', 'Salesforce', 'Five9'];
-
 export default function CallJourneyInvocaDashboard({ config }: Props) {
   const [visibleRows, setVisibleRows] = useState(0);
-  const [showPartners, setShowPartners] = useState(false);
+  const [showFooter, setShowFooter] = useState(false);
 
   const dataPoints = useMemo(() => generateConversationProfile(config), [config]);
 
@@ -84,12 +97,12 @@ export default function CallJourneyInvocaDashboard({ config }: Props) {
       setVisibleRows(v => {
         if (v >= dataPoints.length) {
           clearInterval(interval);
-          setTimeout(() => setShowPartners(true), 600);
+          setTimeout(() => setShowFooter(true), 500);
           return v;
         }
         return v + 1;
       });
-    }, 350);
+    }, 300);
     return () => clearInterval(interval);
   }, [dataPoints.length]);
 
@@ -99,63 +112,87 @@ export default function CallJourneyInvocaDashboard({ config }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-md mx-auto"
+      className="w-full max-w-[420px] mx-auto"
     >
-      {/* Card */}
-      <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-card">
-        {/* Header — dark green bar */}
-        <div className="bg-[#1a3c2a] px-6 py-5 flex items-center gap-4 relative">
-          {/* Accent stripe */}
-          <div className="absolute top-0 right-8 w-10 h-full bg-[#4caf50]/40 rounded-b-lg" />
+      <div className="rounded-2xl overflow-hidden shadow-2xl bg-white relative">
+        {/* Green accent bar top-right */}
+        <div className="absolute top-0 right-6 w-8 h-24 bg-[#4caf50]/50 rounded-b-xl z-10" />
 
-          {/* Avatar */}
-          <div className="w-16 h-16 rounded-lg bg-[#2a5c3a] overflow-hidden flex items-center justify-center flex-shrink-0 z-10">
-            <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#4caf50]/30 to-[#2a5c3a] flex items-center justify-center text-2xl">
-              📞
+        {/* Header */}
+        <div className="bg-[#1a3c2a] px-6 pt-6 pb-5 relative">
+          {/* Photo + branding */}
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#2d5a3c] flex-shrink-0 shadow-md">
+              <div className="w-full h-full bg-gradient-to-br from-[#6bb87a]/40 to-[#2d5a3c] flex items-center justify-center text-2xl">
+                📞
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-white font-bold text-sm tracking-wide uppercase">INVOCA</span>
+                <InvocaLogo size="sm" />
+              </div>
+              <p className="text-white/80 text-xs font-bold tracking-widest uppercase">
+                Conversation Profile
+              </p>
             </div>
           </div>
 
-          <div className="z-10">
-            <div className="flex items-center gap-2 mb-1">
-              <InvocaLogo size="sm" />
-            </div>
-            <p className="text-white/90 text-sm font-bold tracking-wide uppercase">
-              Conversation Profile
-            </p>
+          {/* Decorative waveform on left */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 -ml-1">
+            {[6, 10, 14, 8, 12, 16, 10, 6, 4].map((h, i) => (
+              <div
+                key={i}
+                className="rounded-full"
+                style={{
+                  width: h,
+                  height: 3,
+                  background: i < 4 ? '#e91e63' : i < 6 ? '#ff9800' : '#4caf50',
+                  opacity: 0.7,
+                }}
+              />
+            ))}
           </div>
         </div>
 
         {/* Data rows */}
-        <div className="divide-y divide-border/60">
+        <div className="divide-y divide-gray-100">
           {dataPoints.map((point, i) => (
             <motion.div
               key={point.label}
-              initial={{ opacity: 0, x: -10 }}
-              animate={i < visibleRows ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={i < visibleRows ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.25 }}
               className="flex items-center px-6 py-3"
             >
-              <span className="text-sm font-semibold text-foreground w-[45%] flex-shrink-0">
+              <span className="text-[13px] font-semibold text-gray-800 w-[48%] flex-shrink-0">
                 {point.label}
               </span>
-              <span className="text-sm text-muted-foreground">{point.value}</span>
+              <span className="text-[13px] text-gray-600">{point.value}</span>
             </motion.div>
           ))}
         </div>
 
-        {/* Partner logos */}
-        {showPartners && (
+        {/* Partner logos footer */}
+        {showFooter && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-center gap-6"
+            className="px-6 py-5 border-t border-gray-100 bg-[#f5f3e8]/60 flex items-center justify-center gap-8"
           >
-            {PARTNER_LOGOS.map(name => (
-              <span key={name} className="text-xs font-bold text-muted-foreground/60 tracking-wide">
-                {name}
-              </span>
-            ))}
+            <span className="text-[11px] font-bold" style={{ color: '#4285F4' }}>
+              G<span style={{ color: '#EA4335' }}>o</span><span style={{ color: '#FBBC05' }}>o</span><span style={{ color: '#4285F4' }}>g</span><span style={{ color: '#34A853' }}>l</span><span style={{ color: '#EA4335' }}>e</span>
+            </span>
+            <span className="text-[11px] font-bold text-red-600">
+              <span className="text-red-600">A</span> Adobe
+            </span>
+            <span className="text-[10px] font-bold text-white bg-[#00A1E0] px-2 py-0.5 rounded">
+              salesforce
+            </span>
+            <span className="text-[11px] font-bold text-orange-500">
+              Five9
+            </span>
           </motion.div>
         )}
       </div>
