@@ -17,6 +17,7 @@ export default function JourneySetup() {
   const [customIndustry, setCustomIndustry] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [isLaunching, setIsLaunching] = useState(false);
+  const [enableRecording, setEnableRecording] = useState(false);
 
   const finalIndustry = industry === 'Other' ? customIndustry : industry;
   const isValid = companyName && finalIndustry && websiteUrl;
