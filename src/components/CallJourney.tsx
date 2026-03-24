@@ -107,7 +107,7 @@ export default function CallJourney({ config }: Props) {
             <JourneyGoogleAd key="ad" config={config} onNext={goNext} />
           )}
           {currentStep === 'website' && (
-            <JourneyWebsite key="web" config={config} onNext={goNext} />
+            <JourneyWebsite key="web" config={config} onNext={goNext} variant="call" />
           )}
           {currentStep === 'dialing' && (
             <CallJourneyDialing key="dial" config={config} onNext={goNext} />
