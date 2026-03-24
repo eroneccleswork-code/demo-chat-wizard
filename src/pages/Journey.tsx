@@ -4,9 +4,11 @@ import CustomerJourney from '@/components/CustomerJourney';
 
 export default function Journey() {
   const location = useLocation();
-  const config = (location.state as { config?: BusinessConfig })?.config;
+  const state = location.state as { config?: BusinessConfig; enableRecording?: boolean } | null;
+  const config = state?.config;
+  const enableRecording = state?.enableRecording;
 
   if (!config) return <Navigate to="/" replace />;
 
-  return <CustomerJourney config={config} />;
+  return <CustomerJourney config={config} enableRecording={enableRecording} />;
 }

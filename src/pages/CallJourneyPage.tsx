@@ -4,9 +4,11 @@ import CallJourney from '@/components/CallJourney';
 
 export default function CallJourneyPage() {
   const location = useLocation();
-  const config = (location.state as { config?: BusinessConfig })?.config;
+  const state = location.state as { config?: BusinessConfig; enableRecording?: boolean } | null;
+  const config = state?.config;
+  const enableRecording = state?.enableRecording;
 
   if (!config) return <Navigate to="/" replace />;
 
-  return <CallJourney config={config} />;
+  return <CallJourney config={config} enableRecording={enableRecording} />;
 }

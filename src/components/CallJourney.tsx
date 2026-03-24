@@ -7,11 +7,13 @@ import JourneyWebsite from './journey/JourneyWebsite';
 import CallJourneyDialing from './call-journey/CallJourneyDialing';
 import CallJourneyActive from './call-journey/CallJourneyActive';
 import CallJourneyInvocaDashboard from './call-journey/CallJourneyInvocaDashboard';
+import ScreenRecorder from './ScreenRecorder';
 
 type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call' | 'invoca-dashboard';
 
 interface Props {
   config: BusinessConfig;
+  enableRecording?: boolean;
 }
 
 const STEP_LABELS: Record<CallStep, string> = {
@@ -24,18 +26,23 @@ const STEP_LABELS: Record<CallStep, string> = {
 
 const STEPS: CallStep[] = ['google-ad', 'website', 'dialing', 'active-call', 'invoca-dashboard'];
 
-export default function CallJourney({ config }: Props) {
+export default function CallJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<CallStep>('google-ad');
+  const [started, setStarted] = useState(false);
 
   const stepIndex = STEPS.indexOf(currentStep);
 
   const goNext = useCallback(() => {
+    if (!started) {
+      setStarted(true);
+      return;
+    }
     const idx = STEPS.indexOf(currentStep);
     if (idx < STEPS.length - 1) {
       setCurrentStep(STEPS[idx + 1]);
     }
-  }, [currentStep]);
+  }, [currentStep, started]);
 
   const goPrev = useCallback(() => {
     const idx = STEPS.indexOf(currentStep);
@@ -44,7 +51,7 @@ export default function CallJourney({ config }: Props) {
     }
   }, [currentStep]);
 
-  // Arrow key navigation
+  // Arrow key navigation only
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goNext();
@@ -56,7 +63,9 @@ export default function CallJourney({ config }: Props) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top bar */}
+      {enableRecording && <ScreenRecorder />}
+
+      {/* Top bar — minimal */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate('/')}
@@ -65,7 +74,7 @@ export default function CallJourney({ config }: Props) {
           ← Back
         </button>
         <span className="text-sm font-medium text-foreground">{config.companyName} — Call Journey</span>
-        <span className="text-xs text-muted-foreground">Use ← → arrow keys</span>
+        <div />
       </div>
 
       {/* Progress bar */}
@@ -95,7 +104,7 @@ export default function CallJourney({ config }: Props) {
       <div className="flex-1 flex items-center justify-center p-6">
         <AnimatePresence mode="wait">
           {currentStep === 'google-ad' && (
-            <JourneyGoogleAd key="ad" config={config} onNext={goNext} />
+            <JourneyGoogleAd key="ad" config={config} onNext={goNext} started={started} />
           )}
           {currentStep === 'website' && (
             <JourneyWebsite key="web" config={config} onNext={goNext} variant="call" />
@@ -110,32 +119,6 @@ export default function CallJourney({ config }: Props) {
             <CallJourneyInvocaDashboard key="dash" config={config} />
           )}
         </AnimatePresence>
-      </div>
-
-      {/* Manual controls */}
-      <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-border">
-        <button
-          onClick={goPrev}
-          disabled={stepIndex === 0}
-          className="px-4 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 transition-all"
-        >
-          ← Previous
-        </button>
-        {currentStep !== 'invoca-dashboard' ? (
-          <button
-            onClick={goNext}
-            className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all"
-          >
-            Next Step →
-          </button>
-        ) : (
-          <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all"
-          >
-            Back to Home
-          </button>
-        )}
       </div>
     </div>
   );
