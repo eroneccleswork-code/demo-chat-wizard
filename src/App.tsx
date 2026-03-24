@@ -8,6 +8,8 @@ import Demo from "./pages/Demo.tsx";
 import Setup from "./pages/Setup.tsx";
 import JourneySetup from "./pages/JourneySetup.tsx";
 import Journey from "./pages/Journey.tsx";
+import CallJourneySetup from "./pages/CallJourneySetup.tsx";
+import CallJourneyPage from "./pages/CallJourneyPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
