@@ -16,7 +16,6 @@ export default function CallJourneySetup() {
   const [industry, setIndustry] = useState('');
   const [customIndustry, setCustomIndustry] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLaunching, setIsLaunching] = useState(false);
   const [enableRecording, setEnableRecording] = useState(false);
 
