@@ -35,7 +35,7 @@ export default function CallJourneySetup() {
       websiteUrl,
       customContext: phoneNumber ? `Phone: ${phoneNumber}` : undefined,
     };
-    navigate('/call-journey', { state: { config } });
+    navigate('/call-journey', { state: { config, enableRecording } });
   };
 
   return (
