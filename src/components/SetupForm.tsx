@@ -21,13 +21,7 @@ const INDUSTRIES = [
   'Blinds',
 ];
 
-const CTAS = [
-  'Book Appointment',
-  'Get Quote',
-  'Schedule Consultation',
-  'Request Callback',
-  'Start Free Trial',
-];
+const DEFAULT_CTA = 'Request Callback';
 
 export default function SetupForm() {
   const navigate = useNavigate();
