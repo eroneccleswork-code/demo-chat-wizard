@@ -33,7 +33,7 @@ export default function JourneySetup() {
       cta: 'Get Quote',
       websiteUrl,
     };
-    navigate('/journey', { state: { config } });
+    navigate('/journey', { state: { config, enableRecording } });
   };
 
   return (
