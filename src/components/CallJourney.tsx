@@ -115,6 +115,9 @@ export default function CallJourney({ config, enableRecording }: Props) {
           {currentStep === 'active-call' && (
             <CallJourneyActive key="call" config={config} onNext={goNext} />
           )}
+          {currentStep === 'integrations' && (
+            <JourneyIntegrations key="integrations" config={config} />
+          )}
         </AnimatePresence>
       </div>
     </div>
