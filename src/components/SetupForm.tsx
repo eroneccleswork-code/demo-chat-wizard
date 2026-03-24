@@ -28,7 +28,7 @@ export default function SetupForm() {
   const [config, setConfig] = useState<BusinessConfig>({
     companyName: '',
     industry: '',
-    cta: '',
+    cta: 'Request Callback',
     websiteUrl: '',
     customContext: '',
   });
