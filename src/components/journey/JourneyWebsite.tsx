@@ -75,7 +75,7 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
               className="px-5 py-2.5 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium text-gray-800 flex items-center gap-2"
             >
               {isCallVariant
-                ? `Customer clicks to call ${phoneNumber} →`
+                ? 'Customer clicks the phone number →'
                 : 'Customer finds the contact form →'}
             </motion.div>
           </motion.div>
