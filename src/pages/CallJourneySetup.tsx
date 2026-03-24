@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Building2, Target, Globe, Phone } from 'lucide-react';
+import { ArrowRight, Building2, Target, Globe, Phone, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 
@@ -18,6 +18,7 @@ export default function CallJourneySetup() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLaunching, setIsLaunching] = useState(false);
+  const [enableRecording, setEnableRecording] = useState(false);
 
   const finalIndustry = industry === 'Other' ? customIndustry : industry;
   const isValid = companyName && finalIndustry && websiteUrl;
@@ -34,7 +35,7 @@ export default function CallJourneySetup() {
       websiteUrl,
       customContext: phoneNumber ? `Phone: ${phoneNumber}` : undefined,
     };
-    navigate('/call-journey', { state: { config } });
+    navigate('/call-journey', { state: { config, enableRecording } });
   };
 
   return (
@@ -137,6 +138,21 @@ export default function CallJourneySetup() {
                 placeholder="(555) 123-4567"
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
+            </div>
+
+            {/* Record toggle */}
+            <div className="flex items-center justify-between py-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Video className="w-4 h-4 text-muted-foreground" />
+                Record Demo
+              </label>
+              <button
+                type="button"
+                onClick={() => setEnableRecording(v => !v)}
+                className={`w-10 h-5 rounded-full transition-colors relative ${enableRecording ? 'bg-primary' : 'bg-muted'}`}
+              >
+                <div className={`w-4 h-4 rounded-full bg-white shadow absolute top-0.5 transition-all ${enableRecording ? 'left-5' : 'left-0.5'}`} />
+              </button>
             </div>
           </div>
 

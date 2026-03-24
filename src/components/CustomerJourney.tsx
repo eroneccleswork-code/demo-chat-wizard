@@ -6,11 +6,13 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import JourneyFormFill from './journey/JourneyFormFill';
 import JourneyWaiting from './journey/JourneyWaiting';
+import ScreenRecorder from './ScreenRecorder';
 
 type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting';
 
 interface Props {
   config: BusinessConfig;
+  enableRecording?: boolean;
 }
 
 const STEP_LABELS: Record<JourneyStep, string> = {
@@ -22,18 +24,23 @@ const STEP_LABELS: Record<JourneyStep, string> = {
 
 const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting'];
 
-export default function CustomerJourney({ config }: Props) {
+export default function CustomerJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<JourneyStep>('google-ad');
+  const [started, setStarted] = useState(false);
 
   const stepIndex = STEPS.indexOf(currentStep);
 
   const goNext = useCallback(() => {
+    if (!started) {
+      setStarted(true);
+      return;
+    }
     const idx = STEPS.indexOf(currentStep);
     if (idx < STEPS.length - 1) {
       setCurrentStep(STEPS[idx + 1]);
     }
-  }, [currentStep]);
+  }, [currentStep, started]);
 
   const goPrev = useCallback(() => {
     const idx = STEPS.indexOf(currentStep);
@@ -53,7 +60,7 @@ export default function CustomerJourney({ config }: Props) {
     });
   };
 
-  // Arrow key navigation
+  // Arrow key navigation only
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goNext();
@@ -65,7 +72,9 @@ export default function CustomerJourney({ config }: Props) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top bar */}
+      {enableRecording && <ScreenRecorder />}
+
+      {/* Top bar — minimal */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate('/')}
@@ -74,7 +83,7 @@ export default function CustomerJourney({ config }: Props) {
           ← Back
         </button>
         <span className="text-sm font-medium text-foreground">{config.companyName} — Customer Journey</span>
-        <span className="text-xs text-muted-foreground">Use ← → arrow keys</span>
+        <div />
       </div>
 
       {/* Progress bar */}
@@ -104,7 +113,7 @@ export default function CustomerJourney({ config }: Props) {
       <div className="flex-1 flex items-center justify-center p-6">
         <AnimatePresence mode="wait">
           {currentStep === 'google-ad' && (
-            <JourneyGoogleAd key="ad" config={config} onNext={goNext} />
+            <JourneyGoogleAd key="ad" config={config} onNext={goNext} started={started} />
           )}
           {currentStep === 'website' && (
             <JourneyWebsite key="web" config={config} onNext={goNext} />
@@ -116,32 +125,6 @@ export default function CustomerJourney({ config }: Props) {
             <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />
           )}
         </AnimatePresence>
-      </div>
-
-      {/* Manual controls */}
-      <div className="flex items-center justify-center gap-3 px-6 py-4 border-t border-border">
-        <button
-          onClick={goPrev}
-          disabled={stepIndex === 0}
-          className="px-4 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-30 transition-all"
-        >
-          ← Previous
-        </button>
-        {currentStep !== 'waiting' ? (
-          <button
-            onClick={goNext}
-            className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all"
-          >
-            Next Step →
-          </button>
-        ) : (
-          <button
-            onClick={handleStartDemo}
-            className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium transition-all glow-primary"
-          >
-            Start SMS Demo →
-          </button>
-        )}
       </div>
     </div>
   );
