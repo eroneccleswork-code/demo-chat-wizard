@@ -38,19 +38,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
               🔒 {domain}
             </div>
           </div>
-          {/* Click-to-call number in browser bar for call variant */}
-          {isCallVariant && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex items-center gap-1.5 px-3 py-1 bg-green-600 text-white rounded-md text-xs font-semibold cursor-pointer shadow-md"
-              onClick={onNext}
-            >
-              <Phone className="w-3 h-3" />
-              {phoneNumber}
-            </motion.div>
-          )}
         </div>
 
         {/* Real website iframe */}
