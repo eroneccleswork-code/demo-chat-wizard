@@ -74,19 +74,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
             />
           )}
 
-          {/* Click-to-call floating button for call variant */}
-          {isCallVariant && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-full shadow-xl cursor-pointer hover:bg-green-700 transition-colors"
-              onClick={onNext}
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-bold">{phoneNumber}</span>
-            </motion.div>
-          )}
 
           {/* Click overlay to advance */}
           <motion.div
