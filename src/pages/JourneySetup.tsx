@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Building2, Target, Globe } from 'lucide-react';
+import { ArrowRight, Building2, Target, Globe, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 
