@@ -50,7 +50,7 @@ export default function Index() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                onClick={() => uc.active && navigate('/setup')}
+                onClick={() => uc.active && uc.path && navigate(uc.path)}
                 disabled={!uc.active}
                 className={`w-full flex items-center justify-between px-6 py-4 border border-foreground/20 rounded-sm text-left transition-all ${
                   uc.active
