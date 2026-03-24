@@ -6,9 +6,10 @@ import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
 import JourneyFormFill from './journey/JourneyFormFill';
 import JourneyWaiting from './journey/JourneyWaiting';
+import JourneyIntegrations from './journey/JourneyIntegrations';
 import ScreenRecorder from './ScreenRecorder';
 
-type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting';
+type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting' | 'integrations';
 
 interface Props {
   config: BusinessConfig;
