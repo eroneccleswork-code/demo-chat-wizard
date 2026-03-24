@@ -56,9 +56,11 @@ export default function ScreenRecorder() {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+        const isMP4 = recorder.mimeType.includes('mp4');
+        const blob = new Blob(chunksRef.current, { type: isMP4 ? 'video/mp4' : 'video/webm' });
         const url = URL.createObjectURL(blob);
         setRecordedUrl(url);
+        setFileExt(isMP4 ? 'mp4' : 'webm');
         setIsRecording(false);
         combinedStream.getTracks().forEach(t => t.stop());
       };
