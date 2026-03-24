@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Phone } from 'lucide-react';
+import { Phone, Video, Mic, Volume2, Plus, User } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 
 interface Props {
@@ -10,7 +10,6 @@ interface Props {
 
 export default function CallJourneyDialing({ config, onNext }: Props) {
   const [ringCount, setRingCount] = useState(0);
-  const phoneNumber = config.customContext?.replace('Phone: ', '') || '(800) 555-0199';
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -25,60 +24,77 @@ export default function CallJourneyDialing({ config, onNext }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
-      className="w-full max-w-sm"
+      className="flex justify-center"
     >
-      {/* iPhone call screen */}
-      <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-[44px] border-[3px] border-gray-700 p-8 pt-16 pb-12 text-center shadow-2xl">
+      {/* iPhone frame */}
+      <div className="relative w-[300px] h-[620px] bg-black rounded-[50px] border-[4px] border-gray-800 shadow-2xl overflow-hidden">
         {/* Dynamic Island */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[120px] h-[32px] bg-black rounded-full" />
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-20 border border-gray-800" />
 
-        <p className="text-gray-400 text-sm mb-2">calling…</p>
-        <h2 className="text-white text-2xl font-light mb-1">{config.companyName}</h2>
-        <p className="text-gray-400 text-sm mb-10">{phoneNumber}</p>
-
-        {/* Ringing indicator */}
-        <div className="flex justify-center mb-12">
-          <motion.div
-            animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ repeat: Infinity, duration: 1.2 }}
-            className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center"
+        {/* Screen */}
+        <div className="absolute inset-[2px] rounded-[46px] overflow-hidden bg-gradient-to-b from-[#1c1c1e] to-[#000000] flex flex-col items-center pt-20 pb-10 px-6">
+          {/* Calling status */}
+          <motion.p
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="text-green-400 text-sm font-medium mb-4 tracking-wide"
           >
-            <motion.div
-              animate={{ rotate: [0, -10, 10, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 0.5, repeatDelay: 0.7 }}
-            >
-              <Phone className="w-10 h-10 text-green-400" />
-            </motion.div>
-          </motion.div>
-        </div>
+            calling...
+          </motion.p>
 
-        {/* Ring dots */}
-        <div className="flex justify-center gap-2 mb-8">
-          {[0, 1, 2].map(i => (
-            <motion.div
-              key={i}
-              animate={{ opacity: ringCount % 3 >= i ? 1 : 0.2 }}
-              className="w-2 h-2 rounded-full bg-green-400"
-            />
-          ))}
-        </div>
+          {/* Contact name */}
+          <h2 className="text-white text-[28px] font-light tracking-tight mb-1">
+            {config.companyName}
+          </h2>
 
-        {/* End call button */}
-        <div className="flex justify-center">
+          {/* Ring dots */}
+          <div className="flex justify-center gap-1.5 mt-6 mb-auto">
+            {[0, 1, 2].map(i => (
+              <motion.div
+                key={i}
+                animate={{ opacity: ringCount % 3 >= i ? 1 : 0.15 }}
+                className="w-1.5 h-1.5 rounded-full bg-gray-400"
+              />
+            ))}
+          </div>
+
+          {/* Action buttons grid — iOS style */}
+          <div className="grid grid-cols-3 gap-x-8 gap-y-5 mb-8">
+            {[
+              { icon: Mic, label: 'mute' },
+              { icon: Plus, label: 'keypad' },
+              { icon: Volume2, label: 'audio' },
+              { icon: Plus, label: 'add call' },
+              { icon: Video, label: 'FaceTime' },
+              { icon: User, label: 'contacts' },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-1.5">
+                <div className="w-14 h-14 rounded-full bg-[#2c2c2e] flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-[10px] text-gray-400">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* End call button */}
           <button
             onClick={onNext}
-            className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center shadow-lg"
+            className="w-16 h-16 rounded-full bg-[#ff3b30] flex items-center justify-center shadow-lg"
           >
-            <Phone className="w-7 h-7 text-white" />
+            <Phone className="w-7 h-7 text-white rotate-[135deg]" />
           </button>
         </div>
+
+        {/* Home indicator */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-gray-600 rounded-full" />
       </div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="text-center mt-4"
+        className="absolute bottom-20 left-1/2 -translate-x-1/2"
       >
         <span className="text-xs text-muted-foreground">
           Customer calls the number from the website…
