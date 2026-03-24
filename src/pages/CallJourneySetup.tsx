@@ -32,7 +32,6 @@ export default function CallJourneySetup() {
       industry: finalIndustry,
       cta: 'Call Now',
       websiteUrl,
-      customContext: phoneNumber ? `Phone: ${phoneNumber}` : undefined,
     };
     navigate('/call-journey', { state: { config, enableRecording } });
   };
