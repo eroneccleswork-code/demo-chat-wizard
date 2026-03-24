@@ -10,10 +10,20 @@ interface Props {
 
 export default function JourneyWebsite({ config, onNext, variant = 'form' }: Props) {
   const domain = config.websiteUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'example.com';
-  const fullUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
+  const baseUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
   const [iframeError, setIframeError] = useState(false);
+  const [contactPathIndex, setContactPathIndex] = useState(0);
 
   const isCallVariant = variant === 'call';
+
+  // For call variant, try contact pages where the phone number is likely visible
+  const CONTACT_PATHS = ['/contact', '/contact-us', '/about', '/about-us', '/locations', ''];
+  const iframeSrc = isCallVariant
+    ? `${baseUrl.replace(/\/$/, '')}${CONTACT_PATHS[contactPathIndex]}`
+    : baseUrl;
+  const displayPath = isCallVariant && CONTACT_PATHS[contactPathIndex]
+    ? `${domain}${CONTACT_PATHS[contactPathIndex]}`
+    : domain;
 
   return (
     <motion.div
@@ -34,7 +44,7 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
           </div>
           <div className="flex-1 flex justify-center">
             <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200 min-w-[300px] text-center">
-              🔒 {domain}
+              🔒 {displayPath}
             </div>
           </div>
         </div>
@@ -43,17 +53,23 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
         <div className="relative w-full" style={{ height: '480px' }}>
           {!iframeError ? (
             <iframe
-              src={fullUrl}
+              src={iframeSrc}
               title={`${config.companyName} website`}
               className="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin"
-              onError={() => setIframeError(true)}
+              onError={() => {
+                // If a contact path fails, try next one
+                if (isCallVariant && contactPathIndex < CONTACT_PATHS.length - 1) {
+                  setContactPathIndex(i => i + 1);
+                } else {
+                  setIframeError(true);
+                }
+              }}
               style={{ pointerEvents: 'none' }}
             />
           ) : (
-            /* Fallback: screenshot via thum.io */
             <img
-              src={`https://image.thum.io/get/width/1280/crop/960/${fullUrl}`}
+              src={`https://image.thum.io/get/width/1280/crop/960/${iframeSrc}`}
               alt={`${config.companyName} website screenshot`}
               className="w-full h-full object-cover object-top"
             />
