@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { BusinessConfig } from '@/lib/types';
 
@@ -14,29 +14,68 @@ const FORM_FIELDS = [
   { label: 'Message', value: "I'd like to get a quote for your services." },
 ];
 
-const CONTACT_PATHS = ['/contact', '/contact-us', '/get-a-quote', '/request-quote', '/quote', '/get-quote', '/free-quote', '/schedule', '/book', '/appointment'];
+const CONTACT_PATHS = [
+  '/contact',
+  '/contact-us',
+  '/get-a-quote',
+  '/request-quote',
+  '/quote',
+  '/get-quote',
+  '/free-quote',
+  '/schedule',
+  '/book',
+  '/appointment',
+  '/request-callback',
+  '',
+];
 
 export default function JourneyFormFill({ config, onNext }: Props) {
   const [filledFields, setFilledFields] = useState(0);
   const [fieldTexts, setFieldTexts] = useState<string[]>(FORM_FIELDS.map(() => ''));
   const [submitted, setSubmitted] = useState(false);
-  const [iframeLoaded, setIframeLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [iframeBlocked, setIframeBlocked] = useState(false);
+  const [pathIndex, setPathIndex] = useState(0);
 
   const rawUrl = config.websiteUrl || 'https://example.com';
   const baseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
   const domain = baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const cleanBase = baseUrl.replace(/\/$/, '');
 
-  // Try the base URL first — most sites have forms on the homepage or we try /contact
-  const contactUrl = `${baseUrl.replace(/\/$/, '')}${CONTACT_PATHS[0]}`;
+  const currentPath = CONTACT_PATHS[pathIndex] || '';
+  const currentUrl = `${cleanBase}${currentPath}`;
+  const displayPath = currentPath || '';
 
-  // Auto-type effect — starts after iframe loads (or after 2s fallback)
+  // Screenshot fallback URL — targets the contact page
+  const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/noanimate/${cleanBase}/contact`;
+
+  const handleIframeLoad = () => {
+    setReady(true);
+  };
+
+  const handleIframeError = () => {
+    if (pathIndex < CONTACT_PATHS.length - 1) {
+      setPathIndex(p => p + 1);
+    } else {
+      setIframeBlocked(true);
+      setReady(true);
+    }
+  };
+
+  // Fallback timer — if iframe doesn't load in 3s, show screenshot
   useEffect(() => {
-    const startDelay = setTimeout(() => setIframeLoaded(true), 2000);
-    return () => clearTimeout(startDelay);
-  }, []);
+    const timer = setTimeout(() => {
+      if (!ready) {
+        setIframeBlocked(true);
+        setReady(true);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [ready]);
 
+  // Auto-type effect
   useEffect(() => {
-    if (!iframeLoaded) return;
+    if (!ready) return;
     if (filledFields >= FORM_FIELDS.length) {
       const timer = setTimeout(() => setSubmitted(true), 800);
       return () => clearTimeout(timer);
@@ -60,7 +99,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
     }, 40);
 
     return () => clearInterval(typeInterval);
-  }, [filledFields, iframeLoaded]);
+  }, [filledFields, ready]);
 
   return (
     <motion.div
@@ -80,27 +119,37 @@ export default function JourneyFormFill({ config, onNext }: Props) {
           </div>
           <div className="flex-1 flex justify-center">
             <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200 min-w-[300px] text-center">
-              🔒 {domain}/contact
+              🔒 {domain}{displayPath}
             </div>
           </div>
         </div>
 
-        {/* Split: real site iframe + form fill overlay */}
+        {/* Website + form overlay */}
         <div className="relative" style={{ height: '480px' }}>
-          {/* Real website iframe in background */}
-          <iframe
-            src={contactUrl}
-            title={`${config.companyName} contact page`}
-            className="w-full h-full border-0 absolute inset-0"
-            sandbox="allow-scripts allow-same-origin"
-            onLoad={() => setIframeLoaded(true)}
-            style={{ pointerEvents: 'none' }}
-          />
+          {/* Real website — iframe or screenshot */}
+          {!iframeBlocked ? (
+            <iframe
+              src={currentUrl}
+              title={`${config.companyName} contact page`}
+              className="w-full h-full border-0 absolute inset-0"
+              sandbox="allow-scripts allow-same-origin"
+              onLoad={handleIframeLoad}
+              onError={handleIframeError}
+              style={{ pointerEvents: 'none' }}
+            />
+          ) : (
+            <img
+              src={screenshotUrl}
+              alt={`${config.companyName} website`}
+              className="w-full h-full object-cover object-top absolute inset-0"
+              onLoad={() => setReady(true)}
+            />
+          )}
 
-          {/* Form fill overlay — positioned on the right side over the page */}
+          {/* Form fill overlay — right side */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: iframeLoaded ? 1 : 0 }}
+            animate={{ opacity: ready ? 1 : 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
             className="absolute right-4 top-4 bottom-4 w-[320px] flex flex-col"
           >
@@ -123,7 +172,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
                     }`}
                   >
                     {fieldTexts[i] || (i > filledFields ? '—' : '')}
-                    {i === filledFields && iframeLoaded && (
+                    {i === filledFields && ready && (
                       <span className="animate-pulse text-primary">|</span>
                     )}
                   </div>
@@ -146,7 +195,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
             </div>
           </motion.div>
 
-          {/* Subtle gradient at bottom */}
+          {/* Bottom gradient */}
           <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/60 to-transparent pointer-events-none" />
         </div>
       </div>
