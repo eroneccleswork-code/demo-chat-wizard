@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Phone, DollarSign, Target, Zap } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 import InvocaLogo from '../InvocaLogo';
 
@@ -8,37 +7,91 @@ interface Props {
   config: BusinessConfig;
 }
 
-const METRICS = [
-  { icon: Phone, label: 'Calls This Month', value: '1,247', change: '+18%' },
-  { icon: DollarSign, label: 'Revenue Attributed', value: '$384,200', change: '+24%' },
-  { icon: Target, label: 'Conversion Rate', value: '34.2%', change: '+5.1%' },
-  { icon: TrendingUp, label: 'Cost Per Acquisition', value: '$42.50', change: '-12%' },
-];
+interface DataPoint {
+  label: string;
+  value: string;
+}
 
-const CALL_LOG = [
-  { name: 'Sarah Johnson', duration: '4:32', outcome: 'Converted', campaign: 'Google — Brand' },
-  { name: 'Mike Davis', duration: '2:15', outcome: 'Follow-up', campaign: 'Google — Non-Brand' },
-  { name: 'Lisa Chen', duration: '6:08', outcome: 'Converted', campaign: 'Bing — Search' },
-  { name: 'James Wilson', duration: '1:45', outcome: 'No Sale', campaign: 'Facebook — Retarget' },
-];
+function generateConversationProfile(config: BusinessConfig): DataPoint[] {
+  const industry = config.industry?.toLowerCase() || '';
+  const company = config.companyName || 'Company';
+
+  // Industry-specific data points
+  if (industry.includes('health') || industry.includes('medical') || industry.includes('ortho')) {
+    return [
+      { label: 'Search Keyword', value: `"${industry} near me"` },
+      { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
+      { label: 'Campaign', value: `${config.industry} — Regional` },
+      { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+      { label: 'Insurance', value: 'United Healthcare' },
+      { label: 'Calling Page URL', value: '/scheduling-availability' },
+      { label: 'Caller ID', value: '(404) 464-0231' },
+      { label: 'Interest Driver', value: 'Consultation' },
+      { label: 'Manager Escalation', value: 'False' },
+      { label: 'Outcome', value: 'Consultation booked' },
+      { label: 'Agent', value: 'Candace Yen' },
+      { label: 'Validated Patient Info', value: 'False' },
+      { label: 'Call Quality Score', value: '6.6 / 10.0' },
+    ];
+  }
+
+  if (industry.includes('internet') || industry.includes('telecom') || industry.includes('cable')) {
+    return [
+      { label: 'Search Keyword', value: '"high speed internet"' },
+      { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
+      { label: 'Campaign', value: 'Bundle & Save' },
+      { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+      { label: 'Serviceable Address', value: 'True' },
+      { label: 'Product in Cart', value: 'Internet & TV' },
+      { label: 'Calling Page URL', value: '/checkout' },
+      { label: 'Caller ID', value: '(404) 464-0231' },
+      { label: 'Interest Driver', value: 'Moving' },
+      { label: 'Manager Escalation', value: 'False' },
+      { label: 'Outcome', value: 'New service activation' },
+      { label: 'Agent', value: 'Candace Yen' },
+      { label: 'Mentioned Promotion', value: 'True' },
+      { label: 'Call Quality Score', value: '6.6 / 10.0' },
+    ];
+  }
+
+  // Default / generic
+  return [
+    { label: 'Search Keyword', value: `"${industry} services"` },
+    { label: 'Google Click ID', value: `${Math.floor(Math.random() * 900000000) + 100000000}` },
+    { label: 'Campaign', value: `${config.industry} — Brand` },
+    { label: 'Web Visitor ID', value: `X${Math.floor(Math.random() * 900000) + 100000}` },
+    { label: 'Calling Page URL', value: '/contact' },
+    { label: 'Caller ID', value: '(404) 464-0231' },
+    { label: 'Interest Driver', value: config.industry },
+    { label: 'Manager Escalation', value: 'False' },
+    { label: 'Outcome', value: 'New customer acquired' },
+    { label: 'Agent', value: 'Candace Yen' },
+    { label: 'Mentioned Promotion', value: 'True' },
+    { label: 'Call Quality Score', value: '7.2 / 10.0' },
+  ];
+}
+
+const PARTNER_LOGOS = ['Google', 'Adobe', 'Salesforce', 'Five9'];
 
 export default function CallJourneyInvocaDashboard({ config }: Props) {
-  const [visibleMetrics, setVisibleMetrics] = useState(0);
-  const [showLog, setShowLog] = useState(false);
+  const [visibleRows, setVisibleRows] = useState(0);
+  const [showPartners, setShowPartners] = useState(false);
+
+  const dataPoints = useMemo(() => generateConversationProfile(config), [config]);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setVisibleMetrics(v => {
-        if (v >= METRICS.length) {
+      setVisibleRows(v => {
+        if (v >= dataPoints.length) {
           clearInterval(interval);
-          setTimeout(() => setShowLog(true), 500);
+          setTimeout(() => setShowPartners(true), 600);
           return v;
         }
         return v + 1;
       });
-    }, 400);
+    }, 350);
     return () => clearInterval(interval);
-  }, []);
+  }, [dataPoints.length]);
 
   return (
     <motion.div
@@ -46,101 +99,74 @@ export default function CallJourneyInvocaDashboard({ config }: Props) {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-4xl space-y-6"
+      className="w-full max-w-md mx-auto"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <InvocaLogo size="sm" />
-          <div>
-            <h2 className="text-lg font-bold text-foreground">Invoca for Marketing</h2>
-            <p className="text-xs text-muted-foreground">{config.companyName} — Call Analytics Dashboard</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-primary" />
-          <span className="text-xs font-medium text-primary">Real-time</span>
-        </div>
-      </div>
+      {/* Card */}
+      <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-card">
+        {/* Header — dark green bar */}
+        <div className="bg-[#1a3c2a] px-6 py-5 flex items-center gap-4 relative">
+          {/* Accent stripe */}
+          <div className="absolute top-0 right-8 w-10 h-full bg-[#4caf50]/40 rounded-b-lg" />
 
-      {/* Metrics cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {METRICS.map((metric, i) => (
-          <motion.div
-            key={metric.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={i < visibleMetrics ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.4 }}
-            className="glass-surface rounded-xl p-4 space-y-2"
-          >
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <metric.icon className="w-4 h-4" />
-              <span className="text-xs">{metric.label}</span>
+          {/* Avatar */}
+          <div className="w-16 h-16 rounded-lg bg-[#2a5c3a] overflow-hidden flex items-center justify-center flex-shrink-0 z-10">
+            <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-[#4caf50]/30 to-[#2a5c3a] flex items-center justify-center text-2xl">
+              📞
             </div>
-            <p className="text-xl font-bold text-foreground">{metric.value}</p>
-            <span className={`text-xs font-medium ${
-              metric.change.startsWith('+') ? 'text-green-600' : 'text-primary'
-            }`}>
-              {metric.change} vs last month
-            </span>
-          </motion.div>
-        ))}
-      </div>
+          </div>
 
-      {/* Call attribution log */}
-      {showLog && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="glass-surface rounded-xl overflow-hidden"
-        >
-          <div className="px-4 py-3 border-b border-border flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-semibold text-foreground">Recent Call Attribution</span>
+          <div className="z-10">
+            <div className="flex items-center gap-2 mb-1">
+              <InvocaLogo size="sm" />
+            </div>
+            <p className="text-white/90 text-sm font-bold tracking-wide uppercase">
+              Conversation Profile
+            </p>
           </div>
-          <div className="divide-y divide-border/50">
-            {CALL_LOG.map((call, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.2 }}
-                className="px-4 py-3 flex items-center justify-between text-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-xs font-medium text-foreground">
-                    {call.name.split(' ').map(n => n[0]).join('')}
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">{call.name}</p>
-                    <p className="text-xs text-muted-foreground">{call.campaign}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs text-muted-foreground">{call.duration}</span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                    call.outcome === 'Converted'
-                      ? 'bg-green-100 text-green-700'
-                      : call.outcome === 'Follow-up'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
-                  }`}>
-                    {call.outcome}
-                  </span>
-                </div>
-              </motion.div>
+        </div>
+
+        {/* Data rows */}
+        <div className="divide-y divide-border/60">
+          {dataPoints.map((point, i) => (
+            <motion.div
+              key={point.label}
+              initial={{ opacity: 0, x: -10 }}
+              animate={i < visibleRows ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
+              transition={{ duration: 0.3 }}
+              className="flex items-center px-6 py-3"
+            >
+              <span className="text-sm font-semibold text-foreground w-[45%] flex-shrink-0">
+                {point.label}
+              </span>
+              <span className="text-sm text-muted-foreground">{point.value}</span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Partner logos */}
+        {showPartners && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-center gap-6"
+          >
+            {PARTNER_LOGOS.map(name => (
+              <span key={name} className="text-xs font-bold text-muted-foreground/60 tracking-wide">
+                {name}
+              </span>
             ))}
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </div>
 
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-        className="text-center text-xs text-muted-foreground"
+        className="text-center text-xs text-muted-foreground mt-4"
       >
-        Invoca attributes every call to the marketing source — giving full visibility into what's driving revenue.
+        Invoca captures every signal from the call — attributing it back to the marketing source.
       </motion.p>
     </motion.div>
   );
