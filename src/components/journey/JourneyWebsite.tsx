@@ -44,7 +44,7 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
           </div>
           <div className="flex-1 flex justify-center">
             <div className="bg-white rounded-md px-4 py-1 text-xs text-gray-500 border border-gray-200 min-w-[300px] text-center">
-              🔒 {domain}
+              🔒 {displayPath}
             </div>
           </div>
         </div>
