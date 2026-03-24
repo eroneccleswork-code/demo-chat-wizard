@@ -5,6 +5,7 @@ import { Download } from 'lucide-react';
 export default function ScreenRecorder() {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+  const [fileExt, setFileExt] = useState<'mp4' | 'webm'>('mp4');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
@@ -38,11 +39,17 @@ export default function ScreenRecorder() {
       }
       const combinedStream = new MediaStream(tracks);
 
-      const recorder = new MediaRecorder(combinedStream, {
-        mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-          ? 'video/webm;codecs=vp9,opus'
-          : 'video/webm',
-      });
+      // Prefer MP4 (H.264) for LinkedIn/email compatibility, fall back to WebM
+      const mp4Supported = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2');
+      const mimeType = mp4Supported
+        ? 'video/mp4;codecs=avc1,mp4a.40.2'
+        : MediaRecorder.isTypeSupported('video/mp4')
+          ? 'video/mp4'
+          : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+            ? 'video/webm;codecs=vp9,opus'
+            : 'video/webm';
+
+      const recorder = new MediaRecorder(combinedStream, { mimeType });
 
       chunksRef.current = [];
       recorder.ondataavailable = (e) => {
@@ -50,9 +57,11 @@ export default function ScreenRecorder() {
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+        const isMP4 = recorder.mimeType.includes('mp4');
+        const blob = new Blob(chunksRef.current, { type: isMP4 ? 'video/mp4' : 'video/webm' });
         const url = URL.createObjectURL(blob);
         setRecordedUrl(url);
+        setFileExt(isMP4 ? 'mp4' : 'webm');
         setIsRecording(false);
         combinedStream.getTracks().forEach(t => t.stop());
       };
@@ -74,9 +83,9 @@ export default function ScreenRecorder() {
     if (!recordedUrl) return;
     const a = document.createElement('a');
     a.href = recordedUrl;
-    a.download = `invoca-demo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.webm`;
+    a.download = `invoca-demo-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.${fileExt}`;
     a.click();
-  }, [recordedUrl]);
+  }, [recordedUrl, fileExt]);
 
   // Hidden while recording
   if (isRecording) return null;
