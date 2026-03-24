@@ -4,12 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { BusinessConfig } from '@/lib/types';
 import JourneyGoogleAd from './journey/JourneyGoogleAd';
 import JourneyWebsite from './journey/JourneyWebsite';
-import JourneyFormFill from './journey/JourneyFormFill';
 import JourneyWaiting from './journey/JourneyWaiting';
 import JourneyIntegrations from './journey/JourneyIntegrations';
 import ScreenRecorder from './ScreenRecorder';
 
-type JourneyStep = 'google-ad' | 'website' | 'form-fill' | 'waiting' | 'integrations';
+type JourneyStep = 'google-ad' | 'website' | 'waiting' | 'integrations';
 
 interface Props {
   config: BusinessConfig;
@@ -18,13 +17,12 @@ interface Props {
 
 const STEP_LABELS: Record<JourneyStep, string> = {
   'google-ad': 'Customer searches Google',
-  'website': 'Lands on your website',
-  'form-fill': 'Fills out a form',
+  'website': 'Lands on website & fills out form',
   'waiting': 'Waiting for a response…',
   'integrations': 'Invoca powers the full stack',
 };
 
-const STEPS: JourneyStep[] = ['google-ad', 'website', 'form-fill', 'waiting', 'integrations'];
+const STEPS: JourneyStep[] = ['google-ad', 'website', 'waiting', 'integrations'];
 
 export default function CustomerJourney({ config, enableRecording }: Props) {
   const navigate = useNavigate();
@@ -62,7 +60,6 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
     });
   };
 
-  // Arrow key navigation only
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goNext();
@@ -76,7 +73,6 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
     <div className="min-h-screen bg-background flex flex-col">
       {enableRecording && <ScreenRecorder />}
 
-      {/* Top bar — minimal */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate('/')}
@@ -88,7 +84,6 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
         <div />
       </div>
 
-      {/* Progress bar */}
       <div className="px-6 py-3">
         <div className="flex items-center gap-1">
           {STEPS.map((step, i) => (
@@ -111,17 +106,13 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
         </motion.p>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex items-center justify-center p-6">
         <AnimatePresence mode="wait">
           {currentStep === 'google-ad' && (
             <JourneyGoogleAd key="ad" config={config} onNext={goNext} started={started} />
           )}
           {currentStep === 'website' && (
-            <JourneyWebsite key="web" config={config} onNext={goNext} />
-          )}
-          {currentStep === 'form-fill' && (
-            <JourneyFormFill key="form" config={config} onNext={goNext} />
+            <JourneyWebsite key="web" config={config} onNext={goNext} variant="form" />
           )}
           {currentStep === 'waiting' && (
             <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />

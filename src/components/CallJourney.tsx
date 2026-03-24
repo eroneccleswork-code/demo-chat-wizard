@@ -18,7 +18,7 @@ interface Props {
 
 const STEP_LABELS: Record<CallStep, string> = {
   'google-ad': 'Customer searches Google',
-  'website': 'Lands on your website',
+  'website': 'Finds the phone number & calls',
   'dialing': 'Customer calls the business',
   'active-call': 'Invoca captures the call',
   'integrations': 'Invoca powers the full stack',
@@ -51,7 +51,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
     }
   }, [currentStep]);
 
-  // Arrow key navigation only
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goNext();
@@ -65,7 +64,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
     <div className="min-h-screen bg-background flex flex-col">
       {enableRecording && <ScreenRecorder />}
 
-      {/* Top bar — minimal */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <button
           onClick={() => navigate('/')}
@@ -77,7 +75,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
         <div />
       </div>
 
-      {/* Progress bar */}
       <div className="px-6 py-3">
         <div className="flex items-center gap-1">
           {STEPS.map((step, i) => (
@@ -100,7 +97,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
         </motion.p>
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex items-center justify-center p-6">
         <AnimatePresence mode="wait">
           {currentStep === 'google-ad' && (
