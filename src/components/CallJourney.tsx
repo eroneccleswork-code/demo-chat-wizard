@@ -113,9 +113,6 @@ export default function CallJourney({ config, enableRecording }: Props) {
           {currentStep === 'active-call' && (
             <CallJourneyActive key="call" config={config} onNext={goNext} />
           )}
-          {currentStep === 'invoca-dashboard' && (
-            <CallJourneyInvocaDashboard key="dash" config={config} />
-          )}
         </AnimatePresence>
       </div>
     </div>
