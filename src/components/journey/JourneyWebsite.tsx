@@ -14,7 +14,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
   const fullUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
   const [iframeError, setIframeError] = useState(false);
 
-  const phoneNumber = config.customContext?.replace('Phone: ', '') || '(800) 555-0199';
   const isCallVariant = variant === 'call';
 
   return (
