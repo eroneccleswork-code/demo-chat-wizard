@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone } from 'lucide-react';
 import { BusinessConfig } from '@/lib/types';
 
 interface Props {
@@ -14,7 +13,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
   const fullUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
   const [iframeError, setIframeError] = useState(false);
 
-  const phoneNumber = config.customContext?.replace('Phone: ', '') || '(800) 555-0199';
   const isCallVariant = variant === 'call';
 
   return (
@@ -39,19 +37,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
               🔒 {domain}
             </div>
           </div>
-          {/* Click-to-call number in browser bar for call variant */}
-          {isCallVariant && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex items-center gap-1.5 px-3 py-1 bg-green-600 text-white rounded-md text-xs font-semibold cursor-pointer shadow-md"
-              onClick={onNext}
-            >
-              <Phone className="w-3 h-3" />
-              {phoneNumber}
-            </motion.div>
-          )}
         </div>
 
         {/* Real website iframe */}
@@ -74,19 +59,6 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
             />
           )}
 
-          {/* Click-to-call floating button for call variant */}
-          {isCallVariant && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-full shadow-xl cursor-pointer hover:bg-green-700 transition-colors"
-              onClick={onNext}
-            >
-              <Phone className="w-4 h-4" />
-              <span className="text-sm font-bold">{phoneNumber}</span>
-            </motion.div>
-          )}
 
           {/* Click overlay to advance */}
           <motion.div
@@ -102,7 +74,7 @@ export default function JourneyWebsite({ config, onNext, variant = 'form' }: Pro
               className="px-5 py-2.5 bg-white/95 backdrop-blur rounded-lg shadow-lg text-sm font-medium text-gray-800 flex items-center gap-2"
             >
               {isCallVariant
-                ? `Customer clicks to call ${phoneNumber} →`
+                ? 'Customer clicks the phone number →'
                 : 'Customer finds the contact form →'}
             </motion.div>
           </motion.div>

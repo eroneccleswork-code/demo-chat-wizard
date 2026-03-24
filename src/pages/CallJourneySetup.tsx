@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Building2, Target, Globe, Phone, Video } from 'lucide-react';
+import { ArrowRight, Building2, Target, Globe, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 
@@ -16,7 +16,6 @@ export default function CallJourneySetup() {
   const [industry, setIndustry] = useState('');
   const [customIndustry, setCustomIndustry] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLaunching, setIsLaunching] = useState(false);
   const [enableRecording, setEnableRecording] = useState(false);
 
@@ -33,7 +32,6 @@ export default function CallJourneySetup() {
       industry: finalIndustry,
       cta: 'Call Now',
       websiteUrl,
-      customContext: phoneNumber ? `Phone: ${phoneNumber}` : undefined,
     };
     navigate('/call-journey', { state: { config, enableRecording } });
   };
@@ -125,20 +123,6 @@ export default function CallJourneySetup() {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Phone className="w-4 h-4 text-muted-foreground" />
-                Business Phone Number
-                <span className="text-muted-foreground text-xs">(optional)</span>
-              </label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={e => setPhoneNumber(e.target.value)}
-                placeholder="(555) 123-4567"
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-            </div>
 
             {/* Record toggle */}
             <div className="flex items-center justify-between py-2">
