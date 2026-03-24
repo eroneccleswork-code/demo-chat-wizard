@@ -5,10 +5,10 @@ import InvocaLogo from '@/components/InvocaLogo';
 import heroImage from '@/assets/hero-blinds.jpg';
 
 const USE_CASES = [
-  { label: 'AI Messaging Agent | Lead Form Response', active: true },
-  { label: 'Use Case 2 | Coming Soon', active: false },
-  { label: 'Use Case 3 | Coming Soon', active: false },
-  { label: 'Use Case 4 | Coming Soon', active: false },
+  { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' },
+  { label: 'Customer Journey | Ad to SMS', active: true, path: '/journey-setup' },
+  { label: 'Use Case 3 | Coming Soon', active: false, path: '' },
+  { label: 'Use Case 4 | Coming Soon', active: false, path: '' },
 ];
 
 export default function Index() {
