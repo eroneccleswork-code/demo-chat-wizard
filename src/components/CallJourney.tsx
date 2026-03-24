@@ -8,7 +8,7 @@ import CallJourneyDialing from './call-journey/CallJourneyDialing';
 import CallJourneyActive from './call-journey/CallJourneyActive';
 import ScreenRecorder from './ScreenRecorder';
 
-type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call' | 'invoca-dashboard';
+type CallStep = 'google-ad' | 'website' | 'dialing' | 'active-call';
 
 interface Props {
   config: BusinessConfig;
