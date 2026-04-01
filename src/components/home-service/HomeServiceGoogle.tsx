@@ -2,15 +2,22 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Mic, Camera, MoreVertical } from 'lucide-react';
 
+interface ScrapedAd {
+  description?: string;
+  metaTitle?: string;
+  sitelinks?: string[];
+}
+
 interface Props {
   searchKeyword: string;
   domain: string;
   companyName: string;
   started: boolean;
   onClickAd: () => void;
+  scrapedAd?: ScrapedAd | null;
 }
 
-export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd }: Props) {
+export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd, scrapedAd }: Props) {
   const [faviconError, setFaviconError] = useState(false);
   const hostname = (() => { try { return new URL(domain.startsWith('http') ? domain : `https://${domain}`).hostname.replace(/^www\./, ''); } catch { return domain; } })();
 
