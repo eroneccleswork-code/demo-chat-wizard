@@ -6,6 +6,7 @@ import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, Mes
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 import { generateMockPages } from '@/lib/mock-pages';
+import { firecrawlApi } from '@/lib/api/firecrawl';
 
 const INDUSTRIES = [
   'Window Cleaning',
