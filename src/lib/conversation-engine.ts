@@ -400,10 +400,10 @@ export function getNextAgentMessage(
         };
       }
 
-      // All questions done — give estimate
+      // All questions done — offer callback
       return {
-        message: `${ack} ${generateEstimateResponse(config, newAnswers, newInfo)}`,
-        newState: { phase: 'estimate', questionIndex: currentStepIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'estimate' },
+        message: `${ack} ${generateCallbackOffer(config)}`,
+        newState: { phase: 'estimate', questionIndex: currentStepIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'callback' },
       };
     }
 
