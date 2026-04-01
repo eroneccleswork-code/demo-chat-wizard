@@ -187,7 +187,7 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   )}
                   <div>
                     <p className="text-sm text-gray-900 font-medium">{companyName}</p>
-                    <p className="text-xs text-gray-500">{`https://${hostname}`} <MoreVertical className="inline w-3 h-3 text-gray-400" /></p>
+                    <p className="text-xs text-gray-500">{`https://offers.${hostname}`} <MoreVertical className="inline w-3 h-3 text-gray-400" /></p>
                   </div>
                 </div>
 
@@ -196,32 +196,36 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   className="text-left group"
                   whileHover={{ scale: 1.005 }}
                 >
-                  <h3 className="text-xl text-blue-700 group-hover:underline cursor-pointer mb-1">
-                    {companyName} | Official Site
+                  <h3 className="text-xl text-[#1a0dab] group-hover:underline cursor-pointer mb-1">
+                    {companyName}®
                   </h3>
                 </motion.button>
                 <p className="text-sm text-gray-600 leading-relaxed max-w-xl">
-                  Elevate your home's curb appeal with stylish new services. Next-day appointments available. Enjoy convenient payment and financing options. Free Quotes.
+                  20% Off Entire Purchase — Elevate your home's curb appeal with stylish new services. Next-day appointments available. Enjoy your new windows sooner with a variety of convenient payment and financing options. Free Quotes.
                 </p>
 
                 {/* Sitelinks */}
-                <div className="mt-5 space-y-3 border-t border-gray-200 pt-4">
-                  <div className="cursor-pointer">
-                    <span className="text-blue-700 hover:underline font-medium">About Us</span>
-                    <span className="text-gray-400 ml-2">›</span>
-                    <p className="text-sm text-gray-500">We are a full-service company.</p>
+                <div className="mt-5 space-y-0 border-t border-gray-200 pt-4">
+                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">12 Month 0% Financing</span>
+                      <p className="text-sm text-gray-500 mt-0.5">Call, text, or schedule an appointment online and take advantage of our exclusive offer.</p>
+                    </div>
+                    <span className="text-gray-400 text-lg ml-4">›</span>
                   </div>
-                  <hr className="border-gray-100" />
-                  <div className="cursor-pointer">
-                    <span className="text-blue-700 hover:underline font-medium">Contact Us</span>
-                    <span className="text-gray-400 ml-2">›</span>
-                    <p className="text-sm text-gray-500">Our team of experts are ready to assist you with your project.</p>
+                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">Call or Text for a Free Quote</span>
+                      <p className="text-sm text-gray-500 mt-0.5">Take 20% off your entire purchase plus 0 down, 0 payments and 0 interest for 12 months.</p>
+                    </div>
+                    <span className="text-gray-400 text-lg ml-4">›</span>
                   </div>
-                  <hr className="border-gray-100" />
-                  <div className="cursor-pointer">
-                    <span className="text-blue-700 hover:underline font-medium">Call or Text for a Free Quote</span>
-                    <span className="text-gray-400 ml-2">›</span>
-                    <p className="text-sm text-gray-500">Call, text, or schedule an appointment online.</p>
+                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">Contact Us</span>
+                      <p className="text-sm text-gray-500 mt-0.5">Our team of experts are ready to assist you with your home project.</p>
+                    </div>
+                    <span className="text-gray-400 text-lg ml-4">›</span>
                   </div>
                 </div>
               </div>
