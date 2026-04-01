@@ -45,11 +45,11 @@ export default function HomeServiceWebsite({ websiteUrl, domain, onNext, onBack 
         />
       </div>
 
-      {/* Invisible clickable strip on right edge for presenter */}
+      {/* Invisible clickable zone in bottom-right corner for presenter */}
       {onNext && (
         <div
           onClick={onNext}
-          className="absolute right-0 top-0 w-12 h-full z-50 cursor-default"
+          className="absolute right-0 bottom-0 w-24 h-24 z-50 cursor-default"
         />
       )}
     </motion.div>
