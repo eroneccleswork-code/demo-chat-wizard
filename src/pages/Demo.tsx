@@ -63,6 +63,7 @@ export default function Demo() {
             key="website"
             websiteUrl={websiteUrl}
             domain={domain}
+            onNext={() => setStep('chat')}
           />
         )}
         {step === 'chat' && (
