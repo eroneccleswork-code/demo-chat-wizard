@@ -34,10 +34,18 @@ export async function analyzeCompanyWebsite(
       const metadata = result.data?.metadata || result.metadata || {};
       websiteMarkdown = markdown;
 
-      const lines = markdown
-        .split('\n')
-        .filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
-      const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
+      // Prefer the real meta description from the page
+      const metaDesc = metadata.description || metadata.ogDescription || '';
+      
+      // Fallback: extract from markdown content
+      let fallbackDesc = '';
+      if (!metaDesc) {
+        const lines = markdown
+          .split('\n')
+          .filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|') && !l.startsWith('[') && !l.startsWith('!'));
+        fallbackDesc = lines.slice(0, 2).join(' ').slice(0, 200).trim();
+      }
+
       const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
       const sitelinkTitles = headings
         .map((h: string) => h.replace(/^#+\s+/, '').trim())
@@ -45,7 +53,7 @@ export async function analyzeCompanyWebsite(
         .slice(0, 3);
 
       scrapedAd = {
-        description: description || metadata.description || '',
+        description: metaDesc || fallbackDesc,
         metaTitle: metadata.title || '',
         sitelinks: sitelinkTitles,
       };
