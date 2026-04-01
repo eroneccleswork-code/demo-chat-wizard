@@ -8,10 +8,11 @@ export default function HomeServiceSetup() {
   const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
-  const isValid = searchKeyword && websiteUrl;
+  const isValid = searchKeyword && websiteUrl && companyName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,7 @@ export default function HomeServiceSetup() {
     setIsLaunching(true);
     await new Promise(r => setTimeout(r, 1000));
     navigate('/home-service-demo', {
-      state: { searchKeyword, websiteUrl, enableRecording },
+      state: { searchKeyword, websiteUrl, companyName, enableRecording },
     });
   };
 
@@ -65,6 +66,20 @@ export default function HomeServiceSetup() {
                 value={searchKeyword}
                 onChange={e => setSearchKeyword(e.target.value)}
                 placeholder="window replacement near me"
+                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Globe className="w-4 h-4 text-muted-foreground" />
+                Company Name
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={e => setCompanyName(e.target.value)}
+                placeholder="Renewal by Andersen"
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>

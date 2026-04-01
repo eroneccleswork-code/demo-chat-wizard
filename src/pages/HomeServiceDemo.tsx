@@ -10,7 +10,7 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { searchKeyword, websiteUrl, enableRecording } = (location.state as any) || {};
+  const { searchKeyword, websiteUrl, companyName: passedName, enableRecording } = (location.state as any) || {};
 
   const [step, setStep] = useState<Step>('google');
   const [started, setStarted] = useState(false);
@@ -40,10 +40,9 @@ export default function HomeServiceDemo() {
 
   if (!searchKeyword || !websiteUrl) return null;
 
-  // Extract domain & company name from URL
+  // Extract domain from URL
   const domain = websiteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
-  const companyName = domain.replace(/^www\./, '').split('.')[0];
-  const displayName = companyName.charAt(0).toUpperCase() + companyName.slice(1);
+  const displayName = passedName || domain.replace(/^www\./, '').split('.')[0];
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative">
