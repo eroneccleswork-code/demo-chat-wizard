@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Mic, Camera, MoreVertical } from 'lucide-react';
 
