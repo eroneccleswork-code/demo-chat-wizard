@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Target, Globe, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
+import { firecrawlApi } from '@/lib/api/firecrawl';
 
 const INDUSTRIES = [
   'Window Cleaning', 'Dental', 'Real Estate', 'HVAC', 'Legal',
@@ -26,14 +27,41 @@ export default function JourneySetup() {
     e.preventDefault();
     if (!isValid) return;
     setIsLaunching(true);
-    await new Promise(r => setTimeout(r, 1200));
+
+    // Scrape for ad data
+    let scrapedAd: any = null;
+    try {
+      const result = await firecrawlApi.scrape(websiteUrl, {
+        formats: ['markdown'],
+        onlyMainContent: true,
+      });
+      if (result.success) {
+        const markdown = result.data?.markdown || result.markdown || '';
+        const metadata = result.data?.metadata || result.metadata || {};
+        const lines = markdown.split('\n').filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
+        const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
+        const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
+        const sitelinkTitles = headings
+          .map((h: string) => h.replace(/^#+\s+/, '').trim())
+          .filter((h: string) => h.length > 3 && h.length < 60)
+          .slice(0, 3);
+        scrapedAd = {
+          description: description || metadata.description || '',
+          metaTitle: metadata.title || '',
+          sitelinks: sitelinkTitles,
+        };
+      }
+    } catch (err) {
+      console.warn('Failed to scrape site, using defaults:', err);
+    }
+
     const config: BusinessConfig = {
       companyName,
       industry: finalIndustry,
       cta: 'Get Quote',
       websiteUrl,
     };
-    navigate('/journey', { state: { config, enableRecording } });
+    navigate('/journey', { state: { config, enableRecording, scrapedAd } });
   };
 
   return (
@@ -62,7 +90,7 @@ export default function JourneySetup() {
             See the full journey
           </h1>
           <p className="text-muted-foreground">
-            Enter a company website and watch the customer experience — from ad click to SMS engagement.
+            Enter a company website and watch the customer experience — from Google search to SMS engagement.
           </p>
         </div>
 
@@ -149,7 +177,7 @@ export default function JourneySetup() {
             {isLaunching ? (
               <>
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                Preparing journey…
+                Analyzing website…
               </>
             ) : (
               <>
