@@ -6,7 +6,7 @@ import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, Mes
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 import { generateMockPages } from '@/lib/mock-pages';
-import { firecrawlApi } from '@/lib/api/firecrawl';
+import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 const INDUSTRIES = [
   'Window Cleaning',
@@ -45,43 +45,26 @@ export default function SetupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const finalConfig: BusinessConfig = {
-      ...config,
-      industry: config.industry === 'Other' ? customIndustry : config.industry,
-      presencePage: presencePage || undefined,
-      enableRecording,
-      customQuestions: customQuestions.filter(q => q.trim()) || undefined,
-    };
+    const finalIndustry = config.industry === 'Other' ? customIndustry : config.industry;
     setIsAnalyzing(true);
 
-    // Scrape for ad data if URL provided
+    // Analyze website + generate AI questions
     let scrapedAd: any = null;
-    if (finalConfig.websiteUrl) {
-      try {
-        const result = await firecrawlApi.scrape(finalConfig.websiteUrl, {
-          formats: ['markdown'],
-          onlyMainContent: true,
-        });
-        if (result.success) {
-          const markdown = result.data?.markdown || result.markdown || '';
-          const metadata = result.data?.metadata || result.metadata || {};
-          const lines = markdown.split('\n').filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
-          const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
-          const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
-          const sitelinkTitles = headings
-            .map((h: string) => h.replace(/^#+\s+/, '').trim())
-            .filter((h: string) => h.length > 3 && h.length < 60)
-            .slice(0, 3);
-          scrapedAd = {
-            description: description || metadata.description || '',
-            metaTitle: metadata.title || '',
-            sitelinks: sitelinkTitles,
-          };
-        }
-      } catch (err) {
-        console.warn('Failed to scrape site:', err);
-      }
+    let aiQuestions: string[] = [];
+    if (config.websiteUrl) {
+      const analysis = await analyzeCompanyWebsite(config.websiteUrl, config.companyName, finalIndustry);
+      scrapedAd = analysis.scrapedAd;
+      aiQuestions = analysis.aiQuestions;
     }
+
+    const userQuestions = customQuestions.filter(q => q.trim());
+    const finalConfig: BusinessConfig = {
+      ...config,
+      industry: finalIndustry,
+      presencePage: presencePage || undefined,
+      enableRecording,
+      customQuestions: userQuestions.length > 0 ? userQuestions : aiQuestions.length > 0 ? aiQuestions : undefined,
+    };
 
     navigate('/demo', { state: { config: finalConfig, scrapedAd } });
   };

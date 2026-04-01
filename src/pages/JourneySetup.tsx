@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Target, Globe, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
-import { firecrawlApi } from '@/lib/api/firecrawl';
+import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 const INDUSTRIES = [
   'Window Cleaning', 'Dental', 'Real Estate', 'HVAC', 'Legal',
@@ -28,40 +28,16 @@ export default function JourneySetup() {
     if (!isValid) return;
     setIsLaunching(true);
 
-    // Scrape for ad data
-    let scrapedAd: any = null;
-    try {
-      const result = await firecrawlApi.scrape(websiteUrl, {
-        formats: ['markdown'],
-        onlyMainContent: true,
-      });
-      if (result.success) {
-        const markdown = result.data?.markdown || result.markdown || '';
-        const metadata = result.data?.metadata || result.metadata || {};
-        const lines = markdown.split('\n').filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
-        const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
-        const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
-        const sitelinkTitles = headings
-          .map((h: string) => h.replace(/^#+\s+/, '').trim())
-          .filter((h: string) => h.length > 3 && h.length < 60)
-          .slice(0, 3);
-        scrapedAd = {
-          description: description || metadata.description || '',
-          metaTitle: metadata.title || '',
-          sitelinks: sitelinkTitles,
-        };
-      }
-    } catch (err) {
-      console.warn('Failed to scrape site, using defaults:', err);
-    }
+    const analysis = await analyzeCompanyWebsite(websiteUrl, companyName, finalIndustry);
 
     const config: BusinessConfig = {
       companyName,
       industry: finalIndustry,
       cta: 'Get Quote',
       websiteUrl,
+      customQuestions: analysis.aiQuestions.length > 0 ? analysis.aiQuestions : undefined,
     };
-    navigate('/journey', { state: { config, enableRecording, scrapedAd } });
+    navigate('/journey', { state: { config, enableRecording, scrapedAd: analysis.scrapedAd } });
   };
 
   return (
