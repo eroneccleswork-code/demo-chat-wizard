@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
-import { firecrawlApi } from '@/lib/api/firecrawl';
+import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
