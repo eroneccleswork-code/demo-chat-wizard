@@ -227,21 +227,83 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
               </div>
             </motion.div>
 
-            {/* Faded organic results */}
+            {/* Organic results */}
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.3 }}
+              animate={{ opacity: 1 }}
               transition={{ delay: 2.2 }}
-              className="mt-8 space-y-6 max-w-2xl"
+              className="mt-6 space-y-6 max-w-2xl border-t border-gray-200 pt-6"
             >
-              {[1, 2, 3].map(i => (
-                <div key={i} className="space-y-1">
-                  <div className="h-3 w-40 bg-gray-200 rounded" />
-                  <div className="h-5 w-72 bg-gray-200 rounded" />
-                  <div className="h-3 w-full bg-gray-100 rounded" />
-                  <div className="h-3 w-3/4 bg-gray-100 rounded" />
+              {/* Hide sponsored */}
+              <div className="flex justify-center">
+                <button className="flex items-center gap-2 px-6 py-2.5 border border-gray-300 rounded-full text-sm text-gray-600 hover:bg-gray-50">
+                  Hide sponsored result <span className="text-xs">▲</span>
+                </button>
+              </div>
+
+              {/* Organic result 1 */}
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`} alt="" className="w-5 h-5 rounded-full" />
+                  <div>
+                    <p className="text-sm text-gray-900">{companyName}</p>
+                    <p className="text-xs text-gray-500">https://{domain}</p>
+                  </div>
+                  <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-              ))}
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{companyName} | Official Site</h3>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  Visit the official website for {searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.
+                </p>
+              </div>
+
+              {/* Organic result 2 */}
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <img src="https://www.google.com/s2/favicons?domain=yelp.com&sz=32" alt="" className="w-5 h-5 rounded-full" />
+                  <div>
+                    <p className="text-sm text-gray-900">Yelp</p>
+                    <p className="text-xs text-gray-500">https://www.yelp.com › search</p>
+                  </div>
+                  <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
+                </div>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Top 10 Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Near Me</h3>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  Top 10 Best {searchKeyword.replace(' near me', '')} near you. See ratings, reviews, hours, and photos. Free estimates from local professionals.
+                </p>
+              </div>
+
+              {/* Organic result 3 */}
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <img src="https://www.google.com/s2/favicons?domain=homeadvisor.com&sz=32" alt="" className="w-5 h-5 rounded-full" />
+                  <div>
+                    <p className="text-sm text-gray-900">HomeAdvisor</p>
+                    <p className="text-xs text-gray-500">https://www.homeadvisor.com › service</p>
+                  </div>
+                  <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
+                </div>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Services Near You - Free Quotes</h3>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  Compare local pros for your {searchKeyword.replace(' near me', '')} project. Read verified reviews and get free cost estimates. Connect with top-rated professionals.
+                </p>
+              </div>
+
+              {/* Organic result 4 */}
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <img src="https://www.google.com/s2/favicons?domain=angi.com&sz=32" alt="" className="w-5 h-5 rounded-full" />
+                  <div>
+                    <p className="text-sm text-gray-900">Angi</p>
+                    <p className="text-xs text-gray-500">https://www.angi.com › nearme</p>
+                  </div>
+                  <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
+                </div>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Find the Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Pros | Angi</h3>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  Browse our network of screened and certified {searchKeyword.replace(' near me', '')} professionals. Read real customer reviews and compare pricing.
+                </p>
+              </div>
             </motion.div>
           </div>
         </div>
