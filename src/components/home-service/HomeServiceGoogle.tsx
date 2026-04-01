@@ -263,7 +263,7 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
                 </div>
                 <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{scrapedAd?.metaTitle || `${companyName} | Official Site`}</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
+                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchQuery.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
                 </p>
               </div>
 
@@ -277,9 +277,9 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Top 10 Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Near Me</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Top 10 Best {searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Near Me</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Top 10 Best {searchKeyword.replace(' near me', '')} near you. See ratings, reviews, hours, and photos. Free estimates from local professionals.
+                  Top 10 Best {searchQuery.replace(' near me', '')} near you. See ratings, reviews, hours, and photos. Free estimates from local professionals.
                 </p>
               </div>
 
@@ -293,9 +293,9 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Services Near You - Free Quotes</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Services Near You - Free Quotes</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Compare local pros for your {searchKeyword.replace(' near me', '')} project. Read verified reviews and get free cost estimates. Connect with top-rated professionals.
+                  Compare local pros for your {searchQuery.replace(' near me', '')} project. Read verified reviews and get free cost estimates. Connect with top-rated professionals.
                 </p>
               </div>
 
@@ -309,9 +309,9 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Find the Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Pros | Angi</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Find the Best {searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Pros | Angi</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Browse our network of screened and certified {searchKeyword.replace(' near me', '')} professionals. Read real customer reviews and compare pricing.
+                  Browse our network of screened and certified {searchQuery.replace(' near me', '')} professionals. Read real customer reviews and compare pricing.
                 </p>
               </div>
             </motion.div>

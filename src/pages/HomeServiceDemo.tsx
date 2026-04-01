@@ -10,10 +10,9 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { searchKeyword, websiteUrl, companyName: passedName, enableRecording, scrapedAd } = (location.state as any) || {};
+  const { websiteUrl, companyName: passedName, enableRecording, scrapedAd } = (location.state as any) || {};
 
   const [step, setStep] = useState<Step>('google');
-  const [started, setStarted] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
