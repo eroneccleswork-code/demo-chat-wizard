@@ -64,6 +64,7 @@ export default function Demo() {
             websiteUrl={websiteUrl}
             domain={domain}
             onNext={() => setStep('chat')}
+            onBack={() => setStep('google')}
           />
         )}
         {step === 'chat' && (
