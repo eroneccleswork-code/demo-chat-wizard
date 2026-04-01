@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Building2, Target, Globe, Video } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
-import { firecrawlApi } from '@/lib/api/firecrawl';
+import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 const INDUSTRIES = [
   'Window Cleaning', 'Dental', 'Real Estate', 'HVAC', 'Legal',
