@@ -176,70 +176,56 @@ interface QualificationStep {
 }
 
 function getQualificationSteps(config: BusinessConfig): QualificationStep[] {
-  // If custom questions are provided, use those instead of industry defaults
+  // If custom questions are provided, use those (limit to 4)
   if (config.customQuestions && config.customQuestions.filter(q => q.trim()).length > 0) {
     return config.customQuestions
       .filter(q => q.trim())
-      .slice(0, 5)
+      .slice(0, 4)
       .map((q, i) => ({ question: q, topic: `custom-${i}` }));
   }
 
-  const name = capitalizeWords(config.companyName);
   const industry = config.industry;
 
+  // 3-4 quick yes/no style questions per industry
   const industrySteps: Record<string, QualificationStep[]> = {
     'Window Cleaning': [
-      { question: "How many windows are you looking to have cleaned?", topic: 'quantity' },
-      { question: "Are these standard-size windows, or do you have any large or specialty windows?", topic: 'type' },
-      { question: "Is this a single-story or multi-story home?", topic: 'property' },
-      { question: "Would you like interior and exterior, or just exterior?", topic: 'scope' },
-      { question: "When are you hoping to get this done?", topic: 'timeline' },
-      { question: "Can you share your ZIP code so I can confirm service availability?", topic: 'location' },
+      { question: "Are you looking to get both interior and exterior windows cleaned?", topic: 'scope' },
+      { question: "Is this for a residential property?", topic: 'property' },
+      { question: "Do you have any second-story or hard-to-reach windows?", topic: 'difficulty' },
+      { question: "Are you looking to get this done within the next week or two?", topic: 'timeline' },
     ],
     'Dental': [
-      { question: "Is this for a routine checkup, or is there something specific you'd like addressed?", topic: 'need' },
-      { question: "When was your last dental visit?", topic: 'history' },
+      { question: "Is this for a routine checkup or cleaning?", topic: 'need' },
       { question: "Are you currently experiencing any pain or discomfort?", topic: 'urgency' },
-      { question: "Do you have dental insurance, or would you like info on our self-pay options?", topic: 'insurance' },
-      { question: "Can you share your ZIP code so I can confirm the closest location?", topic: 'location' },
+      { question: "Do you have dental insurance?", topic: 'insurance' },
     ],
     'Real Estate': [
-      { question: "Are you looking to buy, sell, or both?", topic: 'intent' },
-      { question: "What area or neighborhood are you most interested in?", topic: 'location' },
-      { question: "Do you have a budget range in mind?", topic: 'budget' },
-      { question: "What's your timeline looking like?", topic: 'timeline' },
-      { question: "Have you been pre-approved for a mortgage, or would you like help with that?", topic: 'financing' },
-      { question: "Can you share your ZIP code so I can match you with a local agent?", topic: 'location' },
+      { question: "Are you looking to buy a home?", topic: 'intent' },
+      { question: "Have you been pre-approved for a mortgage?", topic: 'financing' },
+      { question: "Are you looking in a specific neighborhood or area?", topic: 'location' },
     ],
     'HVAC': [
-      { question: "Is this for heating, cooling, or both?", topic: 'need' },
-      { question: "How old is your current system?", topic: 'system' },
-      { question: "What's the approximate square footage of your home?", topic: 'scope' },
-      { question: "Is this an urgent repair, or are you looking at maintenance or a new installation?", topic: 'urgency' },
-      { question: "When are you hoping to move forward with this?", topic: 'timeline' },
-      { question: "Can you share your ZIP code so I can confirm service availability?", topic: 'location' },
+      { question: "Is this for an air conditioning issue?", topic: 'need' },
+      { question: "Is your current system still running?", topic: 'status' },
+      { question: "Is this something you'd consider urgent?", topic: 'urgency' },
     ],
     'Legal': [
-      { question: "What type of legal matter is this regarding?", topic: 'need' },
-      { question: "Has anything been filed yet, or is this a new matter?", topic: 'status' },
-      { question: "What's the timeline we're working with?", topic: 'timeline' },
-      { question: "Have you spoken with another attorney about this?", topic: 'history' },
-      { question: "Can you share your ZIP code so I can confirm jurisdiction?", topic: 'location' },
+      { question: "Is this regarding a personal injury matter?", topic: 'need' },
+      { question: "Has anything been filed with the court yet?", topic: 'status' },
+      { question: "Are you currently working with another attorney?", topic: 'history' },
     ],
     'Blinds': [
-      { question: "How many windows are you looking to cover with blinds?", topic: 'quantity' },
-      { question: "What are the approximate measurements of each window?", topic: 'size' },
-      { question: "What material are you considering for the blinds?", topic: 'type' },
-      { question: "When are you hoping to move forward with this project?", topic: 'timeline' },
-      { question: "Can you share your ZIP code so I can confirm service availability?", topic: 'location' },
+      { question: "Are you looking for blinds for multiple windows?", topic: 'quantity' },
+      { question: "Do you have a material preference, like wood or faux wood?", topic: 'type' },
+      { question: "Would you need professional installation as well?", topic: 'installation' },
+      { question: "Are you hoping to get this done in the next couple of weeks?", topic: 'timeline' },
     ],
   };
 
   const defaultSteps: QualificationStep[] = [
-    { question: "What specifically are you looking for help with?", topic: 'need' },
-    { question: "What's your timeline for this?", topic: 'timeline' },
+    { question: "Are you looking for help with a specific project?", topic: 'need' },
+    { question: "Is this something you'd like to get started on soon?", topic: 'timeline' },
     { question: "Do you have a budget range in mind?", topic: 'budget' },
-    { question: "Can you share your ZIP code so I can confirm availability?", topic: 'location' },
   ];
 
   return industrySteps[industry] || defaultSteps;
@@ -266,33 +252,19 @@ function getIntroMessage(config: BusinessConfig): string {
 
 // ─── Estimate & Closing (contextual) ───
 
-function generateEstimateResponse(config: BusinessConfig, answers: string[], extractedInfo: Record<string, string>[]): string {
+function generateCallbackOffer(config: BusinessConfig): string {
   const name = capitalizeWords(config.companyName);
-  const allInfo = Object.assign({}, ...extractedInfo);
-  const hasZip = !!allInfo.zipCode;
-  const areaPhrase = hasZip ? `the ${allInfo.zipCode} area` : 'your area';
-
-  const templates: Record<string, () => string> = {
-    'Window Cleaning': () => {
-      const qty = allInfo.quantity || 'your windows';
-      return `Good news — we do service ${areaPhrase}. Based on ${qty === 'your windows' ? 'what you\'ve described' : `the ${qty} windows you mentioned`}, a preliminary estimate is between $150 and $300. For an exact quote, I'd recommend a quick virtual consultation with one of our specialists. Would you like to schedule one?`;
-    },
-    'Dental': () => `Great news — we have availability at a location near you${hasZip ? ` in ${areaPhrase}` : ''}. Based on what you've described, we can get you in quickly. Would you like to schedule an appointment?`,
-    'Real Estate': () => `We have experienced agents${hasZip ? ` in ${areaPhrase}` : ''} who can help. I'd love to connect you with one for a personalized consultation. Would you like to schedule a call?`,
-    'HVAC': () => {
-      const urgencyNote = allInfo.urgency === 'high' ? ' Given the urgency, we can prioritize your visit.' : '';
-      return `Good news — we do service ${areaPhrase}.${urgencyNote} Based on what you've shared, we can have a technician assess your system and provide options. Would you like to schedule a visit?`;
-    },
-    'Legal': () => `We have attorneys experienced in that area of law. I'd like to set up a free initial consultation so we can discuss your case in detail. Would you like to schedule one?`,
-    'Blinds': () => {
-      const qty = allInfo.quantity || 'your';
-      return `Good news — we do service ${areaPhrase}. Based on ${qty === 'your' ? 'what you\'ve shared' : `the ${qty} windows you mentioned`}, a preliminary estimate for blinds with installation is between $800 and $1,000. For an exact quote, I'd recommend a virtual consultation. Would you like to schedule one?`;
-    },
+  
+  const templates: Record<string, string> = {
+    'Window Cleaning': `Thanks for those details! Based on what you've shared, I'd love to have one of our specialists give you a quick call to provide an exact quote. Would you like to schedule a callback?`,
+    'Dental': `Thanks for that info! I'd love to get you connected with our office to schedule your visit. Would you like us to give you a quick callback?`,
+    'Real Estate': `Thanks for sharing that! I'd like to connect you with one of our agents who specializes in your area. Would you like to schedule a quick callback?`,
+    'HVAC': `Thanks for those details! I'd like to have one of our technicians reach out to discuss your options. Would you like to schedule a callback?`,
+    'Legal': `Thanks for sharing that. I'd like to have one of our attorneys reach out for a free initial consultation. Would you like to schedule a callback?`,
+    'Blinds': `Thanks for those details! I'd love to connect you with one of our design consultants for a personalized quote. Would you like to schedule a callback?`,
   };
 
-  const defaultTemplate = () => `Good news — we service ${areaPhrase}. Based on what you've shared, I'd love to connect you with our team for a personalized quote. Would you like to schedule a consultation?`;
-
-  return (templates[config.industry] || defaultTemplate)();
+  return templates[config.industry] || `Thanks for that info! I'd love to connect you with someone from ${name} who can help. Would you like to schedule a callback?`;
 }
 
 function generateAppointmentOffer(): string {
@@ -428,10 +400,10 @@ export function getNextAgentMessage(
         };
       }
 
-      // All questions done — give estimate
+      // All questions done — offer callback
       return {
-        message: `${ack} ${generateEstimateResponse(config, newAnswers, newInfo)}`,
-        newState: { phase: 'estimate', questionIndex: currentStepIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'estimate' },
+        message: `${ack} ${generateCallbackOffer(config)}`,
+        newState: { phase: 'estimate', questionIndex: currentStepIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'callback' },
       };
     }
 
