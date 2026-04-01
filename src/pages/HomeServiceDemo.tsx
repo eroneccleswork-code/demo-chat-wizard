@@ -55,7 +55,7 @@ export default function HomeServiceDemo() {
           title="Start recording"
         />
       )}
-      {isRecording && <ScreenRecorder onStop={() => setIsRecording(false)} />}
+      {isRecording && <ScreenRecorder />}
 
       <AnimatePresence mode="wait">
         {step === 'google' && (

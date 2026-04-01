@@ -32,6 +32,8 @@ const App = () => (
           <Route path="/call-journey" element={<CallJourneyPage />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/integrations" element={<IntegrationsPage />} />
+          <Route path="/home-service-setup" element={<HomeServiceSetup />} />
+          <Route path="/home-service-demo" element={<HomeServiceDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
