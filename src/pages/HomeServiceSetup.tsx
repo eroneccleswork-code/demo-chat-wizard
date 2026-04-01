@@ -53,7 +53,7 @@ export default function HomeServiceSetup() {
     }
 
     navigate('/home-service-demo', {
-      state: { searchKeyword, websiteUrl, companyName, enableRecording, scrapedAd },
+      state: { websiteUrl, companyName, enableRecording, scrapedAd },
     });
   };
 
