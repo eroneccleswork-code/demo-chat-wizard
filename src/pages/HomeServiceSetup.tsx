@@ -12,7 +12,7 @@ export default function HomeServiceSetup() {
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
-  const isValid = searchKeyword && websiteUrl;
+  const isValid = searchKeyword && websiteUrl && companyName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
