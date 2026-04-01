@@ -165,7 +165,7 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
           </div>
 
           {/* Results body */}
-          <div className="flex-1 overflow-y-auto px-20 py-4">
+          <div className="flex-1 overflow-y-auto px-20 py-4 bg-white">
             {/* Results info */}
             <motion.p
               initial={{ opacity: 0 }}
