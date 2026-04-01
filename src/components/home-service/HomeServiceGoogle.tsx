@@ -67,10 +67,18 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
             </div>
 
             {/* Search bar */}
-            <div className="w-full max-w-[584px] px-4">
+            <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) setStarted(true); }} className="w-full max-w-[584px] px-4">
               <div className="flex items-center gap-3 px-5 py-3 bg-white rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <Search className="w-5 h-5 text-gray-400" />
-                <span className="flex-1 text-gray-400 text-base">|</span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="flex-1 text-base text-gray-800 bg-transparent outline-none placeholder:text-gray-400"
+                  placeholder=""
+                  autoFocus
+                />
                 <Mic className="w-5 h-5 text-blue-500 cursor-pointer" />
                 <Camera className="w-5 h-5 text-blue-500 cursor-pointer" />
                 <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200 cursor-pointer">
@@ -80,14 +88,14 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
 
               {/* Search buttons */}
               <div className="flex items-center justify-center gap-3 mt-6">
-                <button className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
+                <button type="submit" className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
                   Google Search
                 </button>
-                <button className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
+                <button type="button" className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
                   I'm Feeling Lucky
                 </button>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Bottom bar */}
