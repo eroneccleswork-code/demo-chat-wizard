@@ -169,9 +169,18 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
               {/* Ad card */}
               <div className="max-w-2xl">
                 <div className="flex items-center gap-3 mb-1">
-                  <div className="w-7 h-7 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden">
-                    {companyName.charAt(0).toUpperCase()}
-                  </div>
+                  <img
+                    src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`}
+                    alt={companyName}
+                    className="w-7 h-7 rounded-full bg-gray-100 border border-gray-200"
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      el.style.display = 'none';
+                      el.parentElement?.insertAdjacentHTML('afterbegin',
+                        `<div class="w-7 h-7 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">${companyName.charAt(0).toUpperCase()}</div>`
+                      );
+                    }}
+                  />
                   <div>
                     <p className="text-sm text-gray-900 font-medium">{companyName}</p>
                     <p className="text-xs text-gray-500">{`https://offers.${domain}`} <MoreVertical className="inline w-3 h-3 text-gray-400" /></p>
