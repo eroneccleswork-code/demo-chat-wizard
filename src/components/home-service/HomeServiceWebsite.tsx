@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
 
 interface Props {
   websiteUrl: string;
@@ -10,26 +9,9 @@ interface Props {
 
 export default function HomeServiceWebsite({ websiteUrl, domain, onNext, onBack }: Props) {
   const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Periodically steal focus back from iframe so arrow keys work
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (document.activeElement?.tagName === 'IFRAME') {
-        containerRef.current?.focus();
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <motion.div
-      ref={containerRef}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'ArrowRight' && onNext) { e.preventDefault(); onNext(); }
-        if (e.key === 'ArrowLeft' && onBack) { e.preventDefault(); onBack(); }
-      }}
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
