@@ -7,13 +7,12 @@ import { firecrawlApi } from '@/lib/api/firecrawl';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
-  const isValid = searchKeyword && websiteUrl && companyName;
+  const isValid = websiteUrl && companyName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
