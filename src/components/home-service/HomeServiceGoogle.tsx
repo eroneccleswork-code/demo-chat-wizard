@@ -253,9 +253,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{companyName} | Official Site</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{scrapedAd?.metaTitle || `${companyName} | Official Site`}</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Visit the official website for {searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.
+                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
                 </p>
               </div>
 
