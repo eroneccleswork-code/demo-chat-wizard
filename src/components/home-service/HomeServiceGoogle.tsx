@@ -2,15 +2,22 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Mic, Camera, MoreVertical } from 'lucide-react';
 
+interface ScrapedAd {
+  description?: string;
+  metaTitle?: string;
+  sitelinks?: string[];
+}
+
 interface Props {
   searchKeyword: string;
   domain: string;
   companyName: string;
   started: boolean;
   onClickAd: () => void;
+  scrapedAd?: ScrapedAd | null;
 }
 
-export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd }: Props) {
+export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd, scrapedAd }: Props) {
   const [faviconError, setFaviconError] = useState(false);
   const hostname = (() => { try { return new URL(domain.startsWith('http') ? domain : `https://${domain}`).hostname.replace(/^www\./, ''); } catch { return domain; } })();
 
@@ -201,32 +208,23 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </h3>
                 </motion.button>
                 <p className="text-sm text-gray-600 leading-relaxed max-w-xl">
-                  20% Off Entire Purchase — Elevate your home's curb appeal with stylish new services. Next-day appointments available. Enjoy your new windows sooner with a variety of convenient payment and financing options. Free Quotes.
+                  {scrapedAd?.description || `Elevate your home's curb appeal with stylish new services. Next-day appointments available. Enjoy convenient payment and financing options. Free Quotes.`}
                 </p>
 
                 {/* Sitelinks */}
                 <div className="mt-5 space-y-0 border-t border-gray-200 pt-4">
-                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
-                    <div>
-                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">12 Month 0% Financing</span>
-                      <p className="text-sm text-gray-500 mt-0.5">Call, text, or schedule an appointment online and take advantage of our exclusive offer.</p>
+                  {(scrapedAd?.sitelinks && scrapedAd.sitelinks.length > 0
+                    ? scrapedAd.sitelinks
+                    : ['About Us', 'Contact Us', 'Call or Text for a Free Quote']
+                  ).map((title, i) => (
+                    <div key={i} className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
+                      <div>
+                        <span className="text-[#1a0dab] hover:underline font-medium text-lg">{title}</span>
+                        <p className="text-sm text-gray-500 mt-0.5">Learn more about {title.toLowerCase()} from {companyName}.</p>
+                      </div>
+                      <span className="text-gray-400 text-lg ml-4">›</span>
                     </div>
-                    <span className="text-gray-400 text-lg ml-4">›</span>
-                  </div>
-                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
-                    <div>
-                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">Call or Text for a Free Quote</span>
-                      <p className="text-sm text-gray-500 mt-0.5">Take 20% off your entire purchase plus 0 down, 0 payments and 0 interest for 12 months.</p>
-                    </div>
-                    <span className="text-gray-400 text-lg ml-4">›</span>
-                  </div>
-                  <div className="cursor-pointer flex items-center justify-between py-3 border-b border-gray-100">
-                    <div>
-                      <span className="text-[#1a0dab] hover:underline font-medium text-lg">Contact Us</span>
-                      <p className="text-sm text-gray-500 mt-0.5">Our team of experts are ready to assist you with your home project.</p>
-                    </div>
-                    <span className="text-gray-400 text-lg ml-4">›</span>
-                  </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -255,9 +253,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{companyName} | Official Site</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{scrapedAd?.metaTitle || `${companyName} | Official Site`}</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Visit the official website for {searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.
+                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
                 </p>
               </div>
 
