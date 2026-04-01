@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search, Globe, Video } from 'lucide-react';
+import { ArrowRight, Search, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
+import { firecrawlApi } from '@/lib/api/firecrawl';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
@@ -18,9 +19,42 @@ export default function HomeServiceSetup() {
     e.preventDefault();
     if (!isValid) return;
     setIsLaunching(true);
-    await new Promise(r => setTimeout(r, 1000));
+
+    // Scrape the company website for ad data
+    let scrapedAd: any = null;
+    try {
+      const result = await firecrawlApi.scrape(websiteUrl, {
+        formats: ['markdown'],
+        onlyMainContent: true,
+      });
+      
+      if (result.success) {
+        const markdown = result.data?.markdown || result.markdown || '';
+        const metadata = result.data?.metadata || result.metadata || {};
+        
+        // Extract a description from the first meaningful paragraph
+        const lines = markdown.split('\n').filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
+        const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
+        
+        // Extract potential sitelink titles from headings
+        const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
+        const sitelinkTitles = headings
+          .map((h: string) => h.replace(/^#+\s+/, '').trim())
+          .filter((h: string) => h.length > 3 && h.length < 60)
+          .slice(0, 3);
+
+        scrapedAd = {
+          description: description || metadata.description || '',
+          metaTitle: metadata.title || '',
+          sitelinks: sitelinkTitles,
+        };
+      }
+    } catch (err) {
+      console.warn('Failed to scrape site, using defaults:', err);
+    }
+
     navigate('/home-service-demo', {
-      state: { searchKeyword, websiteUrl, companyName, enableRecording },
+      state: { searchKeyword, websiteUrl, companyName, enableRecording, scrapedAd },
     });
   };
 
@@ -72,7 +106,7 @@ export default function HomeServiceSetup() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
-                <Globe className="w-4 h-4 text-muted-foreground" />
+                <Building className="w-4 h-4 text-muted-foreground" />
                 Company Name
               </label>
               <input
@@ -124,7 +158,7 @@ export default function HomeServiceSetup() {
             {isLaunching ? (
               <>
                 <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                Loading journey…
+                Analyzing website…
               </>
             ) : (
               <>
