@@ -237,7 +237,6 @@ function getQualificationSteps(config: BusinessConfig): QualificationStep[] {
 
   const defaultSteps: QualificationStep[] = [
     { question: "What specifically are you looking for help with?", topic: 'need' },
-    { question: "Could you describe the scope of what you need?", topic: 'scope' },
     { question: "What's your timeline for this?", topic: 'timeline' },
     { question: "Do you have a budget range in mind?", topic: 'budget' },
     { question: "Can you share your ZIP code so I can confirm availability?", topic: 'location' },
