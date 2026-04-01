@@ -53,8 +53,37 @@ export default function SetupForm() {
       customQuestions: customQuestions.filter(q => q.trim()) || undefined,
     };
     setIsAnalyzing(true);
-    await new Promise(r => setTimeout(r, 2000));
-    navigate('/demo', { state: { config: finalConfig } });
+
+    // Scrape for ad data if URL provided
+    let scrapedAd: any = null;
+    if (finalConfig.websiteUrl) {
+      try {
+        const result = await firecrawlApi.scrape(finalConfig.websiteUrl, {
+          formats: ['markdown'],
+          onlyMainContent: true,
+        });
+        if (result.success) {
+          const markdown = result.data?.markdown || result.markdown || '';
+          const metadata = result.data?.metadata || result.metadata || {};
+          const lines = markdown.split('\n').filter((l: string) => l.trim().length > 30 && !l.startsWith('#') && !l.startsWith('|'));
+          const description = lines.slice(0, 2).join(' ').slice(0, 200).trim();
+          const headings = markdown.match(/^#{1,3}\s+(.+)/gm) || [];
+          const sitelinkTitles = headings
+            .map((h: string) => h.replace(/^#+\s+/, '').trim())
+            .filter((h: string) => h.length > 3 && h.length < 60)
+            .slice(0, 3);
+          scrapedAd = {
+            description: description || metadata.description || '',
+            metaTitle: metadata.title || '',
+            sitelinks: sitelinkTitles,
+          };
+        }
+      } catch (err) {
+        console.warn('Failed to scrape site:', err);
+      }
+    }
+
+    navigate('/demo', { state: { config: finalConfig, scrapedAd } });
   };
 
   const isValid = config.companyName && config.industry && config.cta && 
