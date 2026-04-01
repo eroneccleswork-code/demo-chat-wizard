@@ -20,22 +20,6 @@ export default function Demo() {
   const domain = config?.websiteUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '') || '';
   const websiteUrl = config?.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config?.websiteUrl}`;
 
-  // Arrow key nav for website step only
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (step === 'website' && e.key === 'ArrowRight') {
-        setStep('chat');
-      }
-      if (step === 'chat' && e.key === 'ArrowLeft') {
-        setStep('website');
-      }
-      if (step === 'website' && e.key === 'ArrowLeft') {
-        setStep('google');
-      }
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [step]);
 
   if (!config) return <Navigate to="/" replace />;
 
