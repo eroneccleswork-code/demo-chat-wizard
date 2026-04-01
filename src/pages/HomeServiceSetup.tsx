@@ -91,20 +91,6 @@ export default function HomeServiceSetup() {
           <div className="glass-surface rounded-xl p-6 space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                Search Keyword
-              </label>
-              <input
-                type="text"
-                value={searchKeyword}
-                onChange={e => setSearchKeyword(e.target.value)}
-                placeholder="window replacement near me"
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
                 <Building className="w-4 h-4 text-muted-foreground" />
                 Company Name
               </label>
