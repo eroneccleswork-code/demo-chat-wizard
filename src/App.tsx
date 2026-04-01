@@ -11,6 +11,8 @@ import Journey from "./pages/Journey.tsx";
 import CallJourneySetup from "./pages/CallJourneySetup.tsx";
 import CallJourneyPage from "./pages/CallJourneyPage.tsx";
 import IntegrationsPage from "./pages/IntegrationsPage.tsx";
+import HomeServiceSetup from "./pages/HomeServiceSetup.tsx";
+import HomeServiceDemo from "./pages/HomeServiceDemo.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
