@@ -8,6 +8,7 @@ export default function HomeServiceSetup() {
   const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
