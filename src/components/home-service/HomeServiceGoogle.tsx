@@ -11,6 +11,9 @@ interface Props {
 }
 
 export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd }: Props) {
+  const [faviconError, setFaviconError] = useState(false);
+  const hostname = (() => { try { return new URL(domain.startsWith('http') ? domain : `https://${domain}`).hostname.replace(/^www\./, ''); } catch { return domain; } })();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
