@@ -132,14 +132,9 @@ export default function HomeServiceGoogle({ domain, companyName, onClickAd, scra
 
               {/* Search input */}
               <div className="flex-1 max-w-2xl flex items-center gap-3 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
-                <motion.span
-                  initial={{ width: 0 }}
-                  animate={{ width: 'auto' }}
-                  transition={{ duration: 1.2, ease: 'easeOut' }}
-                  className="text-gray-800 text-base overflow-hidden whitespace-nowrap"
-                >
-                  {searchKeyword}
-                </motion.span>
+                <span className="text-gray-800 text-base whitespace-nowrap">
+                  {searchQuery}
+                </span>
                 <div className="ml-auto flex items-center gap-2">
                   <span className="text-gray-400 cursor-pointer">✕</span>
                   <div className="w-px h-6 bg-gray-300" />
