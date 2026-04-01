@@ -252,33 +252,19 @@ function getIntroMessage(config: BusinessConfig): string {
 
 // ─── Estimate & Closing (contextual) ───
 
-function generateEstimateResponse(config: BusinessConfig, answers: string[], extractedInfo: Record<string, string>[]): string {
+function generateCallbackOffer(config: BusinessConfig): string {
   const name = capitalizeWords(config.companyName);
-  const allInfo = Object.assign({}, ...extractedInfo);
-  const hasZip = !!allInfo.zipCode;
-  const areaPhrase = hasZip ? `the ${allInfo.zipCode} area` : 'your area';
-
-  const templates: Record<string, () => string> = {
-    'Window Cleaning': () => {
-      const qty = allInfo.quantity || 'your windows';
-      return `Good news — we do service ${areaPhrase}. Based on ${qty === 'your windows' ? 'what you\'ve described' : `the ${qty} windows you mentioned`}, a preliminary estimate is between $150 and $300. For an exact quote, I'd recommend a quick virtual consultation with one of our specialists. Would you like to schedule one?`;
-    },
-    'Dental': () => `Great news — we have availability at a location near you${hasZip ? ` in ${areaPhrase}` : ''}. Based on what you've described, we can get you in quickly. Would you like to schedule an appointment?`,
-    'Real Estate': () => `We have experienced agents${hasZip ? ` in ${areaPhrase}` : ''} who can help. I'd love to connect you with one for a personalized consultation. Would you like to schedule a call?`,
-    'HVAC': () => {
-      const urgencyNote = allInfo.urgency === 'high' ? ' Given the urgency, we can prioritize your visit.' : '';
-      return `Good news — we do service ${areaPhrase}.${urgencyNote} Based on what you've shared, we can have a technician assess your system and provide options. Would you like to schedule a visit?`;
-    },
-    'Legal': () => `We have attorneys experienced in that area of law. I'd like to set up a free initial consultation so we can discuss your case in detail. Would you like to schedule one?`,
-    'Blinds': () => {
-      const qty = allInfo.quantity || 'your';
-      return `Good news — we do service ${areaPhrase}. Based on ${qty === 'your' ? 'what you\'ve shared' : `the ${qty} windows you mentioned`}, a preliminary estimate for blinds with installation is between $800 and $1,000. For an exact quote, I'd recommend a virtual consultation. Would you like to schedule one?`;
-    },
+  
+  const templates: Record<string, string> = {
+    'Window Cleaning': `Thanks for those details! Based on what you've shared, I'd love to have one of our specialists give you a quick call to provide an exact quote. Would you like to schedule a callback?`,
+    'Dental': `Thanks for that info! I'd love to get you connected with our office to schedule your visit. Would you like us to give you a quick callback?`,
+    'Real Estate': `Thanks for sharing that! I'd like to connect you with one of our agents who specializes in your area. Would you like to schedule a quick callback?`,
+    'HVAC': `Thanks for those details! I'd like to have one of our technicians reach out to discuss your options. Would you like to schedule a callback?`,
+    'Legal': `Thanks for sharing that. I'd like to have one of our attorneys reach out for a free initial consultation. Would you like to schedule a callback?`,
+    'Blinds': `Thanks for those details! I'd love to connect you with one of our design consultants for a personalized quote. Would you like to schedule a callback?`,
   };
 
-  const defaultTemplate = () => `Good news — we service ${areaPhrase}. Based on what you've shared, I'd love to connect you with our team for a personalized quote. Would you like to schedule a consultation?`;
-
-  return (templates[config.industry] || defaultTemplate)();
+  return templates[config.industry] || `Thanks for that info! I'd love to connect you with someone from ${name} who can help. Would you like to schedule a callback?`;
 }
 
 function generateAppointmentOffer(): string {
