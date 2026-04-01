@@ -1,46 +1,36 @@
 import { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { BusinessConfig } from '@/lib/types';
-import JourneyGoogleAd from './journey/JourneyGoogleAd';
-import JourneyWebsite from './journey/JourneyWebsite';
+import HomeServiceGoogle from './home-service/HomeServiceGoogle';
+import HomeServiceWebsite from './home-service/HomeServiceWebsite';
 import JourneyWaiting from './journey/JourneyWaiting';
 import JourneyIntegrations from './journey/JourneyIntegrations';
 import ScreenRecorder from './ScreenRecorder';
 
-type JourneyStep = 'google-ad' | 'website' | 'waiting' | 'integrations';
+type JourneyStep = 'google' | 'website' | 'waiting' | 'integrations';
 
 interface Props {
   config: BusinessConfig;
   enableRecording?: boolean;
+  scrapedAd?: { description?: string; metaTitle?: string; sitelinks?: string[] } | null;
 }
 
-const STEP_LABELS: Record<JourneyStep, string> = {
-  'google-ad': 'Customer searches Google',
-  'website': 'Lands on website & fills out form',
-  'waiting': 'Waiting for a response…',
-  'integrations': 'Invoca powers the full stack',
-};
+const STEPS: JourneyStep[] = ['google', 'website', 'waiting', 'integrations'];
 
-const STEPS: JourneyStep[] = ['google-ad', 'website', 'waiting', 'integrations'];
-
-export default function CustomerJourney({ config, enableRecording }: Props) {
+export default function CustomerJourney({ config, enableRecording, scrapedAd }: Props) {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<JourneyStep>('google-ad');
-  const [started, setStarted] = useState(false);
+  const [currentStep, setCurrentStep] = useState<JourneyStep>('google');
 
-  const stepIndex = STEPS.indexOf(currentStep);
+  const domain = config.websiteUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '') || 'example.com';
+  const websiteUrl = config.websiteUrl?.startsWith('http') ? config.websiteUrl : `https://${config.websiteUrl}`;
 
   const goNext = useCallback(() => {
-    if (!started) {
-      setStarted(true);
-      return;
-    }
     const idx = STEPS.indexOf(currentStep);
     if (idx < STEPS.length - 1) {
       setCurrentStep(STEPS[idx + 1]);
     }
-  }, [currentStep, started]);
+  }, [currentStep]);
 
   const goPrev = useCallback(() => {
     const idx = STEPS.indexOf(currentStep);
@@ -48,6 +38,17 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
       setCurrentStep(STEPS[idx - 1]);
     }
   }, [currentStep]);
+
+  // Arrow key navigation — only for website step onward (google has its own keyboard handling)
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (currentStep === 'google') return; // google step handles its own input
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [goNext, goPrev, currentStep]);
 
   const handleStartDemo = () => {
     navigate('/demo', {
@@ -60,68 +61,38 @@ export default function CustomerJourney({ config, enableRecording }: Props) {
     });
   };
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') goNext();
-      if (e.key === 'ArrowLeft') goPrev();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [goNext, goPrev]);
-
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {enableRecording && <ScreenRecorder />}
 
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <button
-          onClick={() => navigate('/')}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Back
-        </button>
-        <span className="text-sm font-medium text-foreground">{config.companyName} — Customer Journey</span>
-        <div />
-      </div>
-
-      <div className="px-6 py-3">
-        <div className="flex items-center gap-1">
-          {STEPS.map((step, i) => (
-            <div key={step} className="flex-1">
-              <div
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  i <= stepIndex ? 'bg-primary' : 'bg-muted'
-                }`}
-              />
-            </div>
-          ))}
-        </div>
-        <motion.p
-          key={currentStep}
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-sm text-muted-foreground mt-2 text-center"
-        >
-          {STEP_LABELS[currentStep]}
-        </motion.p>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center p-6">
-        <AnimatePresence mode="wait">
-          {currentStep === 'google-ad' && (
-            <JourneyGoogleAd key="ad" config={config} onNext={goNext} started={started} />
-          )}
-          {currentStep === 'website' && (
-            <JourneyWebsite key="web" config={config} onNext={goNext} variant="form" />
-          )}
-          {currentStep === 'waiting' && (
-            <JourneyWaiting key="wait" config={config} onStartDemo={handleStartDemo} />
-          )}
-          {currentStep === 'integrations' && (
-            <JourneyIntegrations key="integrations" config={config} />
-          )}
-        </AnimatePresence>
-      </div>
+      <AnimatePresence mode="wait">
+        {currentStep === 'google' && (
+          <HomeServiceGoogle
+            key="google"
+            domain={domain}
+            companyName={config.companyName}
+            onClickAd={() => setCurrentStep('website')}
+            scrapedAd={scrapedAd}
+          />
+        )}
+        {currentStep === 'website' && (
+          <HomeServiceWebsite
+            key="website"
+            websiteUrl={websiteUrl}
+            domain={domain}
+          />
+        )}
+        {currentStep === 'waiting' && (
+          <div key="waiting" className="flex-1 flex items-center justify-center p-6">
+            <JourneyWaiting config={config} onStartDemo={handleStartDemo} />
+          </div>
+        )}
+        {currentStep === 'integrations' && (
+          <div key="integrations" className="flex-1 flex items-center justify-center p-6">
+            <JourneyIntegrations config={config} />
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
