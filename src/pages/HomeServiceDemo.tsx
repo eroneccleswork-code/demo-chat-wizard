@@ -65,6 +65,7 @@ export default function HomeServiceDemo() {
             companyName={displayName}
             started={started}
             onClickAd={() => setStep('website')}
+            scrapedAd={scrapedAd}
           />
         )}
         {step === 'website' && (
