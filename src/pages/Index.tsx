@@ -8,7 +8,7 @@ const USE_CASES = [
   { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' },
   { label: 'Customer Journey | Ad to SMS', active: true, path: '/journey-setup' },
   { label: 'Call Journey | Ad to Phone Call', active: true, path: '/call-journey-setup' },
-  { label: 'Use Case 4 | Coming Soon', active: false, path: '' },
+  { label: 'Home Service Demo | Search to Site', active: true, path: '/home-service-setup' },
 ];
 
 export default function Index() {
