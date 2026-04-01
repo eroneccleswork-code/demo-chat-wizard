@@ -187,7 +187,7 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   )}
                   <div>
                     <p className="text-sm text-gray-900 font-medium">{companyName}</p>
-                    <p className="text-xs text-gray-500">{`https://offers.${domain}`} <MoreVertical className="inline w-3 h-3 text-gray-400" /></p>
+                    <p className="text-xs text-gray-500">{`https://${hostname}`} <MoreVertical className="inline w-3 h-3 text-gray-400" /></p>
                   </div>
                 </div>
 
@@ -197,7 +197,7 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   whileHover={{ scale: 1.005 }}
                 >
                   <h3 className="text-xl text-blue-700 group-hover:underline cursor-pointer mb-1">
-                    {companyName}®
+                    {companyName} | Official Site
                   </h3>
                 </motion.button>
                 <p className="text-sm text-gray-600 leading-relaxed max-w-xl">
