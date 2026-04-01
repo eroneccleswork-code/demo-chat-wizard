@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Mic, Camera, MoreVertical } from 'lucide-react';
 
@@ -9,16 +9,21 @@ interface ScrapedAd {
 }
 
 interface Props {
-  searchKeyword: string;
   domain: string;
   companyName: string;
-  started: boolean;
   onClickAd: () => void;
   scrapedAd?: ScrapedAd | null;
 }
 
-export default function HomeServiceGoogle({ searchKeyword, domain, companyName, started, onClickAd, scrapedAd }: Props) {
+export default function HomeServiceGoogle({ domain, companyName, onClickAd, scrapedAd }: Props) {
   const [faviconError, setFaviconError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [started, setStarted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!started) inputRef.current?.focus();
+  }, [started]);
   const hostname = (() => { try { return new URL(domain.startsWith('http') ? domain : `https://${domain}`).hostname.replace(/^www\./, ''); } catch { return domain; } })();
 
   return (
@@ -62,10 +67,18 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
             </div>
 
             {/* Search bar */}
-            <div className="w-full max-w-[584px] px-4">
+            <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) setStarted(true); }} className="w-full max-w-[584px] px-4">
               <div className="flex items-center gap-3 px-5 py-3 bg-white rounded-full border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                 <Search className="w-5 h-5 text-gray-400" />
-                <span className="flex-1 text-gray-400 text-base">|</span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="flex-1 text-base text-gray-800 bg-transparent outline-none placeholder:text-gray-400"
+                  placeholder=""
+                  autoFocus
+                />
                 <Mic className="w-5 h-5 text-blue-500 cursor-pointer" />
                 <Camera className="w-5 h-5 text-blue-500 cursor-pointer" />
                 <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200 cursor-pointer">
@@ -75,14 +88,14 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
 
               {/* Search buttons */}
               <div className="flex items-center justify-center gap-3 mt-6">
-                <button className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
+                <button type="submit" className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
                   Google Search
                 </button>
-                <button className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
+                <button type="button" className="px-5 py-2 bg-gray-100 hover:border-gray-300 border border-transparent rounded text-sm text-gray-700">
                   I'm Feeling Lucky
                 </button>
               </div>
-            </div>
+            </form>
           </div>
 
           {/* Bottom bar */}
@@ -119,14 +132,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
 
               {/* Search input */}
               <div className="flex-1 max-w-2xl flex items-center gap-3 px-5 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
-                <motion.span
-                  initial={{ width: 0 }}
-                  animate={{ width: 'auto' }}
-                  transition={{ duration: 1.2, ease: 'easeOut' }}
-                  className="text-gray-800 text-base overflow-hidden whitespace-nowrap"
-                >
-                  {searchKeyword}
-                </motion.span>
+                <span className="text-gray-800 text-base whitespace-nowrap">
+                  {searchQuery}
+                </span>
                 <div className="ml-auto flex items-center gap-2">
                   <span className="text-gray-400 cursor-pointer">✕</span>
                   <div className="w-px h-6 bg-gray-300" />
@@ -255,7 +263,7 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                 </div>
                 <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{scrapedAd?.metaTitle || `${companyName} | Official Site`}</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchKeyword.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
+                  {scrapedAd?.description ? scrapedAd.description.slice(0, 150) + '...' : `Visit the official website for ${searchQuery.replace(' near me', '')} services. Schedule your free consultation today. Trusted by thousands of homeowners.`}
                 </p>
               </div>
 
@@ -269,9 +277,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Top 10 Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Near Me</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Top 10 Best {searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Near Me</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Top 10 Best {searchKeyword.replace(' near me', '')} near you. See ratings, reviews, hours, and photos. Free estimates from local professionals.
+                  Top 10 Best {searchQuery.replace(' near me', '')} near you. See ratings, reviews, hours, and photos. Free estimates from local professionals.
                 </p>
               </div>
 
@@ -285,9 +293,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Services Near You - Free Quotes</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">{searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Services Near You - Free Quotes</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Compare local pros for your {searchKeyword.replace(' near me', '')} project. Read verified reviews and get free cost estimates. Connect with top-rated professionals.
+                  Compare local pros for your {searchQuery.replace(' near me', '')} project. Read verified reviews and get free cost estimates. Connect with top-rated professionals.
                 </p>
               </div>
 
@@ -301,9 +309,9 @@ export default function HomeServiceGoogle({ searchKeyword, domain, companyName, 
                   </div>
                   <MoreVertical className="w-4 h-4 text-gray-400 ml-1" />
                 </div>
-                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Find the Best {searchKeyword.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Pros | Angi</h3>
+                <h3 className="text-xl text-blue-700 hover:underline cursor-pointer">Find the Best {searchQuery.replace(' near me', '').replace(/^\w/, c => c.toUpperCase())} Pros | Angi</h3>
                 <p className="text-sm text-gray-600 mt-0.5">
-                  Browse our network of screened and certified {searchKeyword.replace(' near me', '')} professionals. Read real customer reviews and compare pricing.
+                  Browse our network of screened and certified {searchQuery.replace(' near me', '')} professionals. Read real customer reviews and compare pricing.
                 </p>
               </div>
             </motion.div>

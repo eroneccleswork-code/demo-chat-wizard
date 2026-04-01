@@ -1,19 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search, Globe, Video, Building } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { firecrawlApi } from '@/lib/api/firecrawl';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
-  const isValid = searchKeyword && websiteUrl && companyName;
+  const isValid = websiteUrl && companyName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +53,7 @@ export default function HomeServiceSetup() {
     }
 
     navigate('/home-service-demo', {
-      state: { searchKeyword, websiteUrl, companyName, enableRecording, scrapedAd },
+      state: { websiteUrl, companyName, enableRecording, scrapedAd },
     });
   };
 
@@ -90,20 +89,6 @@ export default function HomeServiceSetup() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="glass-surface rounded-xl p-6 space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Search className="w-4 h-4 text-muted-foreground" />
-                Search Keyword
-              </label>
-              <input
-                type="text"
-                value={searchKeyword}
-                onChange={e => setSearchKeyword(e.target.value)}
-                placeholder="window replacement near me"
-                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-              />
-            </div>
-
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Building className="w-4 h-4 text-muted-foreground" />
