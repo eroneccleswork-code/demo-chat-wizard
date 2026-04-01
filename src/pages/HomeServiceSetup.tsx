@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Search, Globe, Video, Building } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { firecrawlApi } from '@/lib/api/firecrawl';
 
