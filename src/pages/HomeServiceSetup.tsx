@@ -20,7 +20,7 @@ export default function HomeServiceSetup() {
     setIsLaunching(true);
     await new Promise(r => setTimeout(r, 1000));
     navigate('/home-service-demo', {
-      state: { searchKeyword, websiteUrl, enableRecording },
+      state: { searchKeyword, websiteUrl, companyName, enableRecording },
     });
   };
 
