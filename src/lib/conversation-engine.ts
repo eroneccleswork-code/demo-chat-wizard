@@ -267,43 +267,47 @@ function generateCallbackOffer(config: BusinessConfig): string {
   return templates[config.industry] || `Thanks for that info! I'd love to connect you with someone from ${name} who can help. Would you like to schedule a callback?`;
 }
 
-function generateAppointmentOffer(): string {
-  const now = new Date();
-  const daysAhead = 2 + Math.floor(Math.random() * 5);
-  const apptDate = new Date(now);
-  apptDate.setDate(apptDate.getDate() + daysAhead);
-
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-  const dayName = days[apptDate.getDay()];
-  const monthName = months[apptDate.getMonth()];
-  const dateNum = apptDate.getDate();
-  const hours = [10, 11, 12, 1, 2, 3];
-  const hour = hours[Math.floor(Math.random() * hours.length)];
-  const ampm = hour >= 10 && hour <= 11 ? 'AM' : 'PM';
-
-  return `I have availability on ${dayName}, ${monthName} ${dateNum} at ${hour}:00 ${ampm} Pacific Time. Would you like me to lock that in?`;
+interface AppointmentSlot {
+  dayName: string;
+  monthName: string;
+  dateNum: number;
+  hour: number;
+  ampm: string;
 }
 
-function generateConfirmation(config: BusinessConfig): string {
-  const now = new Date();
-  const daysAhead = 2 + Math.floor(Math.random() * 5);
-  const apptDate = new Date(now);
-  apptDate.setDate(apptDate.getDate() + daysAhead);
-
+function generateAppointmentSlot(): AppointmentSlot {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  const dayName = days[apptDate.getDay()];
-  const monthName = months[apptDate.getMonth()];
-  const dateNum = apptDate.getDate();
+  const now = new Date();
+  let daysAhead = 2 + Math.floor(Math.random() * 5);
+  const apptDate = new Date(now);
+  apptDate.setDate(apptDate.getDate() + daysAhead);
+  // Skip weekends — bump forward to next weekday
+  while (apptDate.getDay() === 0 || apptDate.getDay() === 6) {
+    apptDate.setDate(apptDate.getDate() + 1);
+  }
+
   const hours = [10, 11, 12, 1, 2, 3];
   const hour = hours[Math.floor(Math.random() * hours.length)];
   const ampm = hour >= 10 && hour <= 11 ? 'AM' : 'PM';
-  const phoneNum = '805-888-2424';
 
-  return `Great. Your virtual consultation is confirmed for ${dayName}, ${monthName} ${dateNum} at ${hour}:00 ${ampm} Pacific Time. You'll receive a text message 5 minutes before the appointment with a reminder and the number to call: ${phoneNum}. Thank you for choosing ${capitalizeWords(config.companyName)}. We look forward to working with you.`;
+  return {
+    dayName: days[apptDate.getDay()],
+    monthName: months[apptDate.getMonth()],
+    dateNum: apptDate.getDate(),
+    hour,
+    ampm,
+  };
+}
+
+function generateAppointmentOffer(slot: AppointmentSlot): string {
+  return `I have availability on ${slot.dayName}, ${slot.monthName} ${slot.dateNum} at ${slot.hour}:00 ${slot.ampm} Pacific Time. Would you like me to lock that in?`;
+}
+
+function generateConfirmation(config: BusinessConfig, slot: AppointmentSlot): string {
+  const phoneNum = '805-888-2424';
+  return `Great. Your virtual consultation is confirmed for ${slot.dayName}, ${slot.monthName} ${slot.dateNum} at ${slot.hour}:00 ${slot.ampm} Pacific Time. You'll receive a text message 5 minutes before the appointment with a reminder and the number to call: ${phoneNum}. Thank you for choosing ${capitalizeWords(config.companyName)}. We look forward to working with you.`;
 }
 
 // ─── State Machine ───
