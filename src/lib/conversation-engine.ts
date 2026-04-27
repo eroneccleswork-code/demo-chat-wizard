@@ -419,9 +419,10 @@ export function getNextAgentMessage(
           newState: { phase: 'done', userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, questionIndex: state.questionIndex + 1, lastTopic: '' },
         };
       }
+      const slot = generateAppointmentSlot();
       return {
-        message: generateAppointmentOffer(),
-        newState: { phase: 'offer-appointment', questionIndex: state.questionIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'appointment' },
+        message: generateAppointmentOffer(slot),
+        newState: { phase: 'offer-appointment', questionIndex: state.questionIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: 'appointment', appointmentSlot: slot },
       };
     }
 
@@ -432,9 +433,10 @@ export function getNextAgentMessage(
           newState: { phase: 'done', userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, questionIndex: state.questionIndex + 1, lastTopic: '' },
         };
       }
+      const confirmSlot = state.appointmentSlot ?? generateAppointmentSlot();
       return {
-        message: generateConfirmation(config),
-        newState: { phase: 'done', questionIndex: state.questionIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: '' },
+        message: generateConfirmation(config, confirmSlot),
+        newState: { phase: 'done', questionIndex: state.questionIndex + 1, userAnswers: newAnswers, extractedInfo: newInfo, negativeCount: newNegCount, lastTopic: '', appointmentSlot: confirmSlot },
       };
     }
 
