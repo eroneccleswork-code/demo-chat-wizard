@@ -321,6 +321,7 @@ export interface ConversationState {
   extractedInfo: Record<string, string>[];
   negativeCount: number;
   lastTopic: string;
+  appointmentSlot?: AppointmentSlot;
 }
 
 export function getInitialState(): ConversationState {
