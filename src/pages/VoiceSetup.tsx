@@ -1,52 +1,46 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Video, Building, Mic } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building, Mic, Play, Loader2 } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { firecrawlApi } from '@/lib/api/firecrawl';
 import { supabase } from '@/integrations/supabase/client';
+import { ELEVEN_VOICES, speakWithElevenLabs } from '@/lib/elevenlabs';
 
 export default function VoiceSetup() {
   const navigate = useNavigate();
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [voiceURI, setVoiceURI] = useState('');
+  const [voiceId, setVoiceId] = useState(ELEVEN_VOICES[0].id);
+  const [previewing, setPreviewing] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [stage, setStage] = useState<string>('');
 
-  useEffect(() => {
-    const load = () => {
-      const list = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
-      setVoices(list);
-      if (list.length && !voiceURI) {
-        const pick = list.find(v => /samantha|aria|jenny|google us english/i.test(v.name)) || list[0];
-        setVoiceURI(pick.voiceURI);
-      }
-    };
-    load();
-    window.speechSynthesis.onvoiceschanged = load;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const previewVoice = () => {
-    const u = new SpeechSynthesisUtterance(`Hi, this is your AI voice agent from ${companyName || 'your company'}. How can I help today?`);
-    const v = voices.find(x => x.voiceURI === voiceURI);
-    if (v) u.voice = v;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
+  const previewVoice = async () => {
+    if (previewing) return;
+    setPreviewing(true);
+    try {
+      const audio = await speakWithElevenLabs(
+        `Hi, this is your AI voice agent from ${companyName || 'your company'}. How can I help today?`,
+        voiceId
+      );
+      audio.onended = () => setPreviewing(false);
+      audio.onerror = () => setPreviewing(false);
+      await audio.play();
+    } catch (e) {
+      console.error(e);
+      setPreviewing(false);
+    }
   };
 
-  const isValid = websiteUrl && companyName && voiceURI;
+  const isValid = websiteUrl && companyName && voiceId;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
     setIsLaunching(true);
 
-    // 1) Scrape the site (real customer journey data)
     setStage('Scraping site…');
     let websiteMarkdown = '';
     let scrapedAd: any = null;
@@ -70,7 +64,6 @@ export default function VoiceSetup() {
       console.warn('Scrape failed:', err);
     }
 
-    // 2) Generate the agentic voice flow from real site content
     setStage('Training voice agent on cart & site…');
     let flow: any = null;
     try {
@@ -82,14 +75,14 @@ export default function VoiceSetup() {
       console.warn('Flow gen failed:', err);
     }
 
-    const voice = voices.find(v => v.voiceURI === voiceURI);
+    const voice = ELEVEN_VOICES.find(v => v.id === voiceId);
     navigate('/voice-demo', {
       state: {
         websiteUrl,
         companyName,
         enableRecording,
         scrapedAd,
-        voiceURI,
+        voiceId,
         voiceName: voice?.name || '',
         flow,
       },
@@ -142,14 +135,18 @@ export default function VoiceSetup() {
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Mic className="w-4 h-4 text-muted-foreground" /> Agent Voice
+                <span className="text-xs text-muted-foreground font-normal">(ElevenLabs)</span>
               </label>
               <div className="flex gap-2">
-                <select value={voiceURI} onChange={e => setVoiceURI(e.target.value)}
+                <select value={voiceId} onChange={e => setVoiceId(e.target.value)}
                   className="flex-1 px-4 py-2.5 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-primary/50">
-                  {voices.map(v => <option key={v.voiceURI} value={v.voiceURI}>{v.name} — {v.lang}</option>)}
+                  {ELEVEN_VOICES.map(v => (
+                    <option key={v.id} value={v.id}>{v.name} — {v.description}</option>
+                  ))}
                 </select>
-                <button type="button" onClick={previewVoice}
-                  className="px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+                <button type="button" onClick={previewVoice} disabled={previewing}
+                  className="px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 flex items-center gap-2 disabled:opacity-60">
+                  {previewing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                   Preview
                 </button>
               </div>
