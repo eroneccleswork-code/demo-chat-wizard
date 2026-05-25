@@ -60,7 +60,7 @@ export default function VoiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
   const st = (location.state as LocState) || {};
-  const { websiteUrl, companyName, enableRecording, scrapedAd, voiceURI, voiceName, flow: flowFromState } = st;
+  const { websiteUrl, companyName, enableRecording, scrapedAd, voiceId, voiceName, flow: flowFromState } = st;
 
   const [step, setStep] = useState<Step>('google');
   const [callOpen, setCallOpen] = useState(false);
