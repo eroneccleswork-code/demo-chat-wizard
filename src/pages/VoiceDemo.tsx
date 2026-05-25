@@ -112,7 +112,7 @@ export default function VoiceDemo() {
         {callOpen && step === 'website' && (
           <CallOverlay
             companyName={displayName}
-            voiceURI={voiceURI || ''}
+            voiceId={voiceId || ''}
             voiceName={voiceName || ''}
             flow={flow}
             onClose={() => setCallOpen(false)}
