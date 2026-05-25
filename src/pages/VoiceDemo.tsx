@@ -405,7 +405,7 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
         </div>
 
         {/* Home indicator */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/40 rounded-full z-30" />
+        <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/40 rounded-full z-30" />
       </motion.div>
 
       {/* Subtle hint badge */}
