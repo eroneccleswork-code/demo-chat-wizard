@@ -158,16 +158,35 @@ function CallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [turns, isSpeaking]);
 
-  const speak = (text: string) => new Promise<void>((resolve) => {
-    const u = new SpeechSynthesisUtterance(text);
-    const v = window.speechSynthesis.getVoices().find(x => x.voiceURI === voiceURI);
-    if (v) u.voice = v;
-    u.onend = () => { setIsSpeaking(false); resolve(); };
-    u.onerror = () => { setIsSpeaking(false); resolve(); };
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+    setIsSpeaking(false);
+  };
+
+  const speak = async (text: string) => {
+    stopAudio();
     setIsSpeaking(true);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-  });
+    try {
+      const audio = await speakWithElevenLabs(text, voiceId);
+      audioRef.current = audio;
+      await new Promise<void>((resolve) => {
+        audio.onended = () => resolve();
+        audio.onerror = () => resolve();
+        audio.play().catch(() => resolve());
+      });
+    } catch (e) {
+      console.error('TTS error', e);
+    } finally {
+      setIsSpeaking(false);
+      audioRef.current = null;
+    }
+  };
 
   // Play current step
   useEffect(() => {
@@ -176,7 +195,6 @@ function CallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
     if (!branch) return;
     const text = stepId === 'greet' ? flow.openingLine : branch.agent;
     if (!text) return;
-    // Cart "viewing" highlight when greeting or any time agent references cart/items
     if (/cart|item|order|left|total|\$/i.test(text)) setAgentViewingCart(true);
     setTurns(prev => [...prev, { id: `a-${Date.now()}`, role: 'agent', text }]);
     setReplies([]);
@@ -185,7 +203,7 @@ function CallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
       setReplies(branch.options || []);
       if (branch.terminal) setTimeout(() => setStatus('ended'), 1500);
     });
-    return () => window.speechSynthesis.cancel();
+    return () => stopAudio();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepId, status]);
 
@@ -196,7 +214,7 @@ function CallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
     setTimeout(() => setStepId(r.nextId), 400);
   };
 
-  const endCall = () => { window.speechSynthesis.cancel(); setStatus('ended'); };
+  const endCall = () => { stopAudio(); setStatus('ended'); };
   const mmss = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
   const cartTotal = flow.cart.reduce((s, i) => s + i.price * i.qty, 0);
 
