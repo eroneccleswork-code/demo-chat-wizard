@@ -11,8 +11,6 @@ export default function VoiceSetup() {
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [enableRecording, setEnableRecording] = useState(false);
-  const [voiceId, setVoiceId] = useState(ELEVEN_VOICES[0].id);
-  const [previewing, setPreviewing] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [stage, setStage] = useState<string>('');
 
