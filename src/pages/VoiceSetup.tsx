@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Video, Building, Mic, Play, Loader2 } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { firecrawlApi } from '@/lib/api/firecrawl';
 import { supabase } from '@/integrations/supabase/client';
-import { ELEVEN_VOICES, speakWithElevenLabs } from '@/lib/elevenlabs';
 
 export default function VoiceSetup() {
   const navigate = useNavigate();
