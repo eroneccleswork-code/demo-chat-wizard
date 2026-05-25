@@ -5,7 +5,7 @@ import { Phone, Mic, MicOff, Volume2, Grid3x3, UserPlus, Video, User } from 'luc
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
-import { speakWithElevenLabs } from '@/lib/elevenlabs';
+import { fetchTtsUrl } from '@/lib/elevenlabs';
 import { supabase } from '@/integrations/supabase/client';
 
 type Step = 'google' | 'website';
