@@ -38,6 +38,8 @@ const App = () => (
             <Route path="/integrations" element={<IntegrationsPage />} />
             <Route path="/home-service-setup" element={<HomeServiceSetup />} />
             <Route path="/home-service-demo" element={<HomeServiceDemo />} />
+            <Route path="/voice-setup" element={<VoiceSetup />} />
+            <Route path="/voice-demo" element={<VoiceDemo />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
