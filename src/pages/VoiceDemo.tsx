@@ -234,9 +234,16 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
 
   const answer = async () => {
     ringRef.current?.stop();
+    // Unlock audio playback within the user gesture (Safari/Chrome autoplay policy)
+    const a = new Audio();
+    a.muted = true;
+    try { await a.play(); } catch {}
+    a.pause();
+    a.muted = false;
+    audioRef.current = a;
+
     setCallState('in-call');
     setStartedAt(Date.now());
-    // request mic permission upfront
     try { await navigator.mediaDevices.getUserMedia({ audio: true }); } catch {}
     messagesRef.current = [{ role: 'assistant', content: flow.openingLine }];
     await speak(flow.openingLine);
