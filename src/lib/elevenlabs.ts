@@ -17,23 +17,34 @@ export const ELEVEN_VOICES: ElevenVoice[] = [
   { id: 'iP95p4xoKVk53GoZ742B', name: 'Chris',   description: 'American male, casual' },
 ];
 
-import { supabase } from '@/integrations/supabase/client';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const cache = new Map<string, string>(); // key -> object URL
 
-export async function speakWithElevenLabs(text: string, voiceId: string): Promise<HTMLAudioElement> {
+export async function fetchTtsUrl(text: string, voiceId: string): Promise<string> {
   const key = `${voiceId}::${text}`;
-  let url = cache.get(key);
-  if (!url) {
-    const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
-      body: { text, voiceId },
-    });
-    if (error) throw error;
-    // supabase-js returns the binary body as a Blob for non-JSON responses
-    const blob = data instanceof Blob ? data : new Blob([data as ArrayBuffer], { type: 'audio/mpeg' });
-    url = URL.createObjectURL(blob);
-    cache.set(key, url);
-  }
-  const audio = new Audio(url);
-  return audio;
+  const cached = cache.get(key);
+  if (cached) return cached;
+
+  const resp = await fetch(`${SUPABASE_URL}/functions/v1/elevenlabs-tts`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      apikey: SUPABASE_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text, voiceId }),
+  });
+  if (!resp.ok) throw new Error(`TTS ${resp.status}: ${await resp.text()}`);
+  const blob = await resp.blob();
+  const url = URL.createObjectURL(blob);
+  cache.set(key, url);
+  return url;
+}
+
+// Back-compat helper (creates fresh Audio per call)
+export async function speakWithElevenLabs(text: string, voiceId: string): Promise<HTMLAudioElement> {
+  const url = await fetchTtsUrl(text, voiceId);
+  return new Audio(url);
 }

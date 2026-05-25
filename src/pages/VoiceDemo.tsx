@@ -5,7 +5,7 @@ import { Phone, Mic, MicOff, Volume2, Grid3x3, UserPlus, Video, User } from 'luc
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
-import { speakWithElevenLabs } from '@/lib/elevenlabs';
+import { fetchTtsUrl } from '@/lib/elevenlabs';
 import { supabase } from '@/integrations/supabase/client';
 
 type Step = 'google' | 'website';
@@ -174,19 +174,21 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
   const speak = async (text: string) => {
     setLastAgentSaid(text);
     setIsAgentSpeaking(true);
-    // pause listening while agent speaks
     try { recognitionRef.current?.stop(); } catch {}
     try {
-      const audio = await speakWithElevenLabs(text, voiceId);
+      const url = await fetchTtsUrl(text, voiceId);
+      const audio = audioRef.current || new Audio();
       audioRef.current = audio;
+      audio.src = url;
+      audio.load();
       await new Promise<void>((resolve) => {
         audio.onended = () => resolve();
-        audio.onerror = () => resolve();
-        audio.play().catch(() => resolve());
+        audio.onerror = (e) => { console.error('audio err', e); resolve(); };
+        const p = audio.play();
+        if (p) p.catch((err) => { console.error('audio.play() blocked:', err); resolve(); });
       });
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('TTS failed', e); }
     setIsAgentSpeaking(false);
-    audioRef.current = null;
     if (stateRef.current === 'in-call') startListening();
   };
 
@@ -232,9 +234,16 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
 
   const answer = async () => {
     ringRef.current?.stop();
+    // Unlock audio playback within the user gesture (Safari/Chrome autoplay policy)
+    const a = new Audio();
+    a.muted = true;
+    try { await a.play(); } catch {}
+    a.pause();
+    a.muted = false;
+    audioRef.current = a;
+
     setCallState('in-call');
     setStartedAt(Date.now());
-    // request mic permission upfront
     try { await navigator.mediaDevices.getUserMedia({ audio: true }); } catch {}
     messagesRef.current = [{ role: 'assistant', content: flow.openingLine }];
     await speak(flow.openingLine);
