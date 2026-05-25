@@ -6,7 +6,6 @@ import heroImage from '@/assets/hero-blinds.jpg';
 
 const USE_CASES = [
   { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' },
-  { label: 'Home Service Demo | Search to Site', active: true, path: '/home-service-setup' },
 ];
 
 export default function Index() {
