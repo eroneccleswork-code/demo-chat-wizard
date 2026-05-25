@@ -5,7 +5,7 @@ import { Phone, Mic, MicOff, Volume2, Grid3x3, UserPlus, Video, User } from 'luc
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
-import { fetchTtsUrl } from '@/lib/elevenlabs';
+import { ELEVEN_VOICES, fetchTtsUrl } from '@/lib/elevenlabs';
 import { supabase } from '@/integrations/supabase/client';
 
 type Step = 'google' | 'website';
@@ -94,7 +94,7 @@ export default function VoiceDemo() {
         {callOpen && step === 'website' && (
           <PhoneCallOverlay
             companyName={displayName}
-            voiceId={voiceId || ''}
+            voiceId={voiceId || ELEVEN_VOICES[0].id}
             voiceName={voiceName || ''}
             flow={flow}
             onClose={() => setCallOpen(false)}
@@ -121,8 +121,11 @@ function PhoneCallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
   const [startedAt, setStartedAt] = useState<number | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const isPlaybackActiveRef = useRef(false);
   const recognitionRef = useRef<any>(null);
   const ringRef = useRef<{ ctx: AudioContext; stop: () => void } | null>(null);
+  const prefetchedOpeningRef = useRef<string | null>(null);
   const messagesRef = useRef<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const stateRef = useRef<CallState>('ringing');
   const mutedRef = useRef(false);
@@ -164,6 +167,16 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
     return () => { ringRef.current?.stop(); };
   }, []);
 
+  // Start fetching the first agent line while the call is still ringing so
+  // accepting the call can start audio immediately from the user tap.
+  useEffect(() => {
+    let cancelled = false;
+    fetchTtsUrl(flow.openingLine, voiceId)
+      .then((url) => { if (!cancelled) prefetchedOpeningRef.current = url; })
+      .catch((e) => console.error('Opening TTS preload failed', e));
+    return () => { cancelled = true; };
+  }, [flow.openingLine, voiceId]);
+
   // Timer
   useEffect(() => {
     if (callState !== 'in-call' || !startedAt) return;
@@ -174,9 +187,12 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
   const speak = async (text: string) => {
     setLastAgentSaid(text);
     setIsAgentSpeaking(true);
+    isPlaybackActiveRef.current = true;
     try { recognitionRef.current?.stop(); } catch {}
     try {
-      const url = await fetchTtsUrl(text, voiceId);
+      const url = text === flow.openingLine && prefetchedOpeningRef.current
+        ? prefetchedOpeningRef.current
+        : await fetchTtsUrl(text, voiceId);
       const audio = audioRef.current || new Audio();
       audioRef.current = audio;
       audio.src = url;
@@ -185,9 +201,32 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
         audio.onended = () => resolve();
         audio.onerror = (e) => { console.error('audio err', e); resolve(); };
         const p = audio.play();
-        if (p) p.catch((err) => { console.error('audio.play() blocked:', err); resolve(); });
+        if (p) p.catch(async (err) => {
+          console.error('audio.play() blocked, retrying with WebAudio:', err);
+          try {
+            const ctx = audioContextRef.current || new (window.AudioContext || (window as any).webkitAudioContext)();
+            audioContextRef.current = ctx;
+            if (ctx.state !== 'running') await ctx.resume();
+            const buffer = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.onended = () => resolve();
+            source.start();
+          } catch (fallbackErr) {
+            console.error('WebAudio playback failed:', fallbackErr);
+            resolve();
+          }
+        });
       });
     } catch (e) { console.error('TTS failed', e); }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.removeAttribute('src');
+      audioRef.current.load();
+      audioRef.current = null;
+    }
+    isPlaybackActiveRef.current = false;
     setIsAgentSpeaking(false);
     if (stateRef.current === 'in-call') startListening();
   };
@@ -205,7 +244,7 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
     rec.onend = () => {
       setIsListening(false);
       // auto-restart if still in call & agent not speaking
-      if (stateRef.current === 'in-call' && !audioRef.current && !mutedRef.current) {
+      if (stateRef.current === 'in-call' && !isPlaybackActiveRef.current && !mutedRef.current) {
         setTimeout(() => { if (stateRef.current === 'in-call') startListening(); }, 200);
       }
     };
@@ -234,17 +273,17 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
 
   const answer = async () => {
     ringRef.current?.stop();
-    // Unlock audio playback within the user gesture (Safari/Chrome autoplay policy)
-    const a = new Audio();
-    a.muted = true;
-    try { await a.play(); } catch {}
-    a.pause();
-    a.muted = false;
-    audioRef.current = a;
+    // Unlock audio output immediately from the user's tap; later TTS playback can
+    // use this running audio context even after the network request completes.
+    try {
+      const ctx = audioContextRef.current || new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = ctx;
+      if (ctx.state !== 'running') await ctx.resume();
+    } catch (e) { console.warn('Audio unlock failed', e); }
 
     setCallState('in-call');
     setStartedAt(Date.now());
-    try { await navigator.mediaDevices.getUserMedia({ audio: true }); } catch {}
+    navigator.mediaDevices?.getUserMedia({ audio: true }).catch((e) => console.warn('Microphone permission failed', e));
     messagesRef.current = [{ role: 'assistant', content: flow.openingLine }];
     await speak(flow.openingLine);
   };
@@ -253,6 +292,9 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
     ringRef.current?.stop();
     try { recognitionRef.current?.stop(); } catch {}
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    audioContextRef.current?.close().catch(() => {});
+    audioContextRef.current = null;
+    isPlaybackActiveRef.current = false;
     setIsAgentSpeaking(false);
     setIsListening(false);
     setCallState('ended');
@@ -263,7 +305,7 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
     const next = !muted;
     setMuted(next);
     if (next) { try { recognitionRef.current?.stop(); } catch {} }
-    else if (callState === 'in-call' && !audioRef.current) startListening();
+    else if (callState === 'in-call' && !isPlaybackActiveRef.current) startListening();
   };
 
   const mmss = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
