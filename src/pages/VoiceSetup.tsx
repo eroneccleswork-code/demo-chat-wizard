@@ -135,7 +135,7 @@ export default function VoiceSetup() {
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <Mic className="w-4 h-4 text-muted-foreground" /> Agent Voice
-                <span className="text-xs text-muted-foreground font-normal">(ElevenLabs)</span>
+                <span className="text-xs text-muted-foreground font-normal">(Deepgram Aura)</span>
               </label>
               <div className="flex gap-2">
                 <select value={voiceId} onChange={e => setVoiceId(e.target.value)}
