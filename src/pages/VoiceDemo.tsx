@@ -5,6 +5,7 @@ import { Phone, PhoneOff, ShoppingCart, Mic, User, X } from 'lucide-react';
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
+import { speakWithElevenLabs } from '@/lib/elevenlabs';
 
 type Step = 'google' | 'website';
 
