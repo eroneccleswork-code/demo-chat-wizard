@@ -174,19 +174,21 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
   const speak = async (text: string) => {
     setLastAgentSaid(text);
     setIsAgentSpeaking(true);
-    // pause listening while agent speaks
     try { recognitionRef.current?.stop(); } catch {}
     try {
-      const audio = await speakWithElevenLabs(text, voiceId);
+      const url = await fetchTtsUrl(text, voiceId);
+      const audio = audioRef.current || new Audio();
       audioRef.current = audio;
+      audio.src = url;
+      audio.load();
       await new Promise<void>((resolve) => {
         audio.onended = () => resolve();
-        audio.onerror = () => resolve();
-        audio.play().catch(() => resolve());
+        audio.onerror = (e) => { console.error('audio err', e); resolve(); };
+        const p = audio.play();
+        if (p) p.catch((err) => { console.error('audio.play() blocked:', err); resolve(); });
       });
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error('TTS failed', e); }
     setIsAgentSpeaking(false);
-    audioRef.current = null;
     if (stateRef.current === 'in-call') startListening();
   };
 
