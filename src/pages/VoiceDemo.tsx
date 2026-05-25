@@ -24,10 +24,11 @@ interface LocState {
   companyName?: string;
   enableRecording?: boolean;
   scrapedAd?: any;
-  voiceURI?: string;
+  voiceId?: string;
   voiceName?: string;
   flow?: VoiceFlow;
 }
+
 
 const FALLBACK_FLOW = (company: string): VoiceFlow => ({
   agentName: 'Ava',
