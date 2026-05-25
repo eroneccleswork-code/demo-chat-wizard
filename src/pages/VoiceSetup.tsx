@@ -1,44 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Phone, Building2, Target, Mic, ShoppingCart, MessageSquare, Plus, Trash2, User, FileText } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building, Mic } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
-import { VoiceAgentConfig, VoiceScenarioType, CartItem } from '@/lib/voice-types';
-
-const INDUSTRIES = ['E-commerce', 'Window Cleaning', 'Dental', 'Real Estate', 'HVAC', 'Legal', 'Landscaping', 'Plumbing', 'Auto Repair', 'Insurance', 'Fitness', 'Blinds'];
-
-const DEFAULT_CART: CartItem[] = [
-  { name: 'Premium Roller Shade', price: 129.99, qty: 2 },
-  { name: 'Cordless Wand', price: 14.99, qty: 1 },
-];
+import { firecrawlApi } from '@/lib/api/firecrawl';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function VoiceSetup() {
   const navigate = useNavigate();
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [enableRecording, setEnableRecording] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [cfg, setCfg] = useState<VoiceAgentConfig>({
-    companyName: '',
-    industry: 'E-commerce',
-    scenarioType: 'cart-recovery',
-    voiceURI: '',
-    voiceName: '',
-    voiceRate: 1,
-    agentName: 'Ava',
-    callerName: 'Alex',
-    callerPhone: '555-0142',
-    cart: DEFAULT_CART,
-    enableTransfer: true,
-    enableUpsell: true,
-    presenceContext: '',
-    customFlow: '',
-  });
+  const [voiceURI, setVoiceURI] = useState('');
+  const [isLaunching, setIsLaunching] = useState(false);
+  const [stage, setStage] = useState<string>('');
 
   useEffect(() => {
     const load = () => {
       const list = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
       setVoices(list);
-      if (list.length && !cfg.voiceURI) {
-        const preferred = list.find(v => /samantha|google us english|jenny|aria|female/i.test(v.name)) || list[0];
-        setCfg(c => ({ ...c, voiceURI: preferred.voiceURI, voiceName: preferred.name }));
+      if (list.length && !voiceURI) {
+        const pick = list.find(v => /samantha|aria|jenny|google us english/i.test(v.name)) || list[0];
+        setVoiceURI(pick.voiceURI);
       }
     };
     load();
@@ -48,26 +32,69 @@ export default function VoiceSetup() {
   }, []);
 
   const previewVoice = () => {
-    const u = new SpeechSynthesisUtterance(`Hi, this is ${cfg.agentName} from ${cfg.companyName || 'your company'}. How can I help you today?`);
-    const v = voices.find(x => x.voiceURI === cfg.voiceURI);
+    const u = new SpeechSynthesisUtterance(`Hi, this is your AI voice agent from ${companyName || 'your company'}. How can I help today?`);
+    const v = voices.find(x => x.voiceURI === voiceURI);
     if (v) u.voice = v;
-    u.rate = cfg.voiceRate;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   };
 
-  const updateCartItem = (i: number, patch: Partial<CartItem>) => {
-    setCfg(c => ({ ...c, cart: (c.cart || []).map((it, idx) => idx === i ? { ...it, ...patch } : it) }));
-  };
-  const addCartItem = () => setCfg(c => ({ ...c, cart: [...(c.cart || []), { name: '', price: 0, qty: 1 }] }));
-  const removeCartItem = (i: number) => setCfg(c => ({ ...c, cart: (c.cart || []).filter((_, idx) => idx !== i) }));
+  const isValid = websiteUrl && companyName && voiceURI;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/voice-demo', { state: { config: cfg } });
-  };
+    if (!isValid) return;
+    setIsLaunching(true);
 
-  const isValid = cfg.companyName && cfg.agentName && cfg.voiceURI;
+    // 1) Scrape the site (real customer journey data)
+    setStage('Scraping site…');
+    let websiteMarkdown = '';
+    let scrapedAd: any = null;
+    try {
+      const r = await firecrawlApi.scrape(websiteUrl, { formats: ['markdown'], onlyMainContent: true });
+      if (r.success) {
+        const md = r.data?.markdown || r.markdown || '';
+        const meta = r.data?.metadata || r.metadata || {};
+        websiteMarkdown = md;
+        const headings = (md.match(/^#{1,3}\s+(.+)/gm) || [])
+          .map((h: string) => h.replace(/^#+\s+/, '').trim())
+          .filter((h: string) => h.length > 3 && h.length < 60)
+          .slice(0, 3);
+        scrapedAd = {
+          description: meta.description || meta.ogDescription || md.split('\n').filter((l: string) => l.length > 30)[0]?.slice(0, 200) || '',
+          metaTitle: meta.title || '',
+          sitelinks: headings,
+        };
+      }
+    } catch (err) {
+      console.warn('Scrape failed:', err);
+    }
+
+    // 2) Generate the agentic voice flow from real site content
+    setStage('Training voice agent on cart & site…');
+    let flow: any = null;
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-voice-flow', {
+        body: { companyName, websiteUrl, websiteMarkdown: websiteMarkdown.slice(0, 4000) },
+      });
+      if (!error && data?.success) flow = data.flow;
+    } catch (err) {
+      console.warn('Flow gen failed:', err);
+    }
+
+    const voice = voices.find(v => v.voiceURI === voiceURI);
+    navigate('/voice-demo', {
+      state: {
+        websiteUrl,
+        companyName,
+        enableRecording,
+        scrapedAd,
+        voiceURI,
+        voiceName: voice?.name || '',
+        flow,
+      },
+    });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -78,174 +105,81 @@ export default function VoiceSetup() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl relative z-10 my-8"
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-lg relative z-10"
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-10">
           <div className="mb-6 flex flex-col items-center">
             <InvocaLogo size="lg" className="mb-3" />
-            <span className="text-sm font-semibold text-primary uppercase tracking-wide">AI Voice Agent</span>
+            <span className="text-sm font-semibold text-primary">AI Voice Agent</span>
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight mb-2">Configure your voice agent</h1>
-          <p className="text-muted-foreground">Pick a voice, train it on your presence, and design the call.</p>
+          <h1 className="text-3xl font-semibold tracking-tight mb-2">Live Search-to-Call Journey</h1>
+          <p className="text-muted-foreground">
+            Enter a company URL — we'll scrape the site, train the voice agent on the real cart, and run a live call.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="glass-surface rounded-xl p-6 space-y-5">
-            {/* Company + Industry */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Field label="Company Name" icon={<Building2 className="w-4 h-4" />}>
-                <input className="input" value={cfg.companyName} onChange={e => setCfg(c => ({ ...c, companyName: e.target.value }))} placeholder="Acme Shades" />
-              </Field>
-              <Field label="Industry" icon={<Target className="w-4 h-4" />}>
-                <select className="input" value={cfg.industry} onChange={e => setCfg(c => ({ ...c, industry: e.target.value }))}>
-                  {INDUSTRIES.map(i => <option key={i}>{i}</option>)}
-                </select>
-              </Field>
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Building className="w-4 h-4 text-muted-foreground" /> Company Name
+              </label>
+              <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
+                placeholder="Acme Shades"
+                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-primary/50" />
             </div>
 
-            {/* Scenario */}
-            <Field label="Scenario" icon={<MessageSquare className="w-4 h-4" />}>
-              <div className="grid grid-cols-3 gap-2">
-                {([
-                  { id: 'cart-recovery', label: 'Cart Recovery', desc: 'Sees cart, upsells, closes' },
-                  { id: 'service-call', label: 'Service Call', desc: 'Books appts, answers Qs' },
-                  { id: 'custom', label: 'Custom Flow', desc: 'Write your own script' },
-                ] as { id: VoiceScenarioType; label: string; desc: string }[]).map(s => (
-                  <button key={s.id} type="button"
-                    onClick={() => setCfg(c => ({ ...c, scenarioType: s.id }))}
-                    className={`p-3 rounded-lg border text-left transition-all ${cfg.scenarioType === s.id ? 'border-primary bg-primary/10' : 'border-border hover:border-foreground/40'}`}
-                  >
-                    <div className="text-sm font-semibold">{s.label}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{s.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </Field>
-
-            {/* Agent name + Caller */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Field label="Agent Name" icon={<User className="w-4 h-4" />}>
-                <input className="input" value={cfg.agentName} onChange={e => setCfg(c => ({ ...c, agentName: e.target.value }))} />
-              </Field>
-              <Field label="Caller Name">
-                <input className="input" value={cfg.callerName || ''} onChange={e => setCfg(c => ({ ...c, callerName: e.target.value }))} />
-              </Field>
-              <Field label="Caller Phone">
-                <input className="input" value={cfg.callerPhone || ''} onChange={e => setCfg(c => ({ ...c, callerPhone: e.target.value }))} />
-              </Field>
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Globe className="w-4 h-4 text-muted-foreground" /> Company Website URL
+              </label>
+              <input type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
+                placeholder="https://www.acmeshades.com"
+                className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-primary/50" />
             </div>
 
-            {/* Voice picker */}
-            <Field label="Agent Voice" icon={<Mic className="w-4 h-4" />}>
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Mic className="w-4 h-4 text-muted-foreground" /> Agent Voice
+              </label>
               <div className="flex gap-2">
-                <select
-                  className="input flex-1"
-                  value={cfg.voiceURI}
-                  onChange={e => {
-                    const v = voices.find(x => x.voiceURI === e.target.value);
-                    setCfg(c => ({ ...c, voiceURI: e.target.value, voiceName: v?.name || '' }));
-                  }}
-                >
+                <select value={voiceURI} onChange={e => setVoiceURI(e.target.value)}
+                  className="flex-1 px-4 py-2.5 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-primary/50">
                   {voices.map(v => <option key={v.voiceURI} value={v.voiceURI}>{v.name} — {v.lang}</option>)}
                 </select>
                 <button type="button" onClick={previewVoice}
-                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
+                  className="px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90">
                   Preview
                 </button>
               </div>
-              <div className="flex items-center gap-3 mt-3">
-                <span className="text-xs text-muted-foreground w-16">Rate</span>
-                <input type="range" min="0.7" max="1.3" step="0.05" value={cfg.voiceRate}
-                  onChange={e => setCfg(c => ({ ...c, voiceRate: parseFloat(e.target.value) }))}
-                  className="flex-1" />
-                <span className="text-xs w-10 text-right">{cfg.voiceRate.toFixed(2)}x</span>
-              </div>
-            </Field>
+            </div>
 
-            {/* Greeting */}
-            <Field label="Opening Line (optional)">
-              <input className="input" placeholder="Auto-generated if blank"
-                value={cfg.greetingLine || ''}
-                onChange={e => setCfg(c => ({ ...c, greetingLine: e.target.value }))} />
-            </Field>
-
-            {/* Presence */}
-            <Field label="Trained On / Presence Context (optional)" icon={<FileText className="w-4 h-4" />}>
-              <textarea rows={3} className="input resize-none"
-                placeholder="Paste product details, FAQ, pricing — what the agent should 'know'."
-                value={cfg.presenceContext || ''}
-                onChange={e => setCfg(c => ({ ...c, presenceContext: e.target.value }))} />
-            </Field>
-
-            {/* Cart (only cart scenario) */}
-            {cfg.scenarioType === 'cart-recovery' && (
-              <Field label="Caller's Cart" icon={<ShoppingCart className="w-4 h-4" />}>
-                <div className="space-y-2">
-                  {(cfg.cart || []).map((it, i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <input className="input flex-1" placeholder="Item name" value={it.name} onChange={e => updateCartItem(i, { name: e.target.value })} />
-                      <input className="input w-24" type="number" step="0.01" placeholder="Price" value={it.price} onChange={e => updateCartItem(i, { price: parseFloat(e.target.value) || 0 })} />
-                      <input className="input w-16" type="number" placeholder="Qty" value={it.qty} onChange={e => updateCartItem(i, { qty: parseInt(e.target.value) || 1 })} />
-                      <button type="button" onClick={() => removeCartItem(i)} className="p-2 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
-                    </div>
-                  ))}
-                  <button type="button" onClick={addCartItem} className="flex items-center gap-2 text-sm text-primary hover:underline">
-                    <Plus className="w-4 h-4" /> Add item
-                  </button>
-                </div>
-              </Field>
-            )}
-
-            {/* Custom flow */}
-            {cfg.scenarioType === 'custom' && (
-              <Field label="Custom Script">
-                <textarea rows={8} className="input resize-none font-mono text-xs"
-                  placeholder={`AGENT: Hi, this is ${cfg.agentName}...\nOPTION: Tell me more\nOPTION: Not interested\nAGENT: Great, here's what we offer...`}
-                  value={cfg.customFlow || ''}
-                  onChange={e => setCfg(c => ({ ...c, customFlow: e.target.value }))} />
-                <p className="text-xs text-muted-foreground mt-1">Use <code>AGENT:</code> lines for what the bot says and <code>OPTION:</code> lines for caller replies.</p>
-              </Field>
-            )}
-
-            {/* Capabilities */}
-            <div className="flex flex-wrap gap-4 pt-2">
-              <Toggle label="Allow upsell" checked={cfg.enableUpsell} onChange={v => setCfg(c => ({ ...c, enableUpsell: v }))} />
-              <Toggle label="Allow transfer to human" checked={cfg.enableTransfer} onChange={v => setCfg(c => ({ ...c, enableTransfer: v }))} />
+            <div className="flex items-center justify-between py-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Video className="w-4 h-4 text-muted-foreground" /> Record Demo
+              </label>
+              <button type="button" onClick={() => setEnableRecording(v => !v)}
+                className={`w-10 h-5 rounded-full transition-colors relative ${enableRecording ? 'bg-primary' : 'bg-muted'}`}>
+                <div className={`w-4 h-4 rounded-full bg-white shadow absolute top-0.5 transition-all ${enableRecording ? 'left-5' : 'left-0.5'}`} />
+              </button>
             </div>
           </div>
 
-          <button type="submit" disabled={!isValid}
-            className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 disabled:opacity-40 hover:opacity-90 transition-all">
-            <Phone className="w-4 h-4" /> Start Call
-          </button>
+          <motion.button type="submit" disabled={!isValid || isLaunching}
+            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium disabled:opacity-40 transition-all glow-primary">
+            {isLaunching ? (
+              <>
+                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                {stage || 'Launching…'}
+              </>
+            ) : (
+              <>Launch Demo <ArrowRight className="w-4 h-4" /></>
+            )}
+          </motion.button>
         </form>
       </motion.div>
-
-      <style>{`
-        .input { width: 100%; padding: 0.625rem 1rem; border-radius: 0.5rem; background: hsl(var(--secondary)); border: 1px solid hsl(var(--border)); color: hsl(var(--foreground)); outline: none; }
-        .input:focus { box-shadow: 0 0 0 2px hsl(var(--primary) / 0.5); }
-      `}</style>
     </div>
-  );
-}
-
-function Field({ label, icon, children }: { label: string; icon?: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium flex items-center gap-2">
-        {icon && <span className="text-muted-foreground">{icon}</span>}
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
-  return (
-    <label className="flex items-center gap-2 cursor-pointer text-sm">
-      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} className="w-4 h-4 accent-primary" />
-      {label}
-    </label>
   );
 }
