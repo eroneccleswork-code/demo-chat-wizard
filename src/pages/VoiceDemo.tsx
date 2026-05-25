@@ -128,8 +128,8 @@ export default function VoiceDemo() {
 interface Turn { id: string; role: 'agent' | 'caller'; text: string }
 type CallStatus = 'ringing' | 'connected' | 'transferring' | 'ended';
 
-function CallOverlay({ companyName, voiceURI, voiceName, flow, onClose }:
-  { companyName: string; voiceURI: string; voiceName: string; flow: VoiceFlow; onClose: () => void }
+function CallOverlay({ companyName, voiceId, voiceName, flow, onClose }:
+  { companyName: string; voiceId: string; voiceName: string; flow: VoiceFlow; onClose: () => void }
 ) {
   const [status, setStatus] = useState<CallStatus>('ringing');
   const [stepId, setStepId] = useState<string>('greet');
