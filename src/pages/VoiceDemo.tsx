@@ -285,7 +285,7 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
         className="relative w-[340px] h-[700px] bg-black rounded-[55px] border-[5px] border-gray-800 shadow-2xl overflow-hidden"
       >
         {/* Dynamic island */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[110px] h-[32px] bg-black rounded-full z-30 border border-gray-900" />
+        <div className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 w-[110px] h-[32px] bg-black rounded-full z-30 border border-gray-900" />
 
         {/* Screen */}
         <div
@@ -405,7 +405,7 @@ Speak naturally as if on a phone. Keep every reply under 2 short sentences. Be w
         </div>
 
         {/* Home indicator */}
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/40 rounded-full z-30" />
+        <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-[120px] h-[4px] bg-white/40 rounded-full z-30" />
       </motion.div>
 
       {/* Subtle hint badge */}
