@@ -17,6 +17,10 @@ import HomeServiceDemo from "./pages/HomeServiceDemo.tsx";
 import VoiceSetup from "./pages/VoiceSetup.tsx";
 import VoiceDemo from "./pages/VoiceDemo.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import InvocaDashboard from "./pages/invoca/InvocaDashboard.tsx";
+import InvocaCallReport from "./pages/invoca/InvocaCallReport.tsx";
+import InvocaCallReview from "./pages/invoca/InvocaCallReview.tsx";
+import InvocaIntegrations from "./pages/invoca/InvocaIntegrations.tsx";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +44,10 @@ const App = () => (
             <Route path="/home-service-demo" element={<HomeServiceDemo />} />
             <Route path="/voice-setup" element={<VoiceSetup />} />
             <Route path="/voice-demo" element={<VoiceDemo />} />
+            <Route path="/invoca" element={<InvocaDashboard />} />
+            <Route path="/invoca/call-report" element={<InvocaCallReport />} />
+            <Route path="/invoca/call-review" element={<InvocaCallReview />} />
+            <Route path="/invoca/integrations" element={<InvocaIntegrations />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

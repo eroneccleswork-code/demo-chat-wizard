@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   websiteUrl: string;
@@ -7,8 +8,13 @@ interface Props {
   onBack?: () => void;
 }
 
-export default function HomeServiceWebsite({ websiteUrl, domain, onNext, onBack }: Props) {
+export default function HomeServiceWebsite({ websiteUrl, domain, onNext }: Props) {
   const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
+  const navigate = useNavigate();
+  const goToInvoca = () => {
+    if (onNext) onNext();
+    else navigate('/invoca');
+  };
 
   return (
     <motion.div
@@ -27,13 +33,12 @@ export default function HomeServiceWebsite({ websiteUrl, domain, onNext, onBack 
         />
       </div>
 
-      {/* Invisible clickable zone in bottom-right corner for presenter */}
-      {onNext && (
-        <div
-          onClick={onNext}
-          className="absolute right-0 bottom-0 w-24 h-24 z-50 cursor-default"
-        />
-      )}
+      {/* Invisible clickable zone in bottom-right corner — advances to Invoca dashboard */}
+      <div
+        onClick={goToInvoca}
+        className="absolute right-0 bottom-0 w-24 h-24 z-50 cursor-default"
+        title="Continue to Invoca"
+      />
     </motion.div>
   );
 }
