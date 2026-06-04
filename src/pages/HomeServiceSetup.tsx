@@ -78,10 +78,16 @@ export default function HomeServiceSetup() {
                 Company Website URL
               </label>
               <input
-                type="url"
+                type="text"
                 value={websiteUrl}
-                onChange={e => setWebsiteUrl(e.target.value)}
-                placeholder="https://www.renewalbyandersen.com"
+                onChange={e => {
+                  let v = e.target.value.trim();
+                  if (v && !v.startsWith('http://') && !v.startsWith('https://')) {
+                    v = `https://${v}`;
+                  }
+                  setWebsiteUrl(v);
+                }}
+                placeholder="www.renewalbyandersen.com"
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
