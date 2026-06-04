@@ -105,8 +105,14 @@ export default function VoiceSetup() {
               <label className="text-sm font-medium flex items-center gap-2">
                 <Globe className="w-4 h-4 text-muted-foreground" /> Company Website URL
               </label>
-              <input type="url" value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
-                placeholder="https://www.acmeshades.com"
+              <input type="text" value={websiteUrl} onChange={e => {
+                  let v = e.target.value.trim();
+                  if (v && !v.startsWith('http://') && !v.startsWith('https://')) {
+                    v = `https://${v}`;
+                  }
+                  setWebsiteUrl(v);
+                }}
+                placeholder="www.acmeshades.com"
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border focus:outline-none focus:ring-2 focus:ring-primary/50" />
             </div>
 
