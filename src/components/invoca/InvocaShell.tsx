@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
 import sidebarImg from '@/assets/invoca-sidebar-v2.png.asset.json';
+import logoImg from '@/assets/invoca-logo.png.asset.json';
 
 interface NavItem {
   label: string;
@@ -29,11 +30,8 @@ export default function InvocaShell({ children, networkName }: { children: React
     <div className="min-h-screen bg-white flex flex-col">
       {/* Top bar */}
       <header className="h-[60px] bg-[#F4F5F7] flex items-center px-4 gap-4 border-b border-[#E5E7EB] flex-shrink-0">
-        <button onClick={() => navigate('/invoca')} className="flex items-center gap-1 shrink-0">
-          <span className="font-extrabold tracking-tight text-[22px] text-[#0F2540]">INVOCA</span>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#1FA37A" className="-ml-0.5">
-            <path d="M4 4h12a4 4 0 014 4v6a4 4 0 01-4 4H10l-5 4v-4H4a0 0 0 010 0V4z"/>
-          </svg>
+        <button onClick={() => navigate('/invoca')} className="flex items-center shrink-0">
+          <img src={logoImg.url} alt="Invoca" className="h-7 w-auto select-none" draggable={false} />
         </button>
         <span className="ml-1 text-[11px] font-bold leading-tight text-[#7A4A00] bg-[#FFD79A] rounded px-2 py-1 shrink-0 text-center">DEMO<br/>NETWORK</span>
         <div className="flex items-center gap-2 ml-6">
