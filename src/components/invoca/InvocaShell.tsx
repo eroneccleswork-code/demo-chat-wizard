@@ -66,23 +66,25 @@ export default function InvocaShell({ children, networkName }: { children: React
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-[88px] bg-white border-r border-[#E5E7EB] flex flex-col py-2 flex-shrink-0">
+        <aside className="w-[104px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex flex-col flex-shrink-0">
           {items.map((it) => (
             <NavLink
               key={it.to}
               to={it.to}
               end={it.to === '/invoca'}
               className={({ isActive }) =>
-                `relative flex flex-col items-center justify-center gap-1 py-3 text-[11px] ${
-                  isActive ? 'text-[#1FA37A] font-semibold border-l-[3px] border-[#1FA37A] bg-[#F0FAF6]' : 'text-[#5B6B7E] border-l-[3px] border-transparent hover:bg-gray-50'
+                `relative flex flex-col items-center justify-center gap-1.5 py-4 text-[12px] leading-tight text-center ${
+                  isActive
+                    ? 'text-[#1FA37A] font-semibold bg-[#E8F5EE] border-l-[4px] border-[#1FA37A]'
+                    : 'text-[#5B6B7E] border-l-[4px] border-transparent hover:bg-[#ECEFF2]'
                 }`
               }
             >
               {it.badge && (
-                <span className="absolute top-1 right-2 text-[8px] font-bold text-[#E53935] bg-[#FFE9E7] rounded px-1">{it.badge}</span>
+                <span className="absolute top-1.5 right-3 text-[8px] font-bold text-[#E53935] bg-[#FDE3E0] rounded px-1 py-px leading-none">{it.badge}</span>
               )}
-              <it.icon className="w-5 h-5" strokeWidth={2} />
-              <span>{it.label}</span>
+              <it.icon className="w-[22px] h-[22px]" strokeWidth={1.75} />
+              <span className="px-1">{it.label}</span>
             </NavLink>
           ))}
         </aside>
