@@ -98,23 +98,60 @@ export default function InvocaDashboard() {
   );
 }
 
-function KpiPanel({ title, topLabel, topValue, bottomLabel, bottomValue }: {
-  title: string; topLabel: string; topValue: string; bottomLabel: string; bottomValue: string;
-}) {
+function KpiRow({ industry }: { industry?: string }) {
+  const isHealthcare = (industry || '').toLowerCase().includes('health') ||
+    (industry || '').toLowerCase().includes('medical') ||
+    (industry || '').toLowerCase().includes('patient') ||
+    !industry;
+  const noun = isHealthcare ? 'Patient' : 'Customer';
+  const nounPlural = noun + 's';
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-md p-6 min-h-[260px]">
+    <div className="grid grid-cols-3 gap-6">
+      <KpiPanel title="TOTAL CALLS">
+        <div className="grid grid-cols-2 gap-2 mt-4">
+          <div className="text-center border-r border-[#EAECEF]">
+            <div className="text-[13px] text-[#0F2540] mb-2">Call Count</div>
+            <div className="text-[44px] leading-none font-semibold text-[#0F2540]">1,309</div>
+          </div>
+          <div className="text-center">
+            <div className="text-[13px] text-[#0F2540] mb-2">Avg. Duration</div>
+            <div className="text-[44px] leading-none font-semibold text-[#0F2540]">4:13</div>
+          </div>
+        </div>
+        <div className="text-center mt-8">
+          <div className="text-[13px] text-[#0F2540] mb-2">Avg. Connected Duration</div>
+          <div className="text-[44px] leading-none font-semibold text-[#0F2540]">3:49</div>
+        </div>
+      </KpiPanel>
+      <KpiPanel title={`NEW ${nounPlural.toUpperCase()}`}>
+        <SingleStat label={`Caller Type: New ${nounPlural} (Count)`} value="890" />
+        <SingleStat label="Appointment: Scheduled (Percent)" value="50%" />
+      </KpiPanel>
+      <KpiPanel title={`EXISTING ${nounPlural.toUpperCase()}`}>
+        <SingleStat label={`Caller Type: Existing ${noun} (Count)`} value="416" />
+        <SingleStat label="Inquiry Type: Billing and Payments (Percent)" value="21%" />
+      </KpiPanel>
+    </div>
+  );
+}
+
+function KpiPanel({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white border border-[#EAECEF] rounded-lg p-6 min-h-[260px] shadow-[0_1px_2px_rgba(15,37,64,0.04)]">
       <div className="flex items-start justify-between">
-        <div className="text-[13px] font-semibold tracking-wide text-[#6B7280] uppercase">{title}</div>
+        <div className="text-[13px] font-semibold tracking-wide text-[#0F2540] uppercase">{title}</div>
         <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
       </div>
-      <div className="text-center mt-6">
-        <div className="text-[13px] text-[#0F2540] mb-2">{topLabel}</div>
-        <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{topValue}</div>
-      </div>
-      <div className="text-center mt-6">
-        <div className="text-[13px] text-[#0F2540] mb-2">{bottomLabel}</div>
-        <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{bottomValue}</div>
-      </div>
+      {children}
+    </div>
+  );
+}
+
+function SingleStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-center mt-6">
+      <div className="text-[13px] text-[#0F2540] mb-2">{label}</div>
+      <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{value}</div>
     </div>
   );
 }
