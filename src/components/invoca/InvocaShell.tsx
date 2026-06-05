@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
 import sidebarImg from '@/assets/invoca-sidebar-v2.png.asset.json';
+import sidebarReportsImg from '@/assets/invoca-sidebar-reports.png.asset.json';
 import logoImg from '@/assets/invoca-logo.png.asset.json';
 
 interface NavItem {
@@ -26,6 +27,8 @@ const items: NavItem[] = [
 
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const activeSidebar = pathname.startsWith('/invoca/call-report') ? sidebarReportsImg.url : sidebarImg.url;
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Top bar */}
@@ -63,7 +66,7 @@ export default function InvocaShell({ children, networkName }: { children: React
         <aside className="w-[84px] min-w-[84px] max-w-[84px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
           <div className="sticky top-0 relative w-[84px]">
             <img
-              src={sidebarImg.url}
+              src={activeSidebar}
               alt=""
               width={84}
               className="block w-[84px] h-auto select-none pointer-events-none"
