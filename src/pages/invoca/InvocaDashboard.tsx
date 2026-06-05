@@ -41,7 +41,7 @@ export default function InvocaDashboard() {
 
   return (
     <InvocaShell networkName={data.networkName}>
-      <div className="px-8 py-6 space-y-6 bg-white">
+      <div className="px-[30px] py-[20px] space-y-6 bg-white">
         {/* KPI Row */}
         <div className="grid grid-cols-3 gap-6">
           <KpiTile label="Avg Call Duration" value="3:49" />
