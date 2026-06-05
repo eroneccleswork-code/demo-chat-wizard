@@ -3,9 +3,9 @@ import { ChevronDown, Download, History, MoreVertical } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import MarketingTrio, { TrioRow } from '@/components/invoca/sections/MarketingTrio';
 import DataTable from '@/components/invoca/sections/DataTable';
+import KpiRow from '@/components/invoca/sections/KpiRow';
+import CallTrending from '@/components/invoca/sections/CallTrending';
 import { useIndustryDashboard, seededRand } from '@/lib/invoca-industry';
-import callTrendingImg from '@/assets/invoca-call-trending-v2.png.asset.json';
-import kpiRowImg from '@/assets/invoca-kpi-row.png.asset.json';
 
 const SOURCE_LABELS = ['Paid Search', 'Organic', 'Direct Mail', 'Email', 'Social Media'];
 const MEDIUM_LABELS = ['cpc', 'organic', 'Post Card', 'SFMC', 'Facebook'];
@@ -74,11 +74,11 @@ export default function InvocaDashboard() {
           <div className="border-t border-[#E5E7EB] mt-4" />
         </div>
 
-        {/* KPI Row — Total Calls / New Patients / Existing Patients */}
-        <img src={kpiRowImg.url} alt="KPI Row" className="block w-full h-auto select-none" draggable={false} />
+        {/* KPI Row — Total Calls / New / Existing */}
+        <KpiRow industry={industry} inquiryLabel={data.inquiryKpiLabel} inquiryPct={data.inquiryKpiPercent} />
 
         {/* Call Trending */}
-        <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
+        <CallTrending categories={data.inquiryTypes} seed={seed + '-trend'} />
 
         {/* 4 trio rows */}
         <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800} industry={industry}
