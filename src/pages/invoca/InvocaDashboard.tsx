@@ -41,7 +41,7 @@ export default function InvocaDashboard() {
   const searchRows: TrioRow[] = data.searchTerms.map(s => ({ label: s.term, calls: s.calls, apptPct: s.apptPct }));
 
   return (
-    <InvocaShell networkName={data.networkName}>
+    <InvocaShell networkName={company || data.networkName}>
       <div className="px-8 py-6 space-y-6 bg-white">
         {/* Dashboard Header */}
         <div>
