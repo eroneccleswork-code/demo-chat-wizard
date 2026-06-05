@@ -4,7 +4,8 @@ import InvocaShell from '@/components/invoca/InvocaShell';
 import MarketingTrio, { TrioRow } from '@/components/invoca/sections/MarketingTrio';
 import DataTable from '@/components/invoca/sections/DataTable';
 import { useIndustryDashboard, seededRand } from '@/lib/invoca-industry';
-import callTrendingImg from '@/assets/invoca-call-trending.png.asset.json';
+import callTrendingImg from '@/assets/invoca-call-trending-v2.png.asset.json';
+import kpiRowImg from '@/assets/invoca-kpi-row.png.asset.json';
 
 const SOURCE_LABELS = ['Paid Search', 'Organic', 'Direct Mail', 'Email', 'Social Media'];
 const MEDIUM_LABELS = ['cpc', 'organic', 'Post Card', 'SFMC', 'Facebook'];
@@ -74,48 +75,10 @@ export default function InvocaDashboard() {
         </div>
 
         {/* KPI Row — Total Calls / New Patients / Existing Patients */}
-        <div className="grid grid-cols-3 gap-6">
-          <div className="bg-white border border-[#E5E7EB] rounded-md p-6 min-h-[260px] relative">
-            <div className="flex items-start justify-between">
-              <div className="text-[13px] font-semibold tracking-wide text-[#6B7280] uppercase">Total Calls</div>
-              <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-6 relative">
-              <div className="text-center">
-                <div className="text-[13px] text-[#0F2540] mb-2">Call Count</div>
-                <div className="text-[44px] leading-none font-semibold text-[#0F2540]">1,309</div>
-              </div>
-              <div className="text-center border-l border-[#E5E7EB]">
-                <div className="text-[13px] text-[#0F2540] mb-2">Avg. Duration</div>
-                <div className="text-[44px] leading-none font-semibold text-[#0F2540]">4:13</div>
-              </div>
-            </div>
-            <div className="text-center mt-6">
-              <div className="text-[13px] text-[#0F2540] mb-2">Avg. Connected Duration</div>
-              <div className="text-[44px] leading-none font-semibold text-[#0F2540]">3:49</div>
-            </div>
-          </div>
-
-          <KpiPanel
-            title="New Patients"
-            topLabel="Caller Type: New Patients (Count)"
-            topValue="890"
-            bottomLabel="Appointment: Scheduled (Percent)"
-            bottomValue="50%"
-          />
-          <KpiPanel
-            title="Existing Patients"
-            topLabel="Caller Type: Existing Patient (Count)"
-            topValue="416"
-            bottomLabel="Inquiry Type: Billing and Payments (Percent)"
-            bottomValue="21%"
-          />
-        </div>
+        <img src={kpiRowImg.url} alt="KPI Row" className="block w-full h-auto select-none" draggable={false} />
 
         {/* Call Trending */}
-        <div className="border border-[#E5E7EB] rounded-md overflow-hidden bg-white">
-          <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
-        </div>
+        <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
 
         {/* 4 trio rows */}
         <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800}
