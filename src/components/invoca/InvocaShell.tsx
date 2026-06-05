@@ -62,12 +62,13 @@ export default function InvocaShell({ children, networkName }: { children: React
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar — exact screenshot with invisible nav hit-areas */}
-        <aside className="w-[92px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
-          <div className="sticky top-0 relative">
+        <aside className="w-[84px] min-w-[84px] max-w-[84px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
+          <div className="sticky top-0 relative w-[84px]">
             <img
               src={sidebarImg.url}
               alt=""
-              className="block w-full h-auto select-none pointer-events-none"
+              width={84}
+              className="block w-[84px] h-auto select-none pointer-events-none"
               draggable={false}
             />
             <div className="absolute inset-0 grid grid-rows-12">
@@ -85,7 +86,7 @@ export default function InvocaShell({ children, networkName }: { children: React
         </aside>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto bg-white">
+        <main className="flex-1 min-w-0 overflow-y-auto bg-white">
           {children}
         </main>
       </div>
