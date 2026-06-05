@@ -195,9 +195,17 @@ function getQualificationSteps(config: BusinessConfig): QualificationStep[] {
       { question: "Are you looking to get this done within the next week or two?", topic: 'timeline' },
     ],
     'Dental': [
+      { question: "Are you a new or existing patient?", topic: 'patient-status' },
       { question: "Is this for a routine checkup or cleaning?", topic: 'need' },
       { question: "Are you currently experiencing any pain or discomfort?", topic: 'urgency' },
       { question: "Do you have dental insurance?", topic: 'insurance' },
+    ],
+    'Healthcare': [
+      { question: "Are you a new or existing patient?", topic: 'patient-status' },
+      { question: "Is this for a routine check-up today?", topic: 'need' },
+      { question: "Do you have a preferred date or time of day that works best for your appointment?", topic: 'timeline' },
+      { question: "Will you be using health insurance for this visit, or will you be self-paying?", topic: 'insurance' },
+      { question: "Are you interested in an in-person visit, or would you prefer a telehealth/virtual appointment?", topic: 'visit-type' },
     ],
     'Real Estate': [
       { question: "Are you looking to buy a home?", topic: 'intent' },
