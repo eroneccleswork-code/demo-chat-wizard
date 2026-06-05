@@ -263,7 +263,7 @@ export default function InvocaCallReport() {
               <span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions
             </button>
           </div>
-          <div className="flex items-end h-[260px] border-l border-b border-[#E5E7EB] pl-3 pb-2 pr-2 relative ml-8 justify-between">
+          <div className="flex items-end h-[200px] pl-3 pb-2 pr-2 relative ml-8 justify-between">
             <div className="absolute -left-7 top-0 text-[10px] text-[#5B6B7E]">300</div>
             <div className="absolute -left-7 top-1/3 text-[10px] text-[#5B6B7E]">200</div>
             <div className="absolute -left-7 top-2/3 text-[10px] text-[#5B6B7E]">100</div>
