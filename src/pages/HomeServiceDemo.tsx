@@ -10,7 +10,7 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { websiteUrl, companyName: passedName, enableRecording, scrapedAd } = (location.state as any) || {};
+  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd } = (location.state as any) || {};
 
   const [step, setStep] = useState<Step>('google');
   const [isRecording, setIsRecording] = useState(false);
@@ -63,6 +63,8 @@ export default function HomeServiceDemo() {
             key="website"
             websiteUrl={websiteUrl}
             domain={domain}
+            companyName={displayName}
+            industry={industry}
           />
         )}
       </AnimatePresence>

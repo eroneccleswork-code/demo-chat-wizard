@@ -5,9 +5,28 @@ import InvocaLogo from '@/components/InvocaLogo';
 import heroImage from '@/assets/hero-blinds.jpg';
 
 const USE_CASES = [
-  { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' },
-  { label: 'Invoca for Marketing demo', active: true, path: '/home-service-setup' },
-  { label: 'AI Voice Agent | Cart & Service Calls', active: true, path: '/voice-setup' },
+  { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' as const, state: undefined as any },
+  {
+    label: 'IFM for Healthcare',
+    active: true,
+    path: '/home-service-setup' as const,
+    state: {
+      industry: 'Healthcare',
+      companyName: 'Banner Health',
+      websiteUrl: 'https://www.bannerhealth.com',
+    },
+  },
+  {
+    label: 'IFM for Home Service',
+    active: true,
+    path: '/home-service-setup' as const,
+    state: {
+      industry: 'Home Services',
+      companyName: 'Renewal by Andersen',
+      websiteUrl: 'https://www.renewalbyandersen.com',
+    },
+  },
+  { label: 'AI Voice Agent | Cart & Service Calls', active: true, path: '/voice-setup' as const, state: undefined as any },
 ];
 
 export default function Index() {
@@ -49,7 +68,7 @@ export default function Index() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                onClick={() => uc.active && uc.path && navigate(uc.path)}
+                onClick={() => uc.active && uc.path && navigate(uc.path, uc.state ? { state: uc.state } : undefined)}
                 disabled={!uc.active}
                 className={`w-full flex items-center justify-between px-6 py-4 border border-foreground/20 rounded-sm text-left transition-all ${
                   uc.active

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
@@ -7,8 +7,11 @@ import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
-  const [websiteUrl, setWebsiteUrl] = useState('https://www.renewalbyandersen.com');
-  const [companyName, setCompanyName] = useState('Renewal by Andersen');
+  const location = useLocation();
+  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string } | null) || {};
+  const industry = preset.industry || 'Home Services';
+  const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
+  const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
@@ -19,10 +22,10 @@ export default function HomeServiceSetup() {
     if (!isValid) return;
     setIsLaunching(true);
 
-    const analysis = await analyzeCompanyWebsite(websiteUrl, companyName, 'Home Services');
+    const analysis = await analyzeCompanyWebsite(websiteUrl, companyName, industry);
 
     navigate('/home-service-demo', {
-      state: { websiteUrl, companyName, enableRecording, scrapedAd: analysis.scrapedAd },
+      state: { websiteUrl, companyName, industry, enableRecording, scrapedAd: analysis.scrapedAd },
     });
   };
 
@@ -46,7 +49,7 @@ export default function HomeServiceSetup() {
             className="mb-6 flex flex-col items-center"
           >
             <InvocaLogo size="lg" className="mb-3" />
-            <span className="text-sm font-semibold text-primary">Home Service Demo</span>
+            <span className="text-sm font-semibold text-primary">IFM for {industry === 'Healthcare' ? 'Healthcare' : 'Home Service'}</span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
             Live Search-to-Site Journey
