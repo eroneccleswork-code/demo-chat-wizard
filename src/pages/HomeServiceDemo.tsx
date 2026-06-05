@@ -65,6 +65,7 @@ export default function HomeServiceDemo() {
             domain={domain}
             companyName={displayName}
             industry={industry}
+            customSignals={customSignals}
           />
         )}
       </AnimatePresence>
