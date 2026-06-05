@@ -49,7 +49,7 @@ export default function HomeServiceSetup() {
             className="mb-6 flex flex-col items-center"
           >
             <InvocaLogo size="lg" className="mb-3" />
-            <span className="text-sm font-semibold text-primary">Home Service Demo</span>
+            <span className="text-sm font-semibold text-primary">IFM for {industry === 'Healthcare' ? 'Healthcare' : 'Home Service'}</span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
             Live Search-to-Site Journey
