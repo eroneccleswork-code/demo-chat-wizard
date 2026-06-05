@@ -1,33 +1,26 @@
-import { ReactNode, SVGProps } from 'react';
+import { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
-import {
-  IcDashboards, IcCallReview, IcAdvertisers, IcCampaigns, IcPublishers,
-  IcPromoNumbers, IcReports, IcIntegrations, IcSignal, IcScore, IcLabs, IcSettings
-} from './InvocaIcons';
-
-type IconCmp = (p: SVGProps<SVGSVGElement>) => JSX.Element;
+import sidebarImg from '@/assets/invoca-sidebar.png.asset.json';
 
 interface NavItem {
   label: string;
-  icon: IconCmp;
   to: string;
-  badge?: 'NEW';
 }
 
 const items: NavItem[] = [
-  { label: 'Dashboards', icon: IcDashboards, to: '/invoca' },
-  { label: 'Call Review', icon: IcCallReview, to: '/invoca/call-review', badge: 'NEW' },
-  { label: 'Advertisers', icon: IcAdvertisers, to: '/invoca/advertisers' },
-  { label: 'Campaigns', icon: IcCampaigns, to: '/invoca/campaigns' },
-  { label: 'Publishers', icon: IcPublishers, to: '/invoca/publishers' },
-  { label: 'Promo Numbers', icon: IcPromoNumbers, to: '/invoca/promo-numbers' },
-  { label: 'Reports', icon: IcReports, to: '/invoca/call-report' },
-  { label: 'Integrations', icon: IcIntegrations, to: '/invoca/integrations' },
-  { label: 'Signal', icon: IcSignal, to: '/invoca/signal' },
-  { label: 'Score', icon: IcScore, to: '/invoca/score' },
-  { label: 'Labs', icon: IcLabs, to: '/invoca/labs' },
-  { label: 'Settings', icon: IcSettings, to: '/invoca/settings' },
+  { label: 'Dashboards', to: '/invoca' },
+  { label: 'Call Review', to: '/invoca/call-review' },
+  { label: 'Advertisers', to: '/invoca/advertisers' },
+  { label: 'Campaigns', to: '/invoca/campaigns' },
+  { label: 'Publishers', to: '/invoca/publishers' },
+  { label: 'Promo Numbers', to: '/invoca/promo-numbers' },
+  { label: 'Reports', to: '/invoca/call-report' },
+  { label: 'Integrations', to: '/invoca/integrations' },
+  { label: 'Signal', to: '/invoca/signal' },
+  { label: 'Score', to: '/invoca/score' },
+  { label: 'Labs', to: '/invoca/labs' },
+  { label: 'Settings', to: '/invoca/settings' },
 ];
 
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
@@ -68,31 +61,22 @@ export default function InvocaShell({ children, networkName }: { children: React
       </header>
 
       <div className="flex flex-1 min-h-0">
-        {/* Sidebar */}
-        <aside className="w-[78px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex flex-col flex-shrink-0">
-          {items.map((it) => {
-            const Icon = it.icon;
-            return (
+        {/* Sidebar — exact screenshot with invisible nav hit-areas */}
+        <aside
+          className="w-[92px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 relative bg-top bg-no-repeat bg-contain"
+          style={{ backgroundImage: `url(${sidebarImg.url})` }}
+        >
+          <div className="absolute inset-0 grid grid-rows-12">
+            {items.map((it) => (
               <NavLink
                 key={it.to}
                 to={it.to}
                 end={it.to === '/invoca'}
-                className={({ isActive }) =>
-                  `relative flex flex-col items-center justify-center gap-1 py-3.5 text-[11px] leading-tight text-center ${
-                    isActive
-                      ? 'text-[#1FA37A] font-semibold bg-[#E8F5EE] border-l-[3px] border-[#1FA37A]'
-                      : 'text-[#2C3E50] border-l-[3px] border-transparent hover:bg-[#ECEFF2]'
-                  }`
-                }
-              >
-                {it.badge && (
-                  <span className="absolute top-1 right-1.5 text-[7px] font-bold text-[#E53935] bg-[#FDE3E0] rounded px-1 py-px leading-none">{it.badge}</span>
-                )}
-                <Icon className="w-[22px] h-[22px]" />
-                <span className="px-0.5">{it.label}</span>
-              </NavLink>
-            );
-          })}
+                aria-label={it.label}
+                className="block hover:bg-black/[0.04]"
+              />
+            ))}
+          </div>
         </aside>
 
         {/* Content */}
