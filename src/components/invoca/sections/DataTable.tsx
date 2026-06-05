@@ -1,3 +1,5 @@
+import { industryTerms } from '@/lib/invoca-industry';
+
 interface Row {
   name: string;
   calls: number;
@@ -6,7 +8,8 @@ interface Row {
   apptPct: number;
 }
 
-export default function DataTable({ title, columnLabel, rows }: { title: string; columnLabel: string; rows: Row[] }) {
+export default function DataTable({ title, columnLabel, rows, industry }: { title: string; columnLabel: string; rows: Row[]; industry?: string }) {
+  const t = industryTerms(industry);
   return (
     <div className="bg-white border border-[#E5E7EB] rounded-md">
       <div className="px-6 pt-5 pb-4 flex items-start justify-between">
@@ -17,9 +20,9 @@ export default function DataTable({ title, columnLabel, rows }: { title: string;
         <div className="grid grid-cols-[1.4fr_1fr_1.6fr_1.6fr_1.6fr] text-[13px] font-semibold text-[#0F2540] py-3 border-b border-[#E5E7EB]">
           <div>{columnLabel}</div>
           <div>Call Count</div>
-          <div>Caller Type: New Patients (Percent)</div>
-          <div>Caller Type: Existing Patient (Perc…</div>
-          <div>Appointment: Scheduled (Percent)</div>
+          <div>{t.newPctLabel}</div>
+          <div>{t.existingPctLabel}</div>
+          <div>{t.apptPctLabel}</div>
         </div>
         {rows.map(r => (
           <div key={r.name} className="grid grid-cols-[1.4fr_1fr_1.6fr_1.6fr_1.6fr] text-[14px] text-[#0F2540] py-4 border-b border-[#F3F4F6]">
