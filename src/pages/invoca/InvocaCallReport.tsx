@@ -264,6 +264,10 @@ export default function InvocaCallReport() {
             </button>
           </div>
           <div className="flex items-end h-[200px] pl-3 pb-2 pr-2 relative ml-8 justify-between">
+            <div className="absolute left-0 right-0 top-0 h-px bg-[#E5E7EB] pointer-events-none" />
+            <div className="absolute left-0 right-0 top-1/3 h-px bg-[#E5E7EB] pointer-events-none" />
+            <div className="absolute left-0 right-0 top-2/3 h-px bg-[#E5E7EB] pointer-events-none" />
+            <div className="absolute left-0 right-0 bottom-2 h-px bg-[#E5E7EB] pointer-events-none" />
             <div className="absolute -left-7 top-0 text-[10px] text-[#5B6B7E]">300</div>
             <div className="absolute -left-7 top-1/3 text-[10px] text-[#5B6B7E]">200</div>
             <div className="absolute -left-7 top-2/3 text-[10px] text-[#5B6B7E]">100</div>
@@ -273,7 +277,7 @@ export default function InvocaCallReport() {
               const isCalls = chartView === 'calls';
               const val = isCalls ? h : convBars[i];
               return (
-                <div key={i} className="relative h-full flex flex-col justify-end" style={{ width: 11 }}>
+                <div key={i} className="relative h-full flex flex-col justify-end" style={{ width: 14 }}>
                   <div
                     className={isCalls ? 'bg-[#22A95A]' : 'bg-[#F5A623]'}
                     style={{ height: `${(val / 300) * 100}%`, width: '100%' }}
