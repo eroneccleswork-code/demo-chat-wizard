@@ -4,16 +4,18 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
   websiteUrl: string;
   domain: string;
+  companyName?: string;
+  industry?: string;
   onNext?: () => void;
   onBack?: () => void;
 }
 
-export default function HomeServiceWebsite({ websiteUrl, domain, onNext }: Props) {
+export default function HomeServiceWebsite({ websiteUrl, domain, companyName, industry, onNext }: Props) {
   const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
   const navigate = useNavigate();
   const goToInvoca = () => {
     if (onNext) onNext();
-    else navigate('/invoca');
+    else navigate('/invoca', { state: { companyName, industry } });
   };
 
   return (
