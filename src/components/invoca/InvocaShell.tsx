@@ -26,7 +26,7 @@ const items: NavItem[] = [
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
   return (
-    <div className="h-screen bg-[#F4F6F8] flex flex-col overflow-hidden">
+    <div className="h-screen w-screen max-w-none bg-[#F4F6F8] flex flex-col overflow-hidden">
       {/* Top bar */}
       <header className="h-[105px] bg-[#F4F5F7] flex items-center px-4 gap-4 border-b border-[#D9DDE3] flex-shrink-0">
         <button onClick={() => navigate('/invoca')} className="flex items-center gap-1 shrink-0">
