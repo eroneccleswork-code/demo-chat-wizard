@@ -20,13 +20,14 @@ function buildRows(labels: string[], seed: string, callBase: number): TrioRow[] 
 }
 
 export default function InvocaDashboard() {
-  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string } };
+  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string; customSignals?: string[] } };
   const company = loc.state?.companyName;
   const industry = loc.state?.industry;
   const websiteContext = loc.state?.websiteContext;
+  const customSignals = loc.state?.customSignals;
   // Persist so other Invoca pages (Call Report, etc.) keep the same context after sidebar navigation
-  if (typeof window !== 'undefined' && (company || industry)) {
-    try { sessionStorage.setItem('invoca-context', JSON.stringify({ companyName: company, industry, websiteContext })); } catch {}
+  if (typeof window !== 'undefined' && (company || industry || customSignals)) {
+    try { sessionStorage.setItem('invoca-context', JSON.stringify({ companyName: company, industry, websiteContext, customSignals })); } catch {}
   }
   const data = useIndustryDashboard(company, industry, websiteContext);
   const seed = `${company || 'invoca'}-${industry || 'healthcare'}`;
