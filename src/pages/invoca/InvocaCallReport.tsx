@@ -307,7 +307,7 @@ export default function InvocaCallReport() {
                 <div
                   key={c.key}
                   style={{ width: c.w }}
-                  className={`shrink-0 overflow-hidden px-3 py-2.5 text-[12px] font-semibold text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                  className={`shrink-0 overflow-hidden px-6 py-2.5 text-[12px] font-semibold text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
                 >
                   {c.head}
                 </div>
