@@ -19,7 +19,7 @@ export default function MarketingTrio({ category, rows, callsAxisMax, appointmen
 
   return (
     <div className="grid grid-cols-3 gap-6">
-      <PanelCard title="Calls">
+      <PanelCard title={`MARKETING: ${category} (Calls)`}>
         <HBarChart
           rows={callsRows.map(r => ({ label: r.label, value: r.calls }))}
           max={maxCalls}
@@ -27,8 +27,8 @@ export default function MarketingTrio({ category, rows, callsAxisMax, appointmen
       </PanelCard>
 
       <PanelCard
-        title={t.apptTitleShort}
-        badge={appointmentsBadge || `${t.apptShort}`}
+        title={`MARKETING: ${category} (${t.apptTitleShort})…`}
+        badge={appointmentsBadge || `MARKETING ${category.toUpperCase()}: ${t.apptShort}…`}
       >
         <HBarChart
           rows={apptRows.map(r => ({ label: r.label, value: r.apptPct }))}
@@ -37,7 +37,7 @@ export default function MarketingTrio({ category, rows, callsAxisMax, appointmen
         />
       </PanelCard>
 
-      <PanelCard title={`${t.apptShort} & Calls`}>
+      <PanelCard title={`MARKETING: ${category} (Calls resulti…`}>
         <div className="px-5 pb-4">
           <div className="grid grid-cols-[1.4fr_1fr_1fr] text-[13px] font-semibold text-[#0F2540] py-2 border-b border-[#F3F4F6]">
             <div>Marketing {category.split(' ')[0].slice(0, 10)}…</div>
