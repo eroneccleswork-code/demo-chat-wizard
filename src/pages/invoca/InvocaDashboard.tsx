@@ -113,7 +113,9 @@ export default function InvocaDashboard() {
         </div>
 
         {/* Call Trending */}
-        <CallTrending categories={data.inquiryTypes} seed={seed} />
+        <div className="border border-[#E5E7EB] rounded-md overflow-hidden bg-white">
+          <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
+        </div>
 
         {/* 4 trio rows */}
         <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800}
