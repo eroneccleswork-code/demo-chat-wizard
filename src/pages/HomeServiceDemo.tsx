@@ -63,6 +63,8 @@ export default function HomeServiceDemo() {
             key="website"
             websiteUrl={websiteUrl}
             domain={domain}
+            companyName={displayName}
+            industry={industry}
           />
         )}
       </AnimatePresence>
