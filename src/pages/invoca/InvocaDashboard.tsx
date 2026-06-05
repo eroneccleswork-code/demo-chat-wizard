@@ -74,11 +74,11 @@ export default function InvocaDashboard() {
           <div className="border-t border-[#E5E7EB] mt-4" />
         </div>
 
-        {/* KPI Row — Total Calls / New Patients / Existing Patients */}
-        <img src={kpiRowImg.url} alt="KPI Row" className="block w-full h-auto select-none" draggable={false} />
+        {/* KPI Row — Total Calls / New / Existing */}
+        <KpiRow industry={industry} inquiryLabel={data.inquiryKpiLabel} inquiryPct={data.inquiryKpiPercent} />
 
         {/* Call Trending */}
-        <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
+        <CallTrending categories={data.inquiryTypes} seed={seed + '-trend'} />
 
         {/* 4 trio rows */}
         <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800} industry={industry}
