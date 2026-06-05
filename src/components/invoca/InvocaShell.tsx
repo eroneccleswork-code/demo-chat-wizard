@@ -27,7 +27,7 @@ const items: NavItem[] = [
   { label: 'Settings', icon: Settings, to: '/invoca/settings' },
 ];
 
-export default function InvocaShell({ children }: { children: ReactNode }) {
+export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -43,7 +43,7 @@ export default function InvocaShell({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-2 ml-6">
           <span className="text-[#1FA37A] text-sm font-medium">Network</span>
           <button className="flex items-center gap-2 bg-white border border-[#D1D5DB] rounded px-3 py-1.5 text-sm text-[#0F2540] min-w-[260px] justify-between">
-            <span>Invoca for Healthcare 2.0</span>
+            <span>{networkName || 'Invoca for Healthcare 2.0'}</span>
             <ChevronDown className="w-4 h-4 text-gray-500" />
           </button>
         </div>
