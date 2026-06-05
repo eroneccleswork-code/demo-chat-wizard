@@ -11,7 +11,7 @@ interface Row {
 export default function DataTable({ title, columnLabel, rows, industry }: { title: string; columnLabel: string; rows: Row[]; industry?: string }) {
   const t = industryTerms(industry);
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-md">
+    <div className="bg-white border border-[#EEF0F3] rounded-[10px] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)]">
       <div className="px-6 pt-5 pb-4 flex items-start justify-between">
         <h3 className="text-[18px] font-semibold text-[#0F2540] tracking-wide">{title}</h3>
         <button className="text-[#9CA3AF] hover:text-[#5B6B7E] text-lg leading-none">⋮</button>
