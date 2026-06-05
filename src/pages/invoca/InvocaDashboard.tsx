@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { ChevronDown, Download, History, MoreVertical } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import CallTrending from '@/components/invoca/sections/CallTrending';
 import MarketingTrio, { TrioRow } from '@/components/invoca/sections/MarketingTrio';
@@ -31,7 +32,6 @@ export default function InvocaDashboard() {
     calls: c.calls,
     apptPct: c.apptPct,
   }));
-  // Pad to 5 rows to keep visual layout
   while (campaignRows.length < 5) {
     const i = campaignRows.length;
     const r = seededRand(seed + '-camp' + i)();
@@ -42,11 +42,74 @@ export default function InvocaDashboard() {
   return (
     <InvocaShell networkName={data.networkName}>
       <div className="px-8 py-6 space-y-6 bg-white">
-        {/* KPI Row */}
+        {/* Dashboard Header */}
+        <div>
+          <div className="text-[12px] font-semibold tracking-wide text-[#2D6CDF] uppercase mb-2">Manage Dashboards</div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-[26px] font-semibold text-[#0F2540] tracking-tight">ADVANCED CALL TRACKING: Optimization</h1>
+                <ChevronDown className="w-5 h-5 text-[#0F2540]" />
+              </div>
+              <div className="flex items-center gap-2 mt-3">
+                <span className="bg-[#C8F0D4] text-[#1F6B3A] text-[12px] font-medium rounded-full px-3 py-0.5">Shared</span>
+                <span className="bg-[#C8F0D4] text-[#1F6B3A] text-[12px] font-medium rounded-full px-3 py-0.5">View Only</span>
+              </div>
+              <div className="flex items-center gap-2 mt-3">
+                <button className="border border-[#0F2540] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">1/1/2023-1/31/2023</button>
+                <button className="border border-[#D1D5DB] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">Marketing Data</button>
+                <button className="border border-[#D1D5DB] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">Signals</button>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-[#6B7280] pt-1">
+              <Download className="w-5 h-5" />
+              <div className="relative">
+                <History className="w-5 h-5" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-[#2D6CDF]" />
+              </div>
+              <MoreVertical className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="border-t border-[#E5E7EB] mt-4" />
+        </div>
+
+        {/* KPI Row — Total Calls / New Patients / Existing Patients */}
         <div className="grid grid-cols-3 gap-6">
-          <KpiTile label="Avg Call Duration" value="3:49" />
-          <KpiTile label="Conversion Rate" value="50%" />
-          <KpiTile label={data.inquiryKpiLabel} value={`${data.inquiryKpiPercent}%`} />
+          <div className="bg-white border border-[#E5E7EB] rounded-md p-6 min-h-[260px] relative">
+            <div className="flex items-start justify-between">
+              <div className="text-[13px] font-semibold tracking-wide text-[#6B7280] uppercase">Total Calls</div>
+              <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-6 relative">
+              <div className="text-center">
+                <div className="text-[13px] text-[#0F2540] mb-2">Call Count</div>
+                <div className="text-[44px] leading-none font-semibold text-[#0F2540]">1,309</div>
+              </div>
+              <div className="text-center border-l border-[#E5E7EB]">
+                <div className="text-[13px] text-[#0F2540] mb-2">Avg. Duration</div>
+                <div className="text-[44px] leading-none font-semibold text-[#0F2540]">4:13</div>
+              </div>
+            </div>
+            <div className="text-center mt-6">
+              <div className="text-[13px] text-[#0F2540] mb-2">Avg. Connected Duration</div>
+              <div className="text-[44px] leading-none font-semibold text-[#0F2540]">3:49</div>
+            </div>
+          </div>
+
+          <KpiPanel
+            title="New Patients"
+            topLabel="Caller Type: New Patients (Count)"
+            topValue="890"
+            bottomLabel="Appointment: Scheduled (Percent)"
+            bottomValue="50%"
+          />
+          <KpiPanel
+            title="Existing Patients"
+            topLabel="Caller Type: Existing Patient (Count)"
+            topValue="416"
+            bottomLabel="Inquiry Type: Billing and Payments (Percent)"
+            bottomValue="21%"
+          />
         </div>
 
         {/* Call Trending */}
@@ -70,11 +133,24 @@ export default function InvocaDashboard() {
   );
 }
 
-function KpiTile({ label, value }: { label: string; value: string }) {
+function KpiPanel({ title, topLabel, topValue, bottomLabel, bottomValue }: {
+  title: string; topLabel: string; topValue: string; bottomLabel: string; bottomValue: string;
+}) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-md p-6 flex flex-col items-center justify-center min-h-[160px]">
-      <div className="text-[14px] text-[#0F2540] text-center mb-3 font-normal">{label}</div>
-      <div className="text-[56px] leading-none font-semibold text-[#0F2540]">{value}</div>
+    <div className="bg-white border border-[#E5E7EB] rounded-md p-6 min-h-[260px]">
+      <div className="flex items-start justify-between">
+        <div className="text-[13px] font-semibold tracking-wide text-[#6B7280] uppercase">{title}</div>
+        <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
+      </div>
+      <div className="text-center mt-6">
+        <div className="text-[13px] text-[#0F2540] mb-2">{topLabel}</div>
+        <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{topValue}</div>
+      </div>
+      <div className="text-center mt-6">
+        <div className="text-[13px] text-[#0F2540] mb-2">{bottomLabel}</div>
+        <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{bottomValue}</div>
+      </div>
     </div>
   );
 }
+
