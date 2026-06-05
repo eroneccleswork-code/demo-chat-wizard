@@ -168,7 +168,7 @@ export default function InvocaCallReport() {
   }, [cfg, company, industry, data]);
 
   const cols: Col[] = [
-    { key: 'icon', w: 60, head: 'Call Details', cell: () => (
+    { key: 'icon', w: 110, head: 'Call Details', cell: () => (
       <svg viewBox="0 0 24 24" className="w-[18px] h-[22px]" aria-label="details">
         <path d="M3 2h12l5 5v15H3z" fill="#4DA9EA" />
         <path d="M15 2v5h5" fill="#2E8FD1" />
@@ -307,7 +307,7 @@ export default function InvocaCallReport() {
                 <div
                   key={c.key}
                   style={{ width: c.w }}
-                  className={`shrink-0 px-4 py-3 text-[13px] font-semibold text-[#0F2540] whitespace-nowrap ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                  className={`shrink-0 overflow-hidden px-4 py-3 text-[13px] font-semibold text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
                 >
                   {c.head}
                 </div>
