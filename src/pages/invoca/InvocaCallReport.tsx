@@ -206,39 +206,41 @@ export default function InvocaCallReport() {
 
   return (
     <InvocaShell networkName={company}>
-      <div className="pl-6 pr-0 py-6">
-        <div className="text-[13px] text-[#2D6CDF] mb-1">
-          <span className="hover:underline cursor-pointer">My Reports</span>{' '}
-          <span className="text-gray-400">›</span> Calls
-        </div>
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-[28px] font-semibold text-[#0F2540]">Marketing Call Details</h1>
-          <div className="flex items-center gap-4">
-            <a className="text-[#2D6CDF] text-sm hover:underline cursor-pointer">Requested Reports</a>
-            <Share2 className="w-5 h-5 text-gray-400" />
-            <Download className="w-5 h-5 text-gray-400" />
-            <Clock className="w-5 h-5 text-gray-400" />
-            <button className="bg-[#2D6CDF] text-white text-sm font-semibold rounded px-5 py-1.5">Save</button>
+      <div className="py-6">
+        <div className="pl-6 pr-6">
+          <div className="text-[13px] text-[#2D6CDF] mb-1">
+            <span className="hover:underline cursor-pointer">My Reports</span>{' '}
+            <span className="text-gray-400">›</span> Calls
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-[28px] font-semibold text-[#0F2540]">Marketing Call Details</h1>
+            <div className="flex items-center gap-4">
+              <a className="text-[#2D6CDF] text-sm hover:underline cursor-pointer">Requested Reports</a>
+              <Share2 className="w-5 h-5 text-gray-400" />
+              <Download className="w-5 h-5 text-gray-400" />
+              <Clock className="w-5 h-5 text-gray-400" />
+              <button className="bg-[#2D6CDF] text-white text-sm font-semibold rounded px-5 py-1.5">Save</button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex border border-[#2D6CDF] rounded overflow-hidden">
+              <button className="p-2 bg-white text-[#2D6CDF]">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+              </button>
+              <button className="p-2 bg-white text-gray-400 border-l border-[#2D6CDF]">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect y="2" width="16" height="3"/><rect y="7" width="16" height="3"/><rect y="12" width="16" height="3"/></svg>
+              </button>
+            </div>
+            <button className="bg-[#1FA37A] text-white rounded px-4 py-2 text-sm font-medium flex items-center gap-3">
+              <span>Custom:</span><span className="font-semibold">Mar 01, 2022 - Mar 31, 2022</span>
+            </button>
+            <button className="bg-[#2D6CDF] text-white rounded p-2"><Plus className="w-4 h-4" /></button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex border border-[#2D6CDF] rounded overflow-hidden">
-            <button className="p-2 bg-white text-[#2D6CDF]">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
-            </button>
-            <button className="p-2 bg-white text-gray-400 border-l border-[#2D6CDF]">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect y="2" width="16" height="3"/><rect y="7" width="16" height="3"/><rect y="12" width="16" height="3"/></svg>
-            </button>
-          </div>
-          <button className="bg-[#1FA37A] text-white rounded px-4 py-2 text-sm font-medium flex items-center gap-3">
-            <span>Custom:</span><span className="font-semibold">Mar 01, 2022 - Mar 31, 2022</span>
-          </button>
-          <button className="bg-[#2D6CDF] text-white rounded p-2"><Plus className="w-4 h-4" /></button>
-        </div>
-
-        {/* Chart — flush, no card */}
-        <div className="border-t border-[#E5E7EB] pt-6 pb-2 mb-6">
+        {/* Chart — divider flush to sidebar */}
+        <div className="border-t border-[#E5E7EB] pt-6 pb-2 mb-6 pl-6 pr-6">
           <div className="flex items-center gap-6 mb-4 text-xs">
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#22A95A] rounded-full" /> Total Calls</div>
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions</div>
@@ -260,18 +262,22 @@ export default function InvocaCallReport() {
           </div>
         </div>
 
-
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-sm font-semibold text-[#0F2540]">Total Calls: 2,334</div>
-          <div className="text-sm text-[#2D6CDF]">
-            <span className="hover:underline cursor-pointer">Edit Columns</span>
-            <span className="text-gray-300 mx-2">|</span>
-            <span className="hover:underline cursor-pointer">Reset Sorting</span>
+        {/* Total Calls header — divider flush to sidebar */}
+        <div className="border-t border-[#E5E7EB] pl-6 pr-6">
+          <div className="flex items-center justify-between py-3">
+            <div className="text-sm font-semibold text-[#0F2540]">Total Calls: 2,334</div>
+            <div className="text-sm text-[#2D6CDF]">
+              <span className="hover:underline cursor-pointer">Edit Columns</span>
+              <span className="text-gray-300 mx-2">|</span>
+              <span className="hover:underline cursor-pointer">Reset Sorting</span>
+            </div>
           </div>
         </div>
 
         {/* Wide horizontally-scrollable table — flush, no card */}
         <div className="overflow-x-auto bg-white border-t border-[#E5E7EB]">
+
+
 
           <div style={{ width: totalW }}>
             {/* Header */}
