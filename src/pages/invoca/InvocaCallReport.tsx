@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Share2, Download, Clock, Plus } from 'lucide-react';
+import { Share2, Download, Clock, Plus, FileSearch } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
 import callDetailsIcon from '@/assets/call-details-icon.png.asset.json';
@@ -168,7 +168,14 @@ export default function InvocaCallReport() {
   }, [cfg, company, industry, data]);
 
   const cols: Col[] = [
-    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-7 h-9" draggable={false} /> },
+    { key: 'icon', w: 60, head: 'Call Details', cell: () => (
+      <svg viewBox="0 0 24 24" className="w-[18px] h-[22px]" aria-label="details">
+        <path d="M3 2h12l5 5v15H3z" fill="#4DA9EA" />
+        <path d="M15 2v5h5" fill="#2E8FD1" />
+        <circle cx="10.5" cy="13.5" r="2.8" fill="none" stroke="#fff" strokeWidth="1.6" />
+        <line x1="12.6" y1="15.6" x2="15" y2="18" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+    ) },
     { key: 'time', w: 150, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
     { key: 'caller', w: 130, head: 'Caller ID', cell: r => r.callerId },
     { key: 'masked', w: 130, head: 'Masked Caller ID', cell: () => '—' },
