@@ -17,7 +17,10 @@ import HomeServiceDemo from "./pages/HomeServiceDemo.tsx";
 import VoiceSetup from "./pages/VoiceSetup.tsx";
 import VoiceDemo from "./pages/VoiceDemo.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import InvocaSaleoTour from "./pages/invoca/InvocaSaleoTour.tsx";
+import InvocaDashboard from "./pages/invoca/InvocaDashboard.tsx";
+import InvocaCallReport from "./pages/invoca/InvocaCallReport.tsx";
+import InvocaCallReview from "./pages/invoca/InvocaCallReview.tsx";
+import InvocaIntegrations from "./pages/invoca/InvocaIntegrations.tsx";
 
 const queryClient = new QueryClient();
 
