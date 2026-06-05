@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Share2, Download, Clock, Plus } from 'lucide-react';
+import { Share2, Download, Clock, Plus, FileSearch } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
 import callDetailsIcon from '@/assets/call-details-icon.png.asset.json';
