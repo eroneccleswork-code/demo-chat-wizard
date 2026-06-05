@@ -27,7 +27,7 @@ const items: NavItem[] = [
   { label: 'Settings', icon: Settings, to: '/invoca/settings' },
 ];
 
-export default function InvocaShell({ children }: { children: ReactNode }) {
+export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white flex flex-col">
