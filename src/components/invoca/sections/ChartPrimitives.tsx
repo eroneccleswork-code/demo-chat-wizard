@@ -55,7 +55,7 @@ export function HBarChart({ rows, max, showPercent = false, colors = CHART_COLOR
 
 export function PanelCard({ title, badge, children }: { title: string; badge?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#EAECEF] rounded-lg overflow-hidden flex flex-col shadow-[0_1px_2px_rgba(15,37,64,0.04)]">
+    <div className="bg-white border border-[#EEF0F3] rounded-[10px] overflow-hidden flex flex-col shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)]">
       <div className="px-5 pt-5 pb-3 flex items-start justify-between">
         <div className="min-w-0">
           <h3 className="text-[17px] font-semibold text-[#0F2540] tracking-tight truncate">{title}</h3>
