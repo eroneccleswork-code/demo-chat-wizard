@@ -1,32 +1,33 @@
-import { ReactNode } from 'react';
+import { ReactNode, SVGProps } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
-import { HiViewGrid, HiUsers, HiPhoneOutgoing } from 'react-icons/hi';
-import { BsFolderFill, BsBarChartFill, BsCompassFill, BsClipboardCheckFill, BsChatLeftTextFill } from 'react-icons/bs';
-import { FaSitemap, FaFlask, FaCog } from 'react-icons/fa';
-import { MdDialpad } from 'react-icons/md';
-import { IconType } from 'react-icons';
+import {
+  IcDashboards, IcCallReview, IcAdvertisers, IcCampaigns, IcPublishers,
+  IcPromoNumbers, IcReports, IcIntegrations, IcSignal, IcScore, IcLabs, IcSettings
+} from './InvocaIcons';
+
+type IconCmp = (p: SVGProps<SVGSVGElement>) => JSX.Element;
 
 interface NavItem {
   label: string;
-  icon: IconType;
+  icon: IconCmp;
   to: string;
   badge?: 'NEW';
 }
 
 const items: NavItem[] = [
-  { label: 'Dashboards', icon: HiViewGrid, to: '/invoca' },
-  { label: 'Call Review', icon: BsChatLeftTextFill, to: '/invoca/call-review', badge: 'NEW' },
-  { label: 'Advertisers', icon: BsFolderFill, to: '/invoca/advertisers' },
-  { label: 'Campaigns', icon: HiPhoneOutgoing, to: '/invoca/campaigns' },
-  { label: 'Publishers', icon: HiUsers, to: '/invoca/publishers' },
-  { label: 'Promo Numbers', icon: MdDialpad, to: '/invoca/promo-numbers' },
-  { label: 'Reports', icon: BsBarChartFill, to: '/invoca/call-report' },
-  { label: 'Integrations', icon: FaSitemap, to: '/invoca/integrations' },
-  { label: 'Signal', icon: BsCompassFill, to: '/invoca/signal' },
-  { label: 'Score', icon: BsClipboardCheckFill, to: '/invoca/score' },
-  { label: 'Labs', icon: FaFlask, to: '/invoca/labs' },
-  { label: 'Settings', icon: FaCog, to: '/invoca/settings' },
+  { label: 'Dashboards', icon: IcDashboards, to: '/invoca' },
+  { label: 'Call Review', icon: IcCallReview, to: '/invoca/call-review', badge: 'NEW' },
+  { label: 'Advertisers', icon: IcAdvertisers, to: '/invoca/advertisers' },
+  { label: 'Campaigns', icon: IcCampaigns, to: '/invoca/campaigns' },
+  { label: 'Publishers', icon: IcPublishers, to: '/invoca/publishers' },
+  { label: 'Promo Numbers', icon: IcPromoNumbers, to: '/invoca/promo-numbers' },
+  { label: 'Reports', icon: IcReports, to: '/invoca/call-report' },
+  { label: 'Integrations', icon: IcIntegrations, to: '/invoca/integrations' },
+  { label: 'Signal', icon: IcSignal, to: '/invoca/signal' },
+  { label: 'Score', icon: IcScore, to: '/invoca/score' },
+  { label: 'Labs', icon: IcLabs, to: '/invoca/labs' },
+  { label: 'Settings', icon: IcSettings, to: '/invoca/settings' },
 ];
 
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
