@@ -62,20 +62,25 @@ export default function InvocaShell({ children, networkName }: { children: React
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar — exact screenshot with invisible nav hit-areas */}
-        <aside
-          className="w-[92px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 relative bg-top bg-no-repeat bg-contain"
-          style={{ backgroundImage: `url(${sidebarImg.url})` }}
-        >
-          <div className="absolute inset-0 grid grid-rows-12">
-            {items.map((it) => (
-              <NavLink
-                key={it.to}
-                to={it.to}
-                end={it.to === '/invoca'}
-                aria-label={it.label}
-                className="block hover:bg-black/[0.04]"
-              />
-            ))}
+        <aside className="w-[92px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
+          <div className="sticky top-0 relative">
+            <img
+              src={sidebarImg.url}
+              alt=""
+              className="block w-full h-auto select-none pointer-events-none"
+              draggable={false}
+            />
+            <div className="absolute inset-0 grid grid-rows-12">
+              {items.map((it) => (
+                <NavLink
+                  key={it.to}
+                  to={it.to}
+                  end={it.to === '/invoca'}
+                  aria-label={it.label}
+                  className="block hover:bg-black/[0.04]"
+                />
+              ))}
+            </div>
           </div>
         </aside>
 
