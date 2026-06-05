@@ -268,6 +268,7 @@ export default function InvocaCallReport() {
             <div className="absolute -left-7 top-1/3 text-[10px] text-[#5B6B7E]">200</div>
             <div className="absolute -left-7 top-2/3 text-[10px] text-[#5B6B7E]">100</div>
             <div className="absolute -left-7 bottom-0 text-[10px] text-[#5B6B7E]">0</div>
+            {chartView === 'calls' && <div className="absolute left-3 right-2 bottom-2 h-px bg-[#F5A623]/60 pointer-events-none" />}
             {bars.map((h, i) => {
               const isCalls = chartView === 'calls';
               const val = isCalls ? h : convBars[i];
