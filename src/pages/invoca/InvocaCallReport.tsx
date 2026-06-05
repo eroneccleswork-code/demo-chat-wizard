@@ -272,11 +272,12 @@ export default function InvocaCallReport() {
               const isCalls = chartView === 'calls';
               const val = isCalls ? h : convBars[i];
               return (
-                <div key={i} className="relative h-full flex flex-col justify-end" style={{ width: 10 }}>
+                <div key={i} className="relative h-full flex flex-col justify-end" style={{ width: 18 }}>
                   <div
                     className={isCalls ? 'bg-[#22A95A]' : 'bg-[#F5A623]'}
                     style={{ height: `${(val / 300) * 100}%`, width: '100%' }}
                   />
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
                 </div>
               );
             })}
