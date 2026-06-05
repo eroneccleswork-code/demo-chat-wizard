@@ -1,10 +1,10 @@
 import { useLocation } from 'react-router-dom';
 import { ChevronDown, Download, History, MoreVertical } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
-import CallTrending from '@/components/invoca/sections/CallTrending';
 import MarketingTrio, { TrioRow } from '@/components/invoca/sections/MarketingTrio';
 import DataTable from '@/components/invoca/sections/DataTable';
 import { useIndustryDashboard, seededRand } from '@/lib/invoca-industry';
+import callTrendingImg from '@/assets/invoca-call-trending.png.asset.json';
 
 const SOURCE_LABELS = ['Paid Search', 'Organic', 'Direct Mail', 'Email', 'Social Media'];
 const MEDIUM_LABELS = ['cpc', 'organic', 'Post Card', 'SFMC', 'Facebook'];
@@ -113,7 +113,9 @@ export default function InvocaDashboard() {
         </div>
 
         {/* Call Trending */}
-        <CallTrending categories={data.inquiryTypes} seed={seed} />
+        <div className="border border-[#E5E7EB] rounded-md overflow-hidden bg-white">
+          <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
+        </div>
 
         {/* 4 trio rows */}
         <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800}
