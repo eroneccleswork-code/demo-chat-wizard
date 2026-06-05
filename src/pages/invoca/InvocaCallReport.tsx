@@ -270,8 +270,9 @@ export default function InvocaCallReport() {
           </div>
         </div>
 
-        {/* Wide horizontally-scrollable table */}
-        <div className="border border-[#EEF0F3] rounded-[10px] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)] overflow-x-auto bg-white">
+        {/* Wide horizontally-scrollable table — flush, no card */}
+        <div className="overflow-x-auto bg-white border-t border-[#E5E7EB]">
+
           <div style={{ width: totalW }}>
             {/* Header */}
             <div className="flex border-b border-[#E5E7EB] bg-white sticky top-0 z-10">
