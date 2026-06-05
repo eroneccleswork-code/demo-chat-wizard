@@ -23,7 +23,12 @@ export default function InvocaDashboard() {
   const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string } };
   const company = loc.state?.companyName;
   const industry = loc.state?.industry;
-  const data = useIndustryDashboard(company, industry, loc.state?.websiteContext);
+  const websiteContext = loc.state?.websiteContext;
+  // Persist so other Invoca pages (Call Report, etc.) keep the same context after sidebar navigation
+  if (typeof window !== 'undefined' && (company || industry)) {
+    try { sessionStorage.setItem('invoca-context', JSON.stringify({ companyName: company, industry, websiteContext })); } catch {}
+  }
+  const data = useIndustryDashboard(company, industry, websiteContext);
   const seed = `${company || 'invoca'}-${industry || 'healthcare'}`;
 
   const sourceRows = buildRows(SOURCE_LABELS, seed + '-source', 650);
