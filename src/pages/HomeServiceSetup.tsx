@@ -7,8 +7,8 @@ import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [companyName, setCompanyName] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('https://www.renewalbyandersen.com');
+  const [companyName, setCompanyName] = useState('Renewal by Andersen');
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
 
