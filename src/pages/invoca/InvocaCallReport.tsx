@@ -120,7 +120,7 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
 const Check = ({ on }: { on: boolean }) => (
   on ? (
     <svg viewBox="0 0 20 20" className="inline-block w-[18px] h-[18px] align-middle" aria-label="yes">
-      <circle cx="10" cy="10" r="9" fill="#22A06B" />
+      <circle cx="10" cy="10" r="9" fill="#5FBC63" />
       <path d="M5.8 10.2l2.7 2.7 5.7-5.7" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ) : (
