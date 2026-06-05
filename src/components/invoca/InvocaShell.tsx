@@ -26,9 +26,9 @@ const items: NavItem[] = [
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
   return (
-    <div className="h-screen w-screen max-w-none bg-[#F4F6F8] flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Top bar */}
-      <header className="h-[105px] bg-[#F4F5F7] flex items-center px-4 gap-4 border-b border-[#D9DDE3] flex-shrink-0">
+      <header className="h-[60px] bg-[#F4F5F7] flex items-center px-4 gap-4 border-b border-[#E5E7EB] flex-shrink-0">
         <button onClick={() => navigate('/invoca')} className="flex items-center gap-1 shrink-0">
           <span className="font-extrabold tracking-tight text-[22px] text-[#0F2540]">INVOCA</span>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="#1FA37A" className="-ml-0.5">
@@ -62,13 +62,13 @@ export default function InvocaShell({ children, networkName }: { children: React
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar — exact screenshot with invisible nav hit-areas */}
-        <aside className="w-[115px] min-w-[115px] max-w-[115px] bg-[#F4F6F8] flex-shrink-0 self-stretch overflow-hidden">
-          <div className="sticky top-0 relative w-[115px]">
+        <aside className="w-[84px] min-w-[84px] max-w-[84px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
+          <div className="sticky top-0 relative w-[84px]">
             <img
               src={sidebarImg.url}
               alt=""
-              width={115}
-              className="block w-[115px] h-auto select-none pointer-events-none"
+              width={84}
+              className="block w-[84px] h-auto select-none pointer-events-none"
               draggable={false}
             />
             <div className="absolute inset-0 grid grid-rows-12">
@@ -86,7 +86,7 @@ export default function InvocaShell({ children, networkName }: { children: React
         </aside>
 
         {/* Content */}
-        <main className="flex-1 min-w-0 overflow-y-auto bg-white border-l border-t border-[#D7DBE0] rounded-tl-[7px] shadow-[-3px_0_8px_rgba(15,23,42,0.12)]">
+        <main className="flex-1 min-w-0 overflow-y-auto bg-white">
           {children}
         </main>
       </div>
