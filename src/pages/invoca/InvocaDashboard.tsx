@@ -81,18 +81,18 @@ export default function InvocaDashboard() {
         <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
 
         {/* 4 trio rows */}
-        <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800}
+        <MarketingTrio category="Source" rows={sourceRows} callsAxisMax={800} industry={industry}
           appointmentsBadge="MARKETING SOURCE: …" />
-        <MarketingTrio category="Medium" rows={mediumRows} callsAxisMax={800}
+        <MarketingTrio category="Medium" rows={mediumRows} callsAxisMax={800} industry={industry}
           appointmentsBadge="MARKETING MEDIUM: …" />
-        <MarketingTrio category="Campaign" rows={campaignRows} />
-        <MarketingTrio category="Search Terms" rows={searchRows} />
+        <MarketingTrio category="Campaign" rows={campaignRows} industry={industry} />
+        <MarketingTrio category="Search Terms" rows={searchRows} industry={industry} />
 
         {/* Lines of Business */}
-        <DataTable title="LINES OF BUSINESS" columnLabel="Line of Business" rows={data.linesOfBusiness} />
+        <DataTable title="LINES OF BUSINESS" columnLabel="Line of Business" rows={data.linesOfBusiness} industry={industry} />
 
         {/* Divisions */}
-        <DataTable title="DIVISIONS" columnLabel="Division" rows={data.divisions} />
+        <DataTable title="DIVISIONS" columnLabel="Division" rows={data.divisions} industry={industry} />
       </div>
     </InvocaShell>
   );

@@ -44,15 +44,73 @@ export const FALLBACK: IndustryDashboardData = {
   ],
 };
 
+export const HOME_SERVICE_FALLBACK: IndustryDashboardData = {
+  networkName: 'Invoca for Home Services 2.0',
+  inquiryKpiLabel: 'Inquiry Type: Pricing and Quotes (Percent)',
+  inquiryKpiPercent: 28,
+  inquiryTypes: ['Free Estimate', 'Service Request', 'Pricing Inquiry'],
+  searchTerms: [
+    { term: 'window replacement', calls: 142, apptPct: 52 },
+    { term: 'roof repair near me', calls: 118, apptPct: 44 },
+    { term: 'HVAC installation cost', calls: 96, apptPct: 39 },
+    { term: 'gutter installation', calls: 71, apptPct: 47 },
+    { term: 'bathroom remodel', calls: 64, apptPct: 36 },
+  ],
+  campaigns: [
+    { name: 'Free in-home estimate', calls: 612, apptPct: 41 },
+    { name: 'Spring savings event', calls: 184, apptPct: 58 },
+    { name: 'Lifetime warranty promise', calls: 88, apptPct: 49 },
+  ],
+  linesOfBusiness: [
+    { name: 'Window Replacement', calls: 884, newPct: 78, existingPct: 22, apptPct: 52 },
+    { name: 'Roofing', calls: 247, newPct: 81, existingPct: 19, apptPct: 47 },
+    { name: 'HVAC Service', calls: 193, newPct: 54, existingPct: 46, apptPct: 61 },
+  ],
+  divisions: [
+    { name: 'West Florida', calls: 128, newPct: 79, existingPct: 21, apptPct: 38 },
+    { name: 'North Texas', calls: 109, newPct: 71, existingPct: 29, apptPct: 55 },
+    { name: 'Gulf Coast', calls: 88, newPct: 66, existingPct: 34, apptPct: 49 },
+    { name: 'Mid-Atlantic', calls: 74, newPct: 58, existingPct: 42, apptPct: 44 },
+    { name: 'Pacific Northwest', calls: 57, newPct: 69, existingPct: 31, apptPct: 51 },
+  ],
+};
+
+export function isHomeService(industry?: string) {
+  const s = (industry || '').toLowerCase();
+  return s.includes('home') || (s.includes('service') && !s.includes('health'));
+}
+
+export function industryTerms(industry?: string) {
+  if (isHomeService(industry)) {
+    return {
+      newPctLabel: 'Caller Type: New Customers (Percent)',
+      existingPctLabel: 'Caller Type: Existing Customer (Perc…',
+      apptPctLabel: 'Estimate: Scheduled (Percent)',
+      apptShort: 'Estimate:…',
+      apptTitleShort: 'Estimate',
+      apptTitle: 'Estimates',
+    };
+  }
+  return {
+    newPctLabel: 'Caller Type: New Patients (Percent)',
+    existingPctLabel: 'Caller Type: Existing Patient (Perc…',
+    apptPctLabel: 'Appointment: Scheduled (Percent)',
+    apptShort: 'Appointment:…',
+    apptTitleShort: 'Appointment',
+    apptTitle: 'Appointments',
+  };
+}
+
 const CACHE_KEY = 'invoca-industry-dashboard';
 
 export function useIndustryDashboard(companyName?: string, industry?: string, websiteContext?: string) {
+  const baseFallback = isHomeService(industry) ? HOME_SERVICE_FALLBACK : FALLBACK;
   const [data, setData] = useState<IndustryDashboardData>(() => {
     try {
-      const cached = sessionStorage.getItem(CACHE_KEY);
+      const cached = sessionStorage.getItem(CACHE_KEY + ':' + (industry || 'default'));
       if (cached) return JSON.parse(cached);
     } catch {}
-    return FALLBACK;
+    return baseFallback;
   });
 
   useEffect(() => {
@@ -64,9 +122,9 @@ export function useIndustryDashboard(companyName?: string, industry?: string, we
           body: { companyName, industry, websiteContext },
         });
         if (cancelled || error || !resp || resp.error) return;
-        const merged = { ...FALLBACK, ...resp };
+        const merged = { ...baseFallback, ...resp };
         setData(merged);
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify(merged));
+        sessionStorage.setItem(CACHE_KEY + ':' + (industry || 'default'), JSON.stringify(merged));
       } catch {}
     })();
     return () => { cancelled = true; };

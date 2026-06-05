@@ -1,4 +1,5 @@
 import { HBarChart, PanelCard, CHART_COLORS } from './ChartPrimitives';
+import { industryTerms } from '@/lib/invoca-industry';
 
 export interface TrioRow { label: string; calls: number; apptPct: number }
 
@@ -7,9 +8,11 @@ interface Props {
   rows: TrioRow[];
   callsAxisMax?: number;
   appointmentsBadge?: string;
+  industry?: string;
 }
 
-export default function MarketingTrio({ category, rows, callsAxisMax, appointmentsBadge }: Props) {
+export default function MarketingTrio({ category, rows, callsAxisMax, appointmentsBadge, industry }: Props) {
+  const t = industryTerms(industry);
   const callsRows = [...rows].sort((a, b) => b.calls - a.calls);
   const apptRows = [...rows].sort((a, b) => b.apptPct - a.apptPct);
   const maxCalls = callsAxisMax ?? (Math.ceil(Math.max(...rows.map(r => r.calls)) / 100) * 100 || 800);
@@ -24,7 +27,7 @@ export default function MarketingTrio({ category, rows, callsAxisMax, appointmen
       </PanelCard>
 
       <PanelCard
-        title={`MARKETING: ${category} (Appointmen…`}
+        title={`MARKETING: ${category} (${t.apptTitleShort}…`}
         badge={appointmentsBadge || `MARKETING ${category.toUpperCase()}: …`}
       >
         <HBarChart
@@ -39,7 +42,7 @@ export default function MarketingTrio({ category, rows, callsAxisMax, appointmen
           <div className="grid grid-cols-[1.4fr_1fr_1fr] text-[13px] font-semibold text-[#0F2540] py-2 border-b border-[#F3F4F6]">
             <div>Marketing {category.split(' ')[0].slice(0, 10)}…</div>
             <div>Call Count</div>
-            <div>Appointment:…</div>
+            <div>{t.apptShort}</div>
           </div>
           {callsRows.map((r, i) => (
             <div key={r.label} className="grid grid-cols-[1.4fr_1fr_1fr] text-[14px] text-[#0F2540] py-3 border-b border-[#F3F4F6]">
