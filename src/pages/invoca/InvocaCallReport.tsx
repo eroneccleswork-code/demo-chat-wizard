@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Share2, Download, Clock, Plus, FileSearch } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
@@ -215,6 +215,8 @@ export default function InvocaCallReport() {
   // Chart bars — stable per company
   const barRand = useMemo(() => seededRand(`${company || 'invoca'}-bars`), [company]);
   const bars = useMemo(() => Array.from({ length: 31 }, () => 170 + Math.floor(barRand() * 40)), [barRand]);
+  const convBars = useMemo(() => bars.map(h => Math.max(6, Math.floor(h * 0.11 + barRand() * 8))), [bars, barRand]);
+  const [chartView, setChartView] = useState<'calls' | 'conv'>('calls');
 
   return (
     <InvocaShell networkName={company}>
@@ -254,20 +256,30 @@ export default function InvocaCallReport() {
         {/* Chart — divider flush to sidebar */}
         <div className="border-t border-[#E5E7EB] pt-6 pb-2 mb-6 pl-6 pr-6">
           <div className="flex items-center gap-6 mb-4 text-xs">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#22A95A] rounded-full" /> Total Calls</div>
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions</div>
+            <button onClick={() => setChartView('calls')} className={`flex items-center gap-1.5 ${chartView==='calls' ? '' : 'opacity-40'}`}>
+              <span className="w-3 h-3 bg-[#22A95A] rounded-full" /> Total Calls
+            </button>
+            <button onClick={() => setChartView('conv')} className={`flex items-center gap-1.5 ${chartView==='conv' ? '' : 'opacity-40'}`}>
+              <span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions
+            </button>
           </div>
-          <div className="flex items-end gap-1 h-[260px] border-l border-b border-[#E5E7EB] pl-3 pb-2 relative ml-8">
+          <div className="flex items-end h-[260px] border-l border-b border-[#E5E7EB] pl-3 pb-2 pr-2 relative ml-8 justify-between">
             <div className="absolute -left-7 top-0 text-[10px] text-[#5B6B7E]">300</div>
             <div className="absolute -left-7 top-1/3 text-[10px] text-[#5B6B7E]">200</div>
             <div className="absolute -left-7 top-2/3 text-[10px] text-[#5B6B7E]">100</div>
             <div className="absolute -left-7 bottom-0 text-[10px] text-[#5B6B7E]">0</div>
-            {bars.map((h, i) => (
-              <div key={i} className="flex-1 relative h-full flex flex-col justify-end">
-                <div className="bg-[#22A95A] w-full" style={{ height: `${(h / 300) * 100}%` }} />
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
-              </div>
-            ))}
+            {bars.map((h, i) => {
+              const isCalls = chartView === 'calls';
+              const val = isCalls ? h : convBars[i];
+              return (
+                <div key={i} className="relative h-full flex flex-col justify-end" style={{ width: 10 }}>
+                  <div
+                    className={isCalls ? 'bg-[#22A95A]' : 'bg-[#F5A623]'}
+                    style={{ height: `${(val / 300) * 100}%`, width: '100%' }}
+                  />
+                </div>
+              );
+            })}
           </div>
           <div className="flex justify-between mt-2 ml-8 pr-2 text-[10px] text-[#5B6B7E]">
             {['03/01','03/03','03/05','03/07','03/09','03/11','03/13','03/15','03/17','03/19','03/21','03/23','03/25','03/27','03/29'].map(d => <span key={d}>{d}</span>)}
