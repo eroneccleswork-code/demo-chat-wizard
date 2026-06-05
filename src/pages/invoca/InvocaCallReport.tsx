@@ -206,7 +206,7 @@ export default function InvocaCallReport() {
 
   return (
     <InvocaShell networkName={company}>
-      <div className="px-10 py-6">
+      <div className="py-6">
         <div className="text-[13px] text-[#2D6CDF] mb-1">
           <span className="hover:underline cursor-pointer">My Reports</span>{' '}
           <span className="text-gray-400">›</span> Calls
