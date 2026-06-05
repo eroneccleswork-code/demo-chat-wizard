@@ -42,10 +42,10 @@ export default function CallTrending({ categories, seed }: Props) {
                 <div key={p} className="absolute left-0 right-0 border-t border-[#F3F4F6]" style={{ bottom: `${p * 100}%` }} />
               ))}
               {data.map(d => (
-                <div key={d.i} className="flex-1 flex flex-col-reverse min-w-0">
-                  <div style={{ height: `${(d.a / maxY) * 100}%`, backgroundColor: TRENDING_COLORS[0] }} />
-                  <div style={{ height: `${(d.b / maxY) * 100}%`, backgroundColor: TRENDING_COLORS[1] }} />
+                <div key={d.i} className="flex-1 h-full flex flex-col justify-end min-w-0">
                   <div style={{ height: `${(d.c / maxY) * 100}%`, backgroundColor: TRENDING_COLORS[2] }} />
+                  <div style={{ height: `${(d.b / maxY) * 100}%`, backgroundColor: TRENDING_COLORS[1] }} />
+                  <div style={{ height: `${(d.a / maxY) * 100}%`, backgroundColor: TRENDING_COLORS[0] }} />
                 </div>
               ))}
             </div>
