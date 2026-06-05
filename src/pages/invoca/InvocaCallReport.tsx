@@ -120,8 +120,9 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
 }
 
 const Check = ({ on }: { on: boolean }) => (
-  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle" draggable={false} />
+  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle mix-blend-multiply" draggable={false} />
 );
+
 
 
 const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' }) => (
@@ -159,7 +160,7 @@ export default function InvocaCallReport() {
   }, [cfg, company, industry, data]);
 
   const cols: Col[] = [
-    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-5 h-5" draggable={false} /> },
+    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-5 h-5 mix-blend-multiply" draggable={false} /> },
     { key: 'time', w: 150, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
     { key: 'caller', w: 130, head: 'Caller ID', cell: r => r.callerId },
     { key: 'masked', w: 130, head: 'Masked Caller ID', cell: () => '—' },
