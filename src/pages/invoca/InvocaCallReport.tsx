@@ -197,6 +197,9 @@ export default function InvocaCallReport() {
     { key: 'journey', w: 240, head: 'Website Journey', cell: r => r.websiteJourney },
     { key: 'page', w: 180, head: 'Calling Page', cell: r => r.callingPage },
     { key: 'lob', w: 150, head: 'Line of Business', cell: r => r.lob },
+    { key: 'qual', w: 180, head: <>Qualified Call<Pill label="RULE" /></>, cell: r => <Check on={r.scheduling} />, align: 'center' },
+    { key: 'conv', w: 180, head: <>Converted Call<Pill label="RULE" /></>, cell: r => <Check on={r.apptSched} />, align: 'center' },
+    { key: 'insv', w: 200, head: <>{cfg.home ? 'Financing Verified' : 'Insurance Verified'}<Pill label="RULE" /></>, cell: r => <Check on={r.qaIns} />, align: 'center' },
   ];
 
   const totalW = cols.reduce((s, c) => s + c.w, 0);
