@@ -1,30 +1,32 @@
 import { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import {
-  LayoutGrid, FolderOpen, Folder, PhoneForwarded, Users, Grid3x3,
-  BarChart3, Network, Compass, ClipboardCheck, FlaskConical, Settings, Star, Bell, HelpCircle, Search, ChevronDown
-} from 'lucide-react';
+import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
+import { HiViewGrid, HiUsers, HiPhoneOutgoing } from 'react-icons/hi';
+import { BsFolderFill, BsBarChartFill, BsCompassFill, BsClipboardCheckFill, BsChatLeftTextFill } from 'react-icons/bs';
+import { FaSitemap, FaFlask, FaCog } from 'react-icons/fa';
+import { MdDialpad } from 'react-icons/md';
+import { IconType } from 'react-icons';
 
 interface NavItem {
   label: string;
-  icon: typeof LayoutGrid;
+  icon: IconType;
   to: string;
   badge?: 'NEW';
 }
 
 const items: NavItem[] = [
-  { label: 'Dashboards', icon: LayoutGrid, to: '/invoca' },
-  { label: 'Call Review', icon: FolderOpen, to: '/invoca/call-review', badge: 'NEW' },
-  { label: 'Advertisers', icon: Folder, to: '/invoca/advertisers' },
-  { label: 'Campaigns', icon: PhoneForwarded, to: '/invoca/campaigns' },
-  { label: 'Publishers', icon: Users, to: '/invoca/publishers' },
-  { label: 'Promo Numbers', icon: Grid3x3, to: '/invoca/promo-numbers' },
-  { label: 'Reports', icon: BarChart3, to: '/invoca/call-report' },
-  { label: 'Integrations', icon: Network, to: '/invoca/integrations' },
-  { label: 'Signal', icon: Compass, to: '/invoca/signal' },
-  { label: 'Score', icon: ClipboardCheck, to: '/invoca/score' },
-  { label: 'Labs', icon: FlaskConical, to: '/invoca/labs' },
-  { label: 'Settings', icon: Settings, to: '/invoca/settings' },
+  { label: 'Dashboards', icon: HiViewGrid, to: '/invoca' },
+  { label: 'Call Review', icon: BsChatLeftTextFill, to: '/invoca/call-review', badge: 'NEW' },
+  { label: 'Advertisers', icon: BsFolderFill, to: '/invoca/advertisers' },
+  { label: 'Campaigns', icon: HiPhoneOutgoing, to: '/invoca/campaigns' },
+  { label: 'Publishers', icon: HiUsers, to: '/invoca/publishers' },
+  { label: 'Promo Numbers', icon: MdDialpad, to: '/invoca/promo-numbers' },
+  { label: 'Reports', icon: BsBarChartFill, to: '/invoca/call-report' },
+  { label: 'Integrations', icon: FaSitemap, to: '/invoca/integrations' },
+  { label: 'Signal', icon: BsCompassFill, to: '/invoca/signal' },
+  { label: 'Score', icon: BsClipboardCheckFill, to: '/invoca/score' },
+  { label: 'Labs', icon: FaFlask, to: '/invoca/labs' },
+  { label: 'Settings', icon: FaCog, to: '/invoca/settings' },
 ];
 
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
@@ -66,27 +68,30 @@ export default function InvocaShell({ children, networkName }: { children: React
 
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <aside className="w-[104px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex flex-col flex-shrink-0">
-          {items.map((it) => (
-            <NavLink
-              key={it.to}
-              to={it.to}
-              end={it.to === '/invoca'}
-              className={({ isActive }) =>
-                `relative flex flex-col items-center justify-center gap-1.5 py-4 text-[12px] leading-tight text-center ${
-                  isActive
-                    ? 'text-[#1FA37A] font-semibold bg-[#E8F5EE] border-l-[4px] border-[#1FA37A]'
-                    : 'text-[#5B6B7E] border-l-[4px] border-transparent hover:bg-[#ECEFF2]'
-                }`
-              }
-            >
-              {it.badge && (
-                <span className="absolute top-1.5 right-3 text-[8px] font-bold text-[#E53935] bg-[#FDE3E0] rounded px-1 py-px leading-none">{it.badge}</span>
-              )}
-              <it.icon className="w-[22px] h-[22px]" strokeWidth={1.75} />
-              <span className="px-1">{it.label}</span>
-            </NavLink>
-          ))}
+        <aside className="w-[78px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex flex-col flex-shrink-0">
+          {items.map((it) => {
+            const Icon = it.icon;
+            return (
+              <NavLink
+                key={it.to}
+                to={it.to}
+                end={it.to === '/invoca'}
+                className={({ isActive }) =>
+                  `relative flex flex-col items-center justify-center gap-1 py-3.5 text-[11px] leading-tight text-center ${
+                    isActive
+                      ? 'text-[#1FA37A] font-semibold bg-[#E8F5EE] border-l-[3px] border-[#1FA37A]'
+                      : 'text-[#2C3E50] border-l-[3px] border-transparent hover:bg-[#ECEFF2]'
+                  }`
+                }
+              >
+                {it.badge && (
+                  <span className="absolute top-1 right-1.5 text-[7px] font-bold text-[#E53935] bg-[#FDE3E0] rounded px-1 py-px leading-none">{it.badge}</span>
+                )}
+                <Icon className="w-[22px] h-[22px]" />
+                <span className="px-0.5">{it.label}</span>
+              </NavLink>
+            );
+          })}
         </aside>
 
         {/* Content */}
