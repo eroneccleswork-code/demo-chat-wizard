@@ -55,17 +55,17 @@ export function HBarChart({ rows, max, showPercent = false, colors = CHART_COLOR
 
 export function PanelCard({ title, badge, children }: { title: string; badge?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-md overflow-hidden flex flex-col">
+    <div className="bg-white border border-[#EAECEF] rounded-lg overflow-hidden flex flex-col shadow-[0_1px_2px_rgba(15,37,64,0.04)]">
       <div className="px-5 pt-5 pb-3 flex items-start justify-between">
-        <div>
-          <h3 className="text-[18px] font-semibold text-[#0F2540] truncate">{title}</h3>
+        <div className="min-w-0">
+          <h3 className="text-[17px] font-semibold text-[#0F2540] tracking-tight truncate">{title}</h3>
           {badge && (
             <span className="inline-block mt-2 text-[10px] font-semibold tracking-wide text-[#5B6B7E] bg-[#F3F4F6] rounded px-2 py-1">
               {badge}
             </span>
           )}
         </div>
-        <button className="text-[#9CA3AF] hover:text-[#5B6B7E] text-lg leading-none">⋮</button>
+        <button className="text-[#9CA3AF] hover:text-[#5B6B7E] text-lg leading-none shrink-0">⋮</button>
       </div>
       {children}
     </div>
