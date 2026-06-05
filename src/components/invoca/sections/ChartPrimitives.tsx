@@ -14,16 +14,16 @@ export function HBarChart({ rows, max, showPercent = false, colors = CHART_COLOR
     <div className="px-5 pt-2 pb-4">
       <div className="space-y-3">
         {rows.map((r, i) => {
-          const pct = Math.max(2, (r.value / max) * 100);
+          const pct = Math.max(3, (r.value / max) * 100);
           const color = colors[i % colors.length];
-          const labelInsideMin = 14; // need enough width to show label inside
+          const labelInsideMin = 14;
           const showInside = pct > labelInsideMin;
           return (
             <div key={r.label} className="grid grid-cols-[110px_1fr] items-center gap-3">
-              <div className="text-[12px] text-[#0F2540] text-right leading-tight whitespace-pre-wrap">{r.label}</div>
-              <div className="relative h-7">
+              <div className="text-[14px] text-[#0F2540] text-right leading-tight whitespace-pre-wrap">{r.label}</div>
+              <div className="relative h-8">
                 <div
-                  className="h-full rounded-[6px] flex items-center justify-center text-white text-[13px] font-semibold shadow-[0_1px_0_rgba(15,37,64,0.04)]"
+                  className="h-full rounded-[8px] flex items-center justify-center text-white text-[14px] font-semibold"
                   style={{ width: `${pct}%`, backgroundColor: color }}
                 >
                   {showInside && (showPercent ? `${r.value}%` : r.value)}
@@ -41,7 +41,7 @@ export function HBarChart({ rows, max, showPercent = false, colors = CHART_COLOR
       </div>
       <div className="grid grid-cols-[110px_1fr] gap-3 mt-3">
         <div />
-        <div className="relative h-4 text-[10px] text-[#5B6B7E]">
+        <div className="relative h-4 text-[11px] text-[#6B7280]">
           {ticks.map((t, i) => (
             <span key={i} className="absolute -translate-x-1/2" style={{ left: `${(i / (ticks.length - 1)) * 100}%` }}>
               {showPercent ? `${t}%` : t}
