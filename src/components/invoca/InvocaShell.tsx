@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
-import sidebarImg from '@/assets/invoca-sidebar.png.asset.json';
+import sidebarImg from '@/assets/invoca-sidebar-v2.png.asset.json';
 
 interface NavItem {
   label: string;
