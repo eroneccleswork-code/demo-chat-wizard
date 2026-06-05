@@ -215,6 +215,8 @@ export default function InvocaCallReport() {
   // Chart bars — stable per company
   const barRand = useMemo(() => seededRand(`${company || 'invoca'}-bars`), [company]);
   const bars = useMemo(() => Array.from({ length: 31 }, () => 170 + Math.floor(barRand() * 40)), [barRand]);
+  const convBars = useMemo(() => bars.map(h => Math.max(6, Math.floor(h * 0.11 + barRand() * 8))), [bars, barRand]);
+  const [chartView, setChartView] = useState<'calls' | 'conv'>('calls');
 
   return (
     <InvocaShell networkName={company}>
