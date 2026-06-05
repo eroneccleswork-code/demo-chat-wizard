@@ -73,8 +73,9 @@ export default function InvocaDashboard() {
           <div className="border-t border-[#E5E7EB] mt-4" />
         </div>
 
-        {/* KPI Row — Total Calls / New Patients / Existing Patients */}
-        <img src={kpiRowImg.url} alt="KPI Row" className="block w-full h-auto select-none" draggable={false} />
+        {/* KPI Row — Total Calls / New {Noun} / Existing {Noun} */}
+        <KpiRow industry={industry} />
+
 
         {/* Call Trending */}
         <img src={callTrendingImg.url} alt="Call Trending" className="block w-full h-auto select-none" draggable={false} />
