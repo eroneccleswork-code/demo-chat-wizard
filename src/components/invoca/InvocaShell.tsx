@@ -27,6 +27,8 @@ const items: NavItem[] = [
 
 export default function InvocaShell({ children, networkName }: { children: ReactNode; networkName?: string }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const activeSidebar = pathname.startsWith('/invoca/call-report') ? sidebarReportsImg.url : sidebarImg.url;
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Top bar */}
