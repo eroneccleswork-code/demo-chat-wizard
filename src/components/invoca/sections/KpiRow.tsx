@@ -15,7 +15,7 @@ interface Props {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-md p-6 min-h-[260px] relative">
+    <div className="bg-white rounded-[10px] p-6 min-h-[260px] relative border border-[#EEF0F3] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)]">
       <div className="flex items-start justify-between">
         <div className="text-[13px] font-semibold tracking-wide text-[#0F2540] uppercase">{title}</div>
         <MoreVertical className="w-4 h-4 text-[#9CA3AF]" />
