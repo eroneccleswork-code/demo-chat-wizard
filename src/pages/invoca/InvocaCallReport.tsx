@@ -120,8 +120,9 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
 }
 
 const Check = ({ on }: { on: boolean }) => (
-  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle" draggable={false} />
+  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle mix-blend-multiply" draggable={false} />
 );
+
 
 
 const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' }) => (
