@@ -4,8 +4,6 @@ import { Share2, Download, Clock, Plus } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
 import callDetailsIcon from '@/assets/call-details-icon.png.asset.json';
-import signalCheck from '@/assets/signal-check.png.asset.json';
-import signalX from '@/assets/signal-x.png.asset.json';
 
 
 // ---- Industry-aware column data ----
