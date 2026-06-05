@@ -144,7 +144,7 @@ type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Row) => Re
 
 export default function InvocaCallReport() {
   const navigate = useNavigate();
-  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string } };
+  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string; customSignals?: string[] } };
 
   // Read persisted context (set by Dashboard on entry)
   const ctx = useMemo(() => {
@@ -156,6 +156,7 @@ export default function InvocaCallReport() {
   }, [loc.state]);
   const company = ctx?.companyName as string | undefined;
   const industry = ctx?.industry as string | undefined;
+  const customSignals = (ctx?.customSignals as string[] | undefined)?.filter(s => s && s.trim()) ?? [];
 
   const cfg = useMemo(() => getIndustryConfig(industry), [industry]);
   const data = useIndustryDashboard(company, industry, ctx?.websiteContext);
