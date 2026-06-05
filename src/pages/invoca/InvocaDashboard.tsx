@@ -5,7 +5,6 @@ import MarketingTrio, { TrioRow } from '@/components/invoca/sections/MarketingTr
 import DataTable from '@/components/invoca/sections/DataTable';
 import { useIndustryDashboard, seededRand } from '@/lib/invoca-industry';
 import callTrendingImg from '@/assets/invoca-call-trending-v2.png.asset.json';
-import kpiRowImg from '@/assets/invoca-kpi-row.png.asset.json';
 
 const SOURCE_LABELS = ['Paid Search', 'Organic', 'Direct Mail', 'Email', 'Social Media'];
 const MEDIUM_LABELS = ['cpc', 'organic', 'Post Card', 'SFMC', 'Facebook'];
