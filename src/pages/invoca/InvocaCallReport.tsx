@@ -144,7 +144,7 @@ type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Row) => Re
 
 export default function InvocaCallReport() {
   const navigate = useNavigate();
-  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string } };
+  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string; customSignals?: string[] } };
 
   // Read persisted context (set by Dashboard on entry)
   const ctx = useMemo(() => {
@@ -156,6 +156,7 @@ export default function InvocaCallReport() {
   }, [loc.state]);
   const company = ctx?.companyName as string | undefined;
   const industry = ctx?.industry as string | undefined;
+  const customSignals = (ctx?.customSignals as string[] | undefined)?.filter(s => s && s.trim()) ?? [];
 
   const cfg = useMemo(() => getIndustryConfig(industry), [industry]);
   const data = useIndustryDashboard(company, industry, ctx?.websiteContext);
@@ -199,7 +200,14 @@ export default function InvocaCallReport() {
     { key: 'lob', w: 150, head: 'Line of Business', cell: r => r.lob },
     { key: 'qual', w: 180, head: <>Qualified Call<Pill label="RULE" /></>, cell: r => <Check on={r.scheduling} />, align: 'center' },
     { key: 'conv', w: 180, head: <>Converted Call<Pill label="RULE" /></>, cell: r => <Check on={r.apptSched} />, align: 'center' },
-    { key: 'insv', w: 200, head: <>{cfg.home ? 'Financing Verified' : 'Insurance Verified'}<Pill label="RULE" /></>, cell: r => <Check on={r.qaIns} />, align: 'center' },
+    { key: 'insv', w: 200, head: <>{cfg.home ? 'Serviceable Address' : 'Insurance Verified'}<Pill label="RULE" /></>, cell: r => <Check on={r.qaIns} />, align: 'center' },
+    ...customSignals.map((label, idx) => ({
+      key: `custom-${idx}`,
+      w: Math.max(180, label.length * 9 + 60),
+      head: <>{label}<Pill label="CUSTOM" tone="blue" /></>,
+      cell: (r: Row) => <Check on={((idx + r.agentQ) % 3) !== 0} />,
+      align: 'center' as const,
+    })),
   ];
 
   const totalW = cols.reduce((s, c) => s + c.w, 0);
