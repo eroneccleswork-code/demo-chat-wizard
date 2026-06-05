@@ -12,7 +12,7 @@ interface Props {
 export default function MarketingTrio({ category, rows, callsAxisMax, appointmentsBadge }: Props) {
   const callsRows = [...rows].sort((a, b) => b.calls - a.calls);
   const apptRows = [...rows].sort((a, b) => b.apptPct - a.apptPct);
-  const maxCalls = callsAxisMax ?? Math.ceil(Math.max(...rows.map(r => r.calls)) / 100) * 100 || 800;
+  const maxCalls = callsAxisMax ?? (Math.ceil(Math.max(...rows.map(r => r.calls)) / 100) * 100 || 800);
 
   return (
     <div className="grid grid-cols-3 gap-6">
