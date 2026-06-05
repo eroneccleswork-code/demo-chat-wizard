@@ -168,7 +168,7 @@ export default function InvocaCallReport() {
   }, [cfg, company, industry, data]);
 
   const cols: Col[] = [
-    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-6 h-7" draggable={false} /> },
+    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-7 h-9" draggable={false} /> },
     { key: 'time', w: 150, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
     { key: 'caller', w: 130, head: 'Caller ID', cell: r => r.callerId },
     { key: 'masked', w: 130, head: 'Masked Caller ID', cell: () => '—' },
