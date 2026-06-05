@@ -4,8 +4,6 @@ import { Share2, Download, Clock, Plus } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
 import callDetailsIcon from '@/assets/call-details-icon.png.asset.json';
-import signalCheck from '@/assets/signal-check.png.asset.json';
-import signalX from '@/assets/signal-x.png.asset.json';
 
 
 // ---- Industry-aware column data ----
@@ -120,7 +118,17 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
 }
 
 const Check = ({ on }: { on: boolean }) => (
-  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle mix-blend-multiply" draggable={false} />
+  on ? (
+    <svg viewBox="0 0 20 20" className="inline-block w-[18px] h-[18px] align-middle" aria-label="yes">
+      <circle cx="10" cy="10" r="9" fill="#22A06B" />
+      <path d="M5.8 10.2l2.7 2.7 5.7-5.7" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 20 20" className="inline-block w-[18px] h-[18px] align-middle" aria-label="no">
+      <circle cx="10" cy="10" r="9" fill="#C7CBD1" />
+      <path d="M7 7l6 6M13 7l-6 6" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  )
 );
 
 
