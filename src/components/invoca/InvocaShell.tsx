@@ -66,7 +66,7 @@ export default function InvocaShell({ children, networkName }: { children: React
         <aside className="w-[84px] min-w-[84px] max-w-[84px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 self-stretch overflow-hidden">
           <div className="sticky top-0 relative w-[84px]">
             <img
-              src={sidebarImg.url}
+              src={activeSidebar}
               alt=""
               width={84}
               className="block w-[84px] h-auto select-none pointer-events-none"
