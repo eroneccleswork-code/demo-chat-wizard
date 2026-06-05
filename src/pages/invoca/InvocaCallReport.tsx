@@ -119,9 +119,10 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
   });
 }
 
-const Check = ({ on }: { on: boolean }) => on
-  ? <span className="inline-flex w-5 h-5 rounded-full bg-[#22A95A] text-white items-center justify-center text-[12px]">✓</span>
-  : <span className="inline-flex w-5 h-5 rounded-full bg-[#C9CED5] text-white items-center justify-center text-[12px]">✕</span>;
+const Check = ({ on }: { on: boolean }) => (
+  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle" draggable={false} />
+);
+
 
 const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' }) => (
   <span className={`ml-1.5 inline-block text-[9px] font-semibold tracking-wide rounded-full px-1.5 py-[1px] align-middle ${
