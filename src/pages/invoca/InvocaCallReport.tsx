@@ -1,32 +1,216 @@
-import InvocaShell from '@/components/invoca/InvocaShell';
+import { useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Share2, Download, Clock, Plus, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import InvocaShell from '@/components/invoca/InvocaShell';
+import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
 
-const callRows = Array.from({ length: 40 }, (_, i) => {
-  const d = (i % 30) + 1;
-  const hrs = (8 + (i % 12));
-  const mins = (i * 7) % 60;
-  const ampm = hrs >= 12 ? 'pm' : 'am';
-  const divisions = ['New England', 'South', 'Mid-West', 'Pacific Coast'];
-  const facilities = ['St Luke\'s Orthopedic', 'Joint Rehab Center', 'CardioVascular Institute', 'Elizabeth Medical Center'];
-  const specialties = ['Orthopedics', 'Oncology', 'Heart and Vascular', 'Primary Care'];
-  const phones = ['866-398-7557', '800-593-6000', '888-545-6000', '888-712-3456'];
+// ---- Industry-aware column data ----
+function getIndustryConfig(industry?: string) {
+  const home = isHomeService(industry);
   return {
-    time: `3/${d}/22 ${hrs > 12 ? hrs - 12 : hrs}:${mins.toString().padStart(2, '0')} ${ampm}`,
-    callerId: `${(700 + i * 13) % 900 + 100}-${(200 + i * 7) % 900 + 100}-${(1000 + i * 17) % 9000}`.slice(0, 12) + '...',
-    phone: phones[i % 4],
-    division: divisions[i % 4],
-    facility: facilities[(i + 1) % 4],
-    specialty: specialties[(i + 2) % 4],
+    home,
+    facilityLabel: home ? 'Branch' : 'Facility',
+    specialtyLabel: home ? 'Service' : 'Specialty',
+    facilities: home
+      ? ['Northeast Branch', 'Pacific Branch', 'Mountain West Branch', 'Southeast Branch']
+      : ["St Luke's Orthopedic", 'Joint Rehab Center', 'CardioVascular Institute', 'Elizabeth Medical Center'],
+    specialties: home
+      ? ['Windows', 'Roofing', 'HVAC', 'Gutters']
+      : ['Orthopedics', 'Oncology', 'Heart and Vascular', 'Primary Care'],
+    divisions: home
+      ? ['New England', 'South', 'Mid-West', 'Mountain States']
+      : ['New England', 'South', 'Mid-West', 'Mountain States'],
+    lobOptions: home ? ['Install', 'Service', 'Estimate'] : ['Surgery', 'Medical', 'Surgery', 'Medical'],
+    callerTypeNew: home ? 'Caller Type: New Customers' : 'Caller Type: New Patients',
+    callerTypeExisting: home ? 'Caller Type: Existing Customer …' : 'Caller Type: Existing Patient …',
+    apptScheduled: home ? 'Estimate: Scheduled' : 'Appointment: Scheduled',
+    apptRescheduled: home ? 'Estimate: Rescheduled …' : 'Appointment: Rescheduled …',
+    apptCanceled: home ? 'Estimate: Canceled' : 'Appointment: Canceled',
+    existingQuality: home ? 'Existing Customer Call Quality' : 'Existing Patient Call Quality',
+    qaInsurance: home ? '(QA) Financing' : '(QA) Insurance',
+    insCommercial: home ? 'Financing Type: 3rd Party' : 'Insurance Type: Commercial',
+    insMedicare: home ? 'Financing Type: In-House' : 'Insurance Type: Medicare',
+    insPrivate: home ? 'Payment Type: Cash' : 'Insurance Type: Private Pay',
+    sourceDomain: home ? 'renewalsathome.com' : 'stlukesmedical.com',
+    landingPath: home ? '/service/windows' : '/service/orthopedics',
+    websiteJourney: home ? 'home/products/service/windows' : 'home/surgery/service/orthopedics',
   };
-});
+}
+
+const SOURCES = ['Paid Search', 'Direct Mail', 'Radio', 'Print', 'Social Media', 'Email', 'Organic'];
+const MEDIUMS: Record<string, string> = {
+  'Paid Search': 'Google Ad', 'Direct Mail': 'Post Card', 'Radio': '—', 'Print': '—',
+  'Social Media': 'Facebook', 'Email': 'SFMC', 'Organic': '—',
+};
+const END_REASONS = ['Success (OK)', 'Success (OK)', 'Success (OK)', 'Destination No Answer', 'Destination No Answer: Voice Mail'];
+const PHONES = ['866-398-7557', '800-593-6000', '888-545-6000', '888-712-3456', '877-844-7575'];
+
+function maskPhone(s: string) {
+  return s.length > 9 ? s.slice(0, 9) + '…' : s;
+}
+
+interface Row {
+  time: string; callerId: string; phone: string; division: string; facility: string; specialty: string;
+  duration: string; endReason: string; source: string; medium: string; campaign: string; searchTerm: string;
+  landingUrl: string; gclid: string; gaClientId: string; msClickId: string; adobeId: string;
+  websiteJourney: string; callingPage: string; lob: string;
+  newPatient: boolean; existingPatient: boolean; scheduling: boolean; apptSched: boolean; qaIns: boolean;
+  apptResched: boolean; apptCanceled: boolean; billing: boolean; availability: boolean;
+  insCommercial: boolean; insMedicare: boolean; insPrivate: boolean;
+  agentQ: number; legal: number; existQ: number;
+}
+
+function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, campaigns: string[], terms: string[]): Row[] {
+  const r = seededRand(seed);
+  return Array.from({ length: 40 }, (_, i) => {
+    const d = (i % 30) + 1;
+    const hrs24 = 8 + (i % 12);
+    const hrs = hrs24 > 12 ? hrs24 - 12 : hrs24;
+    const ampm = hrs24 >= 12 ? 'pm' : 'am';
+    const mins = (i * 7) % 60;
+    const src = SOURCES[i % SOURCES.length];
+    const camp = campaigns[i % campaigns.length] || 'Restoring hope';
+    const hasLanding = src === 'Paid Search' || src === 'Social Media';
+    const term = src === 'Paid Search' ? terms[i % terms.length] : '—';
+    const showGclid = src === 'Paid Search' && i % 3 === 0;
+    return {
+      time: `3/${d}/22 ${hrs}:${mins.toString().padStart(2, '0')} ${ampm}`,
+      callerId: `${(700 + i * 13) % 900 + 100}-${(200 + i * 7) % 900 + 100}-${((1000 + i * 173) % 9000).toString().padStart(4, '0')}`.slice(0, 12) + '…',
+      phone: PHONES[i % PHONES.length],
+      division: cfg.divisions[i % cfg.divisions.length],
+      facility: cfg.facilities[(i + 1) % cfg.facilities.length],
+      specialty: cfg.specialties[(i + 2) % cfg.specialties.length],
+      duration: `${Math.floor(r() * 5)}:${Math.floor(r() * 60).toString().padStart(2, '0')}`,
+      endReason: END_REASONS[i % END_REASONS.length],
+      source: src,
+      medium: MEDIUMS[src],
+      campaign: camp,
+      searchTerm: term,
+      landingUrl: hasLanding
+        ? `www.${cfg.sourceDomain}?utm_source=${src === 'Paid Search' ? 'google' : 'Facebook'}&utm_medium=${src === 'Paid Search' ? 'cpc' : 'Social'}&utm_campaign=FSSL_${1000 + i * 37}`
+        : '—',
+      gclid: showGclid ? 'Cj0KCQiAj9iBBhCJARIsA…' : '—',
+      gaClientId: showGclid ? `${1593940126 + i}.${1614184536 + i * 17}` : '—',
+      msClickId: showGclid ? `0584517172569981${(75 + i).toString().padStart(2, '0')}…` : '—',
+      adobeId: showGclid ? `0599091840012009465${(100 + i).toString().padStart(3, '0')}…` : '—',
+      websiteJourney: showGclid || (i % 6 === 4) ? cfg.websiteJourney : '—',
+      callingPage: showGclid || (i % 6 === 4) ? cfg.landingPath : '—',
+      lob: cfg.lobOptions[i % cfg.lobOptions.length],
+      newPatient: true,
+      existingPatient: false,
+      scheduling: true,
+      apptSched: i % 3 !== 0,
+      qaIns: i % 4 !== 0,
+      apptResched: i % 2 === 0,
+      apptCanceled: false,
+      billing: false,
+      availability: i % 2 === 1,
+      insCommercial: i % 3 === 1,
+      insMedicare: i % 5 === 0,
+      insPrivate: i % 2 === 0,
+      agentQ: 80 + Math.floor(r() * 20),
+      legal: 100,
+      existQ: i % 4 === 0 ? 57 : 100,
+    };
+  });
+}
+
+const Check = ({ on }: { on: boolean }) => on
+  ? <span className="inline-flex w-5 h-5 rounded-full bg-[#22A95A] text-white items-center justify-center text-[12px]">✓</span>
+  : <span className="inline-flex w-5 h-5 rounded-full bg-[#C9CED5] text-white items-center justify-center text-[12px]">✕</span>;
+
+const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' }) => (
+  <span className={`ml-1.5 inline-block text-[9px] font-semibold tracking-wide rounded-full px-1.5 py-[1px] align-middle ${
+    tone === 'blue' ? 'bg-[#E0EAFB] text-[#2D6CDF]' : 'bg-[#E5E7EB] text-[#6B7280]'
+  }`}>{label}</span>
+);
+
+// Column definitions — single source of truth for header + cell + width
+type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Row) => React.ReactNode; align?: 'left' | 'center' };
 
 export default function InvocaCallReport() {
   const navigate = useNavigate();
+  const loc = useLocation() as { state?: { companyName?: string; industry?: string; websiteContext?: string } };
+
+  // Read persisted context (set by Dashboard on entry)
+  const ctx = useMemo(() => {
+    if (loc.state?.companyName || loc.state?.industry) return loc.state;
+    try {
+      const raw = sessionStorage.getItem('invoca-context');
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  }, [loc.state]);
+  const company = ctx?.companyName as string | undefined;
+  const industry = ctx?.industry as string | undefined;
+
+  const cfg = useMemo(() => getIndustryConfig(industry), [industry]);
+  const data = useIndustryDashboard(company, industry, ctx?.websiteContext);
+
+  const rows = useMemo(() => {
+    const seed = `${company || 'invoca'}-${industry || 'healthcare'}-report`;
+    const camps = data.campaigns.map(c => c.name);
+    const terms = data.searchTerms.map(t => t.term);
+    return buildRows(cfg, seed, camps, terms);
+  }, [cfg, company, industry, data]);
+
+  const cols: Col[] = [
+    { key: 'icon', w: 60, head: 'Call Details', cell: () => <Search className="w-4 h-4 text-[#2D6CDF] bg-[#E6F0FF] p-0.5 rounded" /> },
+    { key: 'time', w: 150, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
+    { key: 'caller', w: 130, head: 'Caller ID', cell: r => r.callerId },
+    { key: 'masked', w: 130, head: 'Masked Caller ID', cell: () => '—' },
+    { key: 'phone', w: 180, head: '(Destination) Phone Number', cell: r => r.phone },
+    { key: 'div', w: 130, head: 'Division', cell: r => r.division },
+    { key: 'fac', w: 200, head: cfg.facilityLabel, cell: r => r.facility },
+    { key: 'spec', w: 130, head: cfg.specialtyLabel, cell: r => r.specialty },
+    { key: 'dur', w: 150, head: 'Total Connected Duration', cell: r => r.duration },
+    { key: 'end', w: 220, head: '(End) of Call Reason', cell: r => r.endReason },
+    { key: 'src', w: 130, head: 'Marketing Source', cell: r => r.source },
+    { key: 'med', w: 130, head: 'Marketing Medium', cell: r => r.medium },
+    { key: 'camp', w: 220, head: 'Marketing Campaign', cell: r => r.campaign },
+    { key: 'term', w: 200, head: 'Marketing Search Terms', cell: r => <span className="truncate">{r.searchTerm}</span> },
+    { key: 'landing', w: 360, head: 'Full Landing Page URL', cell: r => <span className="text-[12px] truncate block">{r.landingUrl}</span> },
+    { key: 'gclid', w: 180, head: 'Google Click ID', cell: r => r.gclid },
+    { key: 'ga', w: 200, head: 'Google Analytics Client ID', cell: r => r.gaClientId },
+    { key: 'ms', w: 200, head: 'Microsoft Ads Click ID', cell: r => r.msClickId },
+    { key: 'adobe', w: 220, head: 'Adobe Experience Cloud ID', cell: r => r.adobeId },
+    { key: 'journey', w: 240, head: 'Website Journey', cell: r => r.websiteJourney },
+    { key: 'page', w: 180, head: 'Calling Page', cell: r => r.callingPage },
+    { key: 'lob', w: 150, head: 'Line of Business', cell: r => r.lob },
+    { key: 'cnp', w: 240, head: <>{cfg.callerTypeNew}<Pill label="RULE" /><Pill label="KEYPRESS" /></>, cell: r => <Check on={r.newPatient} />, align: 'center' },
+    { key: 'cep', w: 220, head: <>{cfg.callerTypeExisting}</>, cell: r => <Check on={r.existingPatient} />, align: 'center' },
+    { key: 'sched', w: 220, head: <>Inquiry Type: Scheduling<Pill label="RULE" /></>, cell: r => <Check on={r.scheduling} />, align: 'center' },
+    { key: 'asch', w: 220, head: <>{cfg.apptScheduled}<Pill label="RULE" /></>, cell: r => <Check on={r.apptSched} />, align: 'center' },
+    { key: 'qains', w: 160, head: cfg.qaInsurance, cell: r => <Check on={r.qaIns} />, align: 'center' },
+    { key: 'aresch', w: 220, head: cfg.apptRescheduled, cell: r => <Check on={r.apptResched} />, align: 'center' },
+    { key: 'acanc', w: 220, head: <>{cfg.apptCanceled}<Pill label="RULE" /></>, cell: r => <Check on={r.apptCanceled} />, align: 'center' },
+    { key: 'bill', w: 260, head: 'Inquiry Type: Billing and Payments …', cell: r => <Check on={r.billing} />, align: 'center' },
+    { key: 'avail', w: 260, head: 'Inquiry Type: Availability and Hours …', cell: r => <Check on={r.availability} />, align: 'center' },
+    { key: 'inscom', w: 240, head: <>{cfg.insCommercial}<Pill label="RULE" /></>, cell: r => <Check on={r.insCommercial} />, align: 'center' },
+    { key: 'insmed', w: 220, head: <>{cfg.insMedicare}<Pill label="RULE" /></>, cell: r => <Check on={r.insMedicare} />, align: 'center' },
+    { key: 'insprv', w: 240, head: <>{cfg.insPrivate}<Pill label="RULE" /></>, cell: r => <Check on={r.insPrivate} />, align: 'center' },
+    { key: 'comp', w: 200, head: <>Competitive Mention<Pill label="RULE" /></>, cell: () => <span className="text-[#9CA3AF]">—</span>, align: 'center' },
+    { key: 'agentq', w: 150, head: 'Agent Call Quality', cell: r => r.agentQ, align: 'center' },
+    { key: 'legal', w: 150, head: 'Legal Compliance', cell: r => r.legal, align: 'center' },
+    { key: 'existq', w: 220, head: cfg.existingQuality, cell: r => r.existQ, align: 'center' },
+    { key: 'etiq', w: 130, head: 'Call Etiquette', cell: () => <span className="text-[#9CA3AF]">—</span>, align: 'center' },
+    { key: 'info', w: 180, head: 'Information Gathering', cell: () => <span className="text-[#9CA3AF]">—</span>, align: 'center' },
+    { key: 'overall', w: 230, head: <>Overall Performance<Pill label="COMBINATION" /></>, cell: () => <span className="text-[#9CA3AF]">—</span>, align: 'center' },
+    { key: 'billcalls', w: 200, head: 'Billing and Payment Calls', cell: () => <span className="text-[#9CA3AF]">—</span>, align: 'center' },
+  ];
+
+  const totalW = cols.reduce((s, c) => s + c.w, 0);
+
+  // Chart bars — stable per company
+  const barRand = useMemo(() => seededRand(`${company || 'invoca'}-bars`), [company]);
+  const bars = useMemo(() => Array.from({ length: 31 }, () => 170 + Math.floor(barRand() * 40)), [barRand]);
+
   return (
-    <InvocaShell>
+    <InvocaShell networkName={company}>
       <div className="px-10 py-6">
-        <div className="text-[13px] text-[#2D6CDF] mb-1"><span className="hover:underline cursor-pointer">My Reports</span> <span className="text-gray-400">›</span> Calls</div>
+        <div className="text-[13px] text-[#2D6CDF] mb-1">
+          <span className="hover:underline cursor-pointer">My Reports</span>{' '}
+          <span className="text-gray-400">›</span> Calls
+        </div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-[28px] font-semibold text-[#0F2540]">Marketing Call Details</h1>
           <div className="flex items-center gap-4">
@@ -40,8 +224,12 @@ export default function InvocaCallReport() {
 
         <div className="flex items-center gap-3 mb-6">
           <div className="flex border border-[#2D6CDF] rounded overflow-hidden">
-            <button className="p-2 bg-white text-[#2D6CDF]"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg></button>
-            <button className="p-2 bg-white text-gray-400 border-l border-[#2D6CDF]"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect y="2" width="16" height="3"/><rect y="7" width="16" height="3"/><rect y="12" width="16" height="3"/></svg></button>
+            <button className="p-2 bg-white text-[#2D6CDF]">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+            </button>
+            <button className="p-2 bg-white text-gray-400 border-l border-[#2D6CDF]">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect y="2" width="16" height="3"/><rect y="7" width="16" height="3"/><rect y="12" width="16" height="3"/></svg>
+            </button>
           </div>
           <button className="bg-[#1FA37A] text-white rounded px-4 py-2 text-sm font-medium flex items-center gap-3">
             <span>Custom:</span><span className="font-semibold">Mar 01, 2022 - Mar 31, 2022</span>
@@ -50,28 +238,24 @@ export default function InvocaCallReport() {
         </div>
 
         {/* Chart */}
-        <div className="border border-[#E5E7EB] rounded p-6 mb-6">
+        <div className="border border-[#EEF0F3] rounded-[10px] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)] p-6 mb-6">
           <div className="flex items-center gap-6 mb-4 text-xs">
-            <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#1FA37A] rounded-full" /> Total Calls</div>
+            <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#22A95A] rounded-full" /> Total Calls</div>
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions</div>
           </div>
-          <div className="flex items-end gap-1 h-[260px] border-l border-b border-[#E5E7EB] pl-3 pb-2 relative">
-            <div className="absolute left-[-30px] top-0 text-[10px] text-[#5B6B7E]">300</div>
-            <div className="absolute left-[-30px] top-1/3 text-[10px] text-[#5B6B7E]">200</div>
-            <div className="absolute left-[-30px] top-2/3 text-[10px] text-[#5B6B7E]">100</div>
-            <div className="absolute left-[-30px] bottom-0 text-[10px] text-[#5B6B7E]">0</div>
-            <div className="absolute left-[-50px] top-1/2 text-[10px] text-[#5B6B7E] -rotate-90">Calls</div>
-            {Array.from({ length: 31 }, (_, i) => {
-              const h = 170 + Math.floor(Math.random() * 40);
-              return (
-                <div key={i} className="flex-1 relative h-full flex flex-col justify-end">
-                  <div className="bg-[#1FA37A] w-full rounded-t-sm" style={{ height: `${(h / 300) * 100}%` }} />
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
-                </div>
-              );
-            })}
+          <div className="flex items-end gap-1 h-[260px] border-l border-b border-[#E5E7EB] pl-3 pb-2 relative ml-8">
+            <div className="absolute -left-7 top-0 text-[10px] text-[#5B6B7E]">300</div>
+            <div className="absolute -left-7 top-1/3 text-[10px] text-[#5B6B7E]">200</div>
+            <div className="absolute -left-7 top-2/3 text-[10px] text-[#5B6B7E]">100</div>
+            <div className="absolute -left-7 bottom-0 text-[10px] text-[#5B6B7E]">0</div>
+            {bars.map((h, i) => (
+              <div key={i} className="flex-1 relative h-full flex flex-col justify-end">
+                <div className="bg-[#22A95A] w-full" style={{ height: `${(h / 300) * 100}%` }} />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
+              </div>
+            ))}
           </div>
-          <div className="flex justify-between mt-2 px-3 text-[10px] text-[#5B6B7E]">
+          <div className="flex justify-between mt-2 ml-8 pr-2 text-[10px] text-[#5B6B7E]">
             {['03/01','03/03','03/05','03/07','03/09','03/11','03/13','03/15','03/17','03/19','03/21','03/23','03/25','03/27','03/29'].map(d => <span key={d}>{d}</span>)}
           </div>
         </div>
@@ -79,38 +263,46 @@ export default function InvocaCallReport() {
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm font-semibold text-[#0F2540]">Total Calls: 2,334</div>
           <div className="text-sm text-[#2D6CDF]">
-            <span className="hover:underline cursor-pointer">Edit Columns</span> <span className="text-gray-300 mx-2">|</span> <span className="hover:underline cursor-pointer">Reset Sorting</span>
+            <span className="hover:underline cursor-pointer">Edit Columns</span>
+            <span className="text-gray-300 mx-2">|</span>
+            <span className="hover:underline cursor-pointer">Reset Sorting</span>
           </div>
         </div>
 
-        {/* Table */}
-        <div className="border-t border-[#E5E7EB]">
-          <div className="grid grid-cols-[60px_1.2fr_1fr_1fr_1.2fr_1fr_1.2fr_1fr] text-[13px] font-semibold text-[#0F2540] py-3 border-b border-[#E5E7EB] gap-2">
-            <div>Call Details</div>
-            <div>Call Start Time ↑</div>
-            <div>Caller ID</div>
-            <div>Masked Caller ID</div>
-            <div>(Destination) Phone Number</div>
-            <div>Division</div>
-            <div>Facility</div>
-            <div>Specialty</div>
-          </div>
-          {callRows.map((r, i) => (
-            <div
-              key={i}
-              onClick={() => navigate('/invoca/call-review')}
-              className="grid grid-cols-[60px_1.2fr_1fr_1fr_1.2fr_1fr_1.2fr_1fr] text-[14px] text-[#0F2540] py-4 border-b border-[#F3F4F6] gap-2 hover:bg-gray-50 cursor-pointer"
-            >
-              <div><Search className="w-4 h-4 text-[#2D6CDF] bg-[#E6F0FF] p-0.5 rounded" /></div>
-              <div>{r.time}</div>
-              <div>{r.callerId}</div>
-              <div>—</div>
-              <div>{r.phone}</div>
-              <div>{r.division}</div>
-              <div>{r.facility}</div>
-              <div>{r.specialty}</div>
+        {/* Wide horizontally-scrollable table */}
+        <div className="border border-[#EEF0F3] rounded-[10px] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)] overflow-x-auto bg-white">
+          <div style={{ width: totalW }}>
+            {/* Header */}
+            <div className="flex border-b border-[#E5E7EB] bg-white sticky top-0 z-10">
+              {cols.map(c => (
+                <div
+                  key={c.key}
+                  style={{ width: c.w }}
+                  className={`shrink-0 px-3 py-3 text-[12px] font-semibold text-[#0F2540] ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                >
+                  {c.head}
+                </div>
+              ))}
             </div>
-          ))}
+            {/* Rows */}
+            {rows.map((r, i) => (
+              <div
+                key={i}
+                onClick={() => navigate('/invoca/call-review')}
+                className={`flex border-b border-[#F3F4F6] hover:bg-[#F8FAFC] cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFBFC]'}`}
+              >
+                {cols.map(c => (
+                  <div
+                    key={c.key}
+                    style={{ width: c.w }}
+                    className={`shrink-0 px-3 py-3 text-[13px] text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                  >
+                    {c.cell(r)}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center justify-between py-4">
@@ -120,7 +312,7 @@ export default function InvocaCallReport() {
             </select>
             records per page
           </div>
-          <div className="text-sm text-[#5B6B7E]">Showing 1 to 100 of 334 entries</div>
+          <div className="text-sm text-[#5B6B7E]">Showing 1 to 40 of 2,334 entries</div>
         </div>
       </div>
     </InvocaShell>
