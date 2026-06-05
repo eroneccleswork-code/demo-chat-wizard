@@ -57,7 +57,7 @@ export default function InvocaDashboard() {
                 <span className="bg-[#C8F0D4] text-[#1F6B3A] text-[12px] font-medium rounded-full px-3 py-0.5">View Only</span>
               </div>
               <div className="flex items-center gap-2 mt-3">
-                <button className="border border-[#0F2540] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">1/1/2023-1/31/2023</button>
+                <button className="border border-[#0F2540] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">{(() => { const n = new Date(); const s = new Date(n.getFullYear(), n.getMonth(), 1); const e = new Date(n.getFullYear(), n.getMonth() + 1, 0); const f = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`; return `${f(s)}-${f(e)}`; })()}</button>
                 <button className="border border-[#D1D5DB] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">Marketing Data</button>
                 <button className="border border-[#D1D5DB] rounded-full px-3 py-1 text-[13px] font-medium text-[#0F2540]">Signals</button>
               </div>
