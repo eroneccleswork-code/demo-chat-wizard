@@ -1,10 +1,7 @@
-import { ReactNode, SVGProps } from 'react';
+import { ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Star, Bell, HelpCircle, Search, ChevronDown } from 'lucide-react';
-import {
-  IcDashboards, IcCallReview, IcAdvertisers, IcCampaigns, IcPublishers,
-  IcPromoNumbers, IcReports, IcIntegrations, IcSignal, IcScore, IcLabs, IcSettings
-} from './InvocaIcons';
+import sidebarImg from '@/assets/invoca-sidebar.png.asset.json';
 
 type IconCmp = (p: SVGProps<SVGSVGElement>) => JSX.Element;
 
