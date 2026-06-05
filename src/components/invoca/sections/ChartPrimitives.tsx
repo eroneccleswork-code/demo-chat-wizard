@@ -23,7 +23,7 @@ export function HBarChart({ rows, max, showPercent = false, colors = CHART_COLOR
               <div className="text-[12px] text-[#0F2540] text-right leading-tight whitespace-pre-wrap">{r.label}</div>
               <div className="relative h-7">
                 <div
-                  className="h-full rounded-[3px] flex items-center justify-center text-white text-[13px] font-semibold"
+                  className="h-full rounded-[6px] flex items-center justify-center text-white text-[13px] font-semibold shadow-[0_1px_0_rgba(15,37,64,0.04)]"
                   style={{ width: `${pct}%`, backgroundColor: color }}
                 >
                   {showInside && (showPercent ? `${r.value}%` : r.value)}
