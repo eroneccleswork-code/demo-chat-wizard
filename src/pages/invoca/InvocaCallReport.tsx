@@ -237,8 +237,8 @@ export default function InvocaCallReport() {
           <button className="bg-[#2D6CDF] text-white rounded p-2"><Plus className="w-4 h-4" /></button>
         </div>
 
-        {/* Chart */}
-        <div className="border border-[#EEF0F3] rounded-[10px] shadow-[0_1px_3px_rgba(15,37,64,0.06),0_4px_12px_rgba(15,37,64,0.04)] p-6 mb-6">
+        {/* Chart — flush, no card */}
+        <div className="border-t border-[#E5E7EB] pt-6 pb-2 mb-6">
           <div className="flex items-center gap-6 mb-4 text-xs">
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#22A95A] rounded-full" /> Total Calls</div>
             <div className="flex items-center gap-1.5"><span className="w-3 h-3 bg-[#F5A623] rounded-full" /> Conversions</div>
@@ -259,6 +259,7 @@ export default function InvocaCallReport() {
             {['03/01','03/03','03/05','03/07','03/09','03/11','03/13','03/15','03/17','03/19','03/21','03/23','03/25','03/27','03/29'].map(d => <span key={d}>{d}</span>)}
           </div>
         </div>
+
 
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm font-semibold text-[#0F2540]">Total Calls: 2,334</div>
