@@ -68,31 +68,22 @@ export default function InvocaShell({ children, networkName }: { children: React
       </header>
 
       <div className="flex flex-1 min-h-0">
-        {/* Sidebar */}
-        <aside className="w-[78px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex flex-col flex-shrink-0">
-          {items.map((it) => {
-            const Icon = it.icon;
-            return (
+        {/* Sidebar — exact screenshot with invisible nav hit-areas */}
+        <aside
+          className="w-[92px] bg-[#F4F6F8] border-r border-[#E1E4E8] flex-shrink-0 relative bg-top bg-no-repeat bg-contain"
+          style={{ backgroundImage: `url(${sidebarImg.url})` }}
+        >
+          <div className="absolute inset-0 grid grid-rows-12">
+            {items.map((it) => (
               <NavLink
                 key={it.to}
                 to={it.to}
                 end={it.to === '/invoca'}
-                className={({ isActive }) =>
-                  `relative flex flex-col items-center justify-center gap-1 py-3.5 text-[11px] leading-tight text-center ${
-                    isActive
-                      ? 'text-[#1FA37A] font-semibold bg-[#E8F5EE] border-l-[3px] border-[#1FA37A]'
-                      : 'text-[#2C3E50] border-l-[3px] border-transparent hover:bg-[#ECEFF2]'
-                  }`
-                }
-              >
-                {it.badge && (
-                  <span className="absolute top-1 right-1.5 text-[7px] font-bold text-[#E53935] bg-[#FDE3E0] rounded px-1 py-px leading-none">{it.badge}</span>
-                )}
-                <Icon className="w-[22px] h-[22px]" />
-                <span className="px-0.5">{it.label}</span>
-              </NavLink>
-            );
-          })}
+                aria-label={it.label}
+                className="block hover:bg-black/[0.04]"
+              />
+            ))}
+          </div>
         </aside>
 
         {/* Content */}
