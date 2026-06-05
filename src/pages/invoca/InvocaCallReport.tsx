@@ -1,8 +1,12 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Share2, Download, Clock, Plus, Search } from 'lucide-react';
+import { Share2, Download, Clock, Plus } from 'lucide-react';
 import InvocaShell from '@/components/invoca/InvocaShell';
 import { seededRand, isHomeService, useIndustryDashboard } from '@/lib/invoca-industry';
+import callDetailsIcon from '@/assets/call-details-icon.png.asset.json';
+import signalCheck from '@/assets/signal-check.png.asset.json';
+import signalX from '@/assets/signal-x.png.asset.json';
+
 
 // ---- Industry-aware column data ----
 function getIndustryConfig(industry?: string) {
@@ -115,9 +119,10 @@ function buildRows(cfg: ReturnType<typeof getIndustryConfig>, seed: string, camp
   });
 }
 
-const Check = ({ on }: { on: boolean }) => on
-  ? <span className="inline-flex w-5 h-5 rounded-full bg-[#22A95A] text-white items-center justify-center text-[12px]">✓</span>
-  : <span className="inline-flex w-5 h-5 rounded-full bg-[#C9CED5] text-white items-center justify-center text-[12px]">✕</span>;
+const Check = ({ on }: { on: boolean }) => (
+  <img src={on ? signalCheck.url : signalX.url} alt={on ? 'yes' : 'no'} className="inline-block w-5 h-5 align-middle" draggable={false} />
+);
+
 
 const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' }) => (
   <span className={`ml-1.5 inline-block text-[9px] font-semibold tracking-wide rounded-full px-1.5 py-[1px] align-middle ${
@@ -154,7 +159,7 @@ export default function InvocaCallReport() {
   }, [cfg, company, industry, data]);
 
   const cols: Col[] = [
-    { key: 'icon', w: 60, head: 'Call Details', cell: () => <Search className="w-4 h-4 text-[#2D6CDF] bg-[#E6F0FF] p-0.5 rounded" /> },
+    { key: 'icon', w: 60, head: 'Call Details', cell: () => <img src={callDetailsIcon.url} alt="" className="w-5 h-5" draggable={false} /> },
     { key: 'time', w: 150, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
     { key: 'caller', w: 130, head: 'Caller ID', cell: r => r.callerId },
     { key: 'masked', w: 130, head: 'Masked Caller ID', cell: () => '—' },
