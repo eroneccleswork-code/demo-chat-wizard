@@ -29,7 +29,7 @@ function Metric({ label, value, align = 'center' }: { label: string; value: stri
   return (
     <div className={align === 'center' ? 'text-center' : 'text-left'}>
       <div className="text-[13px] text-[#0F2540] mb-2">{label}</div>
-      <div className="text-[44px] leading-none font-semibold text-[#0F2540]">{value}</div>
+      <div className="text-[44px] leading-none font-normal text-[#0F2540]">{value}</div>
     </div>
   );
 }
