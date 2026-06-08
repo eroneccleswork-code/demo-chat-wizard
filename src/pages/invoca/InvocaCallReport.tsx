@@ -158,8 +158,31 @@ export default function InvocaCallReport() {
   const industry = ctx?.industry as string | undefined;
   const customSignals = (ctx?.customSignals as string[] | undefined)?.filter(s => s && s.trim()) ?? [];
 
-  const cfg = useMemo(() => getIndustryConfig(industry), [industry]);
+  const baseCfg = useMemo(() => getIndustryConfig(industry), [industry]);
   const data = useIndustryDashboard(company, industry, ctx?.websiteContext);
+
+  // Customize cfg from the scraped/AI dashboard data so the report reflects the company
+  const cfg = useMemo(() => {
+    const divisions = data.divisions?.length ? data.divisions.map(d => d.name) : baseCfg.divisions;
+    const lobs = data.linesOfBusiness?.length ? data.linesOfBusiness.map(l => l.name) : baseCfg.lobOptions;
+    const facilities = data.linesOfBusiness?.length
+      ? data.linesOfBusiness.map(l => l.name)
+      : baseCfg.facilities;
+    const specialties = data.linesOfBusiness?.length
+      ? data.linesOfBusiness.map(l => l.name)
+      : baseCfg.specialties;
+    const domain = company
+      ? company.toLowerCase().replace(/[^a-z0-9]+/g, '') + '.com'
+      : baseCfg.sourceDomain;
+    return {
+      ...baseCfg,
+      divisions,
+      lobOptions: lobs,
+      facilities,
+      specialties,
+      sourceDomain: domain,
+    };
+  }, [baseCfg, data, company]);
 
   const rows = useMemo(() => {
     const seed = `${company || 'invoca'}-${industry || 'healthcare'}-report`;
