@@ -34,17 +34,33 @@ export default function InvocaDashboard() {
 
   const sourceRows = buildRows(SOURCE_LABELS, seed + '-source', 650);
   const mediumRows = buildRows(MEDIUM_LABELS, seed + '-medium', 650);
-  const campaignRows: TrioRow[] = data.campaigns.map(c => ({
+  // Reconcile totals: campaign + search calls should roughly equal source/medium totals
+  const totalCalls = sourceRows.reduce((s, r) => s + r.calls, 0);
+
+  const rawCampaigns: TrioRow[] = data.campaigns.map(c => ({
     label: c.name.length > 22 ? c.name.slice(0, 20) + '…' : c.name,
     calls: c.calls,
-    apptPct: c.apptPct,
+    apptPct: Math.round(c.apptPct),
   }));
-  while (campaignRows.length < 5) {
-    const i = campaignRows.length;
+  while (rawCampaigns.length < 5) {
+    const i = rawCampaigns.length;
     const r = seededRand(seed + '-camp' + i)();
-    campaignRows.push({ label: `Campaign ${i + 1}`, calls: Math.round(50 + r * 150), apptPct: Math.round(30 + r * 50) });
+    rawCampaigns.push({ label: `Campaign ${i + 1}`, calls: Math.round(50 + r * 150), apptPct: Math.round(30 + r * 50) });
   }
-  const searchRows: TrioRow[] = data.searchTerms.map(s => ({ label: s.term, calls: s.calls, apptPct: s.apptPct }));
+  const campTotal = rawCampaigns.reduce((s, r) => s + r.calls, 0) || 1;
+  const campScale = totalCalls / campTotal;
+  const campaignRows: TrioRow[] = rawCampaigns.map(r => ({
+    ...r,
+    calls: Math.max(1, Math.round(r.calls * campScale)),
+  }));
+
+  const rawSearch: TrioRow[] = data.searchTerms.map(s => ({ label: s.term, calls: s.calls, apptPct: Math.round(s.apptPct) }));
+  const searchTotal = rawSearch.reduce((s, r) => s + r.calls, 0) || 1;
+  const searchScale = (totalCalls * 0.85) / searchTotal;
+  const searchRows: TrioRow[] = rawSearch.map(r => ({
+    ...r,
+    calls: Math.max(1, Math.round(r.calls * searchScale)),
+  }));
 
   return (
     <InvocaShell networkName={company || data.networkName}>
