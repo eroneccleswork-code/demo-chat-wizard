@@ -135,12 +135,8 @@ export default function JourneyFormFill({ config, onNext }: Props) {
             onLoad={() => setReady(true)}
             onError={() => setReady(true)}
           />
-        </div>
-        {false && iframeBlocked && handleIframeLoad && handleIframeError && currentUrl && (<></>)}
-        <div style={{ display: 'none' }}>{/* placeholder to balance JSX */}</div>
-        {/* end website */}
-        <div style={{ display: 'none' }}>
-          <span>{pathIndex}</span>
+
+
 
           {/* Form fill overlay — right side */}
           <motion.div
