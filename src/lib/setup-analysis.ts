@@ -23,13 +23,18 @@ export async function analyzeCompanyWebsite(
   let scrapedAd: ScrapeResult['scrapedAd'] = null;
   let websiteMarkdown = '';
 
-  // Step 1: Scrape the website
+  // Step 1: Scrape the website (with hard timeout so bad sites don't block the demo)
   try {
-    const result = await firecrawlApi.scrape(websiteUrl, {
+    const scrapePromise = firecrawlApi.scrape(websiteUrl, {
       formats: ['markdown'],
       onlyMainContent: true,
     });
+    const timeoutPromise = new Promise<any>((resolve) =>
+      setTimeout(() => resolve({ success: false, error: 'client timeout' }), 22000)
+    );
+    const result = await Promise.race([scrapePromise, timeoutPromise]);
     if (result.success) {
+
       const markdown = result.data?.markdown || result.markdown || '';
       const metadata = result.data?.metadata || result.metadata || {};
       websiteMarkdown = markdown;
