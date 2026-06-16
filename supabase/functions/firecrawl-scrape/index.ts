@@ -33,20 +33,38 @@ Deno.serve(async (req) => {
 
     console.log('Scraping URL:', formattedUrl);
 
-    const response = await fetch('https://api.firecrawl.dev/v1/scrape', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: formattedUrl,
-        formats: options?.formats || ['markdown'],
-        onlyMainContent: options?.onlyMainContent ?? true,
-        waitFor: options?.waitFor,
-        location: options?.location,
-      }),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    let response: Response;
+    try {
+      response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: formattedUrl,
+          formats: options?.formats || ['markdown'],
+          onlyMainContent: options?.onlyMainContent ?? true,
+          waitFor: options?.waitFor,
+          location: options?.location,
+          timeout: 20000,
+        }),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      clearTimeout(timeoutId);
+      const isAbort = err instanceof Error && err.name === 'AbortError';
+      console.error('Firecrawl fetch failed:', err);
+      return new Response(
+        JSON.stringify({ success: false, error: isAbort ? 'Scrape timed out' : (err instanceof Error ? err.message : 'Fetch failed') }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    clearTimeout(timeoutId);
+
 
     const data = await response.json();
 
