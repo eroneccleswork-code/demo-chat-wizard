@@ -5,6 +5,8 @@ type FirecrawlResponse<T = any> = {
   error?: string;
   data?: T;
   markdown?: string;
+  html?: string;
+  rawHtml?: string;
   metadata?: any;
 };
 
