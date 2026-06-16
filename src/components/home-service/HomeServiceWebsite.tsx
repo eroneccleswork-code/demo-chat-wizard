@@ -1,5 +1,7 @@
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { firecrawlApi } from '@/lib/api/firecrawl';
 
 interface Props {
   websiteUrl: string;
@@ -12,13 +14,44 @@ interface Props {
 }
 
 export default function HomeServiceWebsite({ websiteUrl, domain, companyName, industry, customSignals, onNext }: Props) {
-  const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
-  const screenshotUrl = `https://image.thum.io/get/width/1440/crop/1100/noanimate/${url}`;
+  const [fallbackHtml, setFallbackHtml] = useState('');
+  const [useFallback, setUseFallback] = useState(false);
+  const url = useMemo(() => {
+    const cleanedWebsiteUrl = websiteUrl.trim().replace(/^(https?:\/\/)+/i, 'https://').replace(/\s+/g, '');
+    return cleanedWebsiteUrl.startsWith('http') ? cleanedWebsiteUrl : `https://${cleanedWebsiteUrl}`;
+  }, [websiteUrl]);
   const navigate = useNavigate();
   const goToInvoca = () => {
     if (onNext) onNext();
     else navigate('/invoca', { state: { companyName, industry, customSignals } });
   };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const timer = window.setTimeout(async () => {
+      try {
+        const result = await firecrawlApi.scrape(url, {
+          formats: ['rawHtml', 'html'],
+          onlyMainContent: false,
+          waitFor: 2000,
+        });
+
+        const html = result?.data?.rawHtml || result?.rawHtml || result?.data?.html || result?.html || '';
+        if (!cancelled && html) {
+          setFallbackHtml(`<!doctype html><html><head><base href="${url}"></head><body>${html}</body></html>`);
+          setUseFallback(true);
+        }
+      } catch (error) {
+        console.warn('Failed to render website fallback:', error);
+      }
+    }, 2200);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [url]);
 
   return (
     <motion.div
@@ -29,11 +62,12 @@ export default function HomeServiceWebsite({ websiteUrl, domain, companyName, in
       className="w-full h-screen bg-white flex flex-col relative outline-none"
     >
       <div className="flex-1">
-        <img
-          src={screenshotUrl}
+        <iframe
+          src={useFallback ? undefined : url}
+          srcDoc={useFallback ? fallbackHtml : undefined}
           title={domain}
-          alt={`${companyName || domain} website preview`}
-          className="w-full h-full object-cover object-top"
+          className="w-full h-full border-0"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
         />
       </div>
 

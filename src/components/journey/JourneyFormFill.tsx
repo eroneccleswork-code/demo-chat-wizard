@@ -36,7 +36,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
   const [ready, setReady] = useState(false);
   const [pathIndex] = useState(0);
 
-  const rawUrl = config.websiteUrl || 'https://example.com';
+  const rawUrl = (config.websiteUrl || 'https://example.com').trim().replace(/^(https?:\/\/)+/i, 'https://').replace(/\s+/g, '');
   const baseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
   const domain = baseUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
   const cleanBase = baseUrl.replace(/\/$/, '');
@@ -44,8 +44,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
   const currentPath = CONTACT_PATHS[pathIndex] || '';
   const displayPath = currentPath || '';
 
-  // Screenshot of the contact page — iframes are blocked by X-Frame-Options on most sites
-  const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/noanimate/${cleanBase}/contact`;
+  const iframeUrl = `${cleanBase}${displayPath}`;
 
   // Safety fallback — ensure typing starts even if screenshot is slow
   useEffect(() => {
@@ -107,14 +106,13 @@ export default function JourneyFormFill({ config, onNext }: Props) {
 
         {/* Website + form overlay */}
         <div className="relative" style={{ height: '480px' }}>
-          {/* Real website — screenshot (iframes blocked by X-Frame-Options on most sites) */}
-          <img
-            src={screenshotUrl}
-            alt={`${config.companyName} website`}
+          {/* Real website */}
+          <iframe
+            src={iframeUrl}
             title={`${domain}${displayPath}`}
-            className="w-full h-full object-cover object-top absolute inset-0"
+            className="w-full h-full border-0 absolute inset-0"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
             onLoad={() => setReady(true)}
-            onError={() => setReady(true)}
           />
 
 
