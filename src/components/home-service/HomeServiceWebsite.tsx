@@ -13,6 +13,7 @@ interface Props {
 
 export default function HomeServiceWebsite({ websiteUrl, domain, companyName, industry, customSignals, onNext }: Props) {
   const url = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
+  const screenshotUrl = `https://image.thum.io/get/width/1440/crop/1100/noanimate/${url}`;
   const navigate = useNavigate();
   const goToInvoca = () => {
     if (onNext) onNext();
@@ -28,11 +29,11 @@ export default function HomeServiceWebsite({ websiteUrl, domain, companyName, in
       className="w-full h-screen bg-white flex flex-col relative outline-none"
     >
       <div className="flex-1">
-        <iframe
-          src={url}
+        <img
+          src={screenshotUrl}
           title={domain}
-          className="w-full h-full border-0"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          alt={`${companyName || domain} website preview`}
+          className="w-full h-full object-cover object-top"
         />
       </div>
 
