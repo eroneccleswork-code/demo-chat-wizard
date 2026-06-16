@@ -34,8 +34,7 @@ export default function JourneyFormFill({ config, onNext }: Props) {
   const [fieldTexts, setFieldTexts] = useState<string[]>(FORM_FIELDS.map(() => ''));
   const [submitted, setSubmitted] = useState(false);
   const [ready, setReady] = useState(false);
-  const [iframeBlocked, setIframeBlocked] = useState(false);
-  const [pathIndex, setPathIndex] = useState(0);
+  const [pathIndex] = useState(0);
 
   const rawUrl = config.websiteUrl || 'https://example.com';
   const baseUrl = rawUrl.startsWith('http') ? rawUrl : `https://${rawUrl}`;
@@ -43,35 +42,17 @@ export default function JourneyFormFill({ config, onNext }: Props) {
   const cleanBase = baseUrl.replace(/\/$/, '');
 
   const currentPath = CONTACT_PATHS[pathIndex] || '';
-  const currentUrl = `${cleanBase}${currentPath}`;
   const displayPath = currentPath || '';
 
-  // Screenshot fallback URL — targets the contact page
+  // Screenshot of the contact page — iframes are blocked by X-Frame-Options on most sites
   const screenshotUrl = `https://image.thum.io/get/width/1200/crop/900/noanimate/${cleanBase}/contact`;
 
-  const handleIframeLoad = () => {
-    setReady(true);
-  };
-
-  const handleIframeError = () => {
-    if (pathIndex < CONTACT_PATHS.length - 1) {
-      setPathIndex(p => p + 1);
-    } else {
-      setIframeBlocked(true);
-      setReady(true);
-    }
-  };
-
-  // Fallback timer — if iframe doesn't load in 3s, show screenshot
+  // Safety fallback — ensure typing starts even if screenshot is slow
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!ready) {
-        setIframeBlocked(true);
-        setReady(true);
-      }
-    }, 3000);
+    const timer = setTimeout(() => setReady(true), 2500);
     return () => clearTimeout(timer);
-  }, [ready]);
+  }, []);
+
 
   // Auto-type effect
   useEffect(() => {
@@ -126,25 +107,17 @@ export default function JourneyFormFill({ config, onNext }: Props) {
 
         {/* Website + form overlay */}
         <div className="relative" style={{ height: '480px' }}>
-          {/* Real website — iframe or screenshot */}
-          {!iframeBlocked ? (
-            <iframe
-              src={currentUrl}
-              title={`${config.companyName} contact page`}
-              className="w-full h-full border-0 absolute inset-0"
-              sandbox="allow-scripts allow-same-origin"
-              onLoad={handleIframeLoad}
-              onError={handleIframeError}
-              style={{ pointerEvents: 'none' }}
-            />
-          ) : (
-            <img
-              src={screenshotUrl}
-              alt={`${config.companyName} website`}
-              className="w-full h-full object-cover object-top absolute inset-0"
-              onLoad={() => setReady(true)}
-            />
-          )}
+          {/* Real website — screenshot (iframes blocked by X-Frame-Options on most sites) */}
+          <img
+            src={screenshotUrl}
+            alt={`${config.companyName} website`}
+            title={`${domain}${displayPath}`}
+            className="w-full h-full object-cover object-top absolute inset-0"
+            onLoad={() => setReady(true)}
+            onError={() => setReady(true)}
+          />
+
+
 
           {/* Form fill overlay — right side */}
           <motion.div
