@@ -480,6 +480,7 @@ export function getScenarioMessages(scenario: DemoScenario): string[] {
       return ['Just looking', 'Not sure yet', 'Maybe later', 'I\'ll think about it'];
     case 'confused':
       return ['Um hi?', 'I think so', 'Not sure', 'Maybe 3?', 'Standard I guess', 'Soon', '90210', 'Sure', 'Yes'];
+  }
 }
 
 // ─── Shipping / Callback Escalation Flow ───
