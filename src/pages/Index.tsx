@@ -6,7 +6,6 @@ import heroImage from '@/assets/hero-blinds.jpg';
 
 const USE_CASES = [
   { label: 'AI Messaging Agent | Lead Form Response', active: true, path: '/setup' as const, state: undefined as any },
-  { label: 'AI Messaging Agent | Shipping & Callback', active: true, path: '/shipping-setup' as const, state: undefined as any },
   {
     label: 'IFM for Healthcare',
     active: true,
