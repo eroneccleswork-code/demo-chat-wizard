@@ -492,7 +492,7 @@ type ShippingPhase =
   | 'confirm-product'
   | 'gave-tracking'
   | 'offer-callback'
-  | 'awaiting-confirm-callback'
+  | 'awaiting-time'
   | 'confirmed'
   | 'done';
 
