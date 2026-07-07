@@ -335,6 +335,24 @@ export default function SetupForm() {
             )}
           </div>
 
+          {/* ERP Lookback toggle */}
+          <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Package className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <span className="text-sm font-medium">ERP Lookback</span>
+                <p className="text-xs text-muted-foreground">Swap the flow to shipping-tracking + callback escalation</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErpLookback(v => !v)}
+              className={`relative w-11 h-6 rounded-full transition-colors ${erpLookback ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${erpLookback ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           {/* Record Pitch toggle */}
           <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
