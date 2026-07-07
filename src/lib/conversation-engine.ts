@@ -618,13 +618,23 @@ function getShippingAgentMessage(
     }
 
     case 'offer-callback': {
-      if (isNo || sentiment === 'negative' && !isYes) {
+      if (isNo || (sentiment === 'negative' && !isYes)) {
         return advance('done', `No problem. If you change your mind, just reply here anytime. Thanks!`);
       }
       const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone;
       return advance(
+        'awaiting-time',
+        `Great — I'll get a callback scheduled${phoneInfo ? ` to ${phoneInfo}` : ''}. When's a good time? Something like "this afternoon" or "tomorrow morning" works.`
+      );
+    }
+
+    case 'awaiting-time': {
+      const when = userMessage.trim();
+      const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone || 'your number on file';
+      const prefix = /^(at |in |on |around |after |before )/i.test(when) ? when : `for ${when}`;
+      return advance(
         'confirmed',
-        `Great — connecting you now. A ${companyName} specialist will call you${phoneInfo ? ` at ${phoneInfo}` : ''} in the next couple of minutes.`
+        `All set. I've scheduled a callback from a ${companyName} specialist ${prefix} at ${phoneInfo}. You'll get a text confirmation shortly. Thanks for your patience!`
       );
     }
 
