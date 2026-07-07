@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, MessageSquare, Plus, Trash2, Package } from 'lucide-react';
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 import { generateMockPages } from '@/lib/mock-pages';
@@ -42,6 +42,7 @@ export default function SetupForm() {
   const [enableRecording, setEnableRecording] = useState(true);
   const [customQuestions, setCustomQuestions] = useState<string[]>([]);
   const [showCustomQuestions, setShowCustomQuestions] = useState(false);
+  const [erpLookback, setErpLookback] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +65,7 @@ export default function SetupForm() {
       presencePage: presencePage || undefined,
       enableRecording,
       customQuestions: userQuestions.length > 0 ? userQuestions : aiQuestions.length > 0 ? aiQuestions : undefined,
+      flowType: erpLookback ? 'shipping' : 'default',
     };
 
     navigate('/demo', { state: { config: finalConfig, scrapedAd } });
