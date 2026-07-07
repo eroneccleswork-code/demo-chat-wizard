@@ -480,5 +480,156 @@ export function getScenarioMessages(scenario: DemoScenario): string[] {
       return ['Just looking', 'Not sure yet', 'Maybe later', 'I\'ll think about it'];
     case 'confused':
       return ['Um hi?', 'I think so', 'Not sure', 'Maybe 3?', 'Standard I guess', 'Soon', '90210', 'Sure', 'Yes'];
+}
+
+// ─── Shipping / Callback Escalation Flow ───
+
+type ShippingPhase =
+  | 'intro'
+  | 'awaiting-number'
+  | 'lookup-result'
+  | 'probe-issue'
+  | 'offer-callback'
+  | 'awaiting-phone'
+  | 'awaiting-time'
+  | 'confirmed'
+  | 'done';
+
+function extractTrackingNumber(msg: string): string | null {
+  const cleaned = msg.replace(/[\s-]/g, '');
+  const match = cleaned.match(/[A-Z0-9]{8,}/i);
+  return match ? match[0].toUpperCase() : null;
+}
+
+function extractPhone(msg: string): string | null {
+  const digits = msg.replace(/\D/g, '');
+  if (digits.length >= 10) {
+    const d = digits.slice(-10);
+    return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
   }
+  return null;
+}
+
+function getShippingAgentMessage(
+  config: BusinessConfig,
+  state: ConversationState,
+  userMessage?: string
+): { message: string; newState: ConversationState } {
+  const name = capitalizeWords(config.companyName);
+  const phase = (state.lastTopic || 'intro') as ShippingPhase;
+  const answers = userMessage ? [...state.userAnswers, userMessage] : state.userAnswers;
+
+  const advance = (nextPhase: ShippingPhase, message: string, extra: Partial<ConversationState> = {}) => ({
+    message,
+    newState: {
+      ...state,
+      userAnswers: answers,
+      extractedInfo: state.extractedInfo,
+      lastTopic: nextPhase,
+      questionIndex: state.questionIndex + 1,
+      phase: nextPhase === 'confirmed' || nextPhase === 'done' ? 'done' as ConversationPhase : 'qualifying' as ConversationPhase,
+      ...extra,
+    },
+  });
+
+  // Opening — no user input
+  if (!userMessage) {
+    return advance(
+      'awaiting-number',
+      `Hi! Thanks for reaching out to ${name}. I'm an AI agent — I can help you check on a shipment. Do you have your order or tracking number handy?`
+    );
+  }
+
+  const sentiment = detectSentiment(userMessage);
+
+  switch (phase) {
+    case 'awaiting-number': {
+      const tracking = extractTrackingNumber(userMessage);
+      if (!tracking) {
+        if (sentiment === 'negative') {
+          return advance(
+            'offer-callback',
+            `No problem — I don't need it to help. Would you like me to have a live support specialist give you a quick callback instead?`
+          );
+        }
+        return advance(
+          'awaiting-number',
+          `No worries — a tracking number usually starts with a few letters or digits (like 1Z999AA1... or TRK-482910). Could you double-check your confirmation email and share it?`
+        );
+      }
+      const statuses = [
+        `it's currently in transit and last scanned in Memphis, TN about 3 hours ago. Estimated delivery is tomorrow by 8 PM`,
+        `it's out for delivery today with the local courier — expected between 2 PM and 6 PM`,
+        `it's been held at the local sorting facility since yesterday morning — that's flagged as unusual`,
+      ];
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      return advance(
+        'probe-issue',
+        `Got it — pulling up ${tracking} now… Looks like ${status}. Is there something specific about this shipment I can help with?`
+      );
+    }
+
+    case 'probe-issue': {
+      if (sentiment === 'negative') {
+        return advance(
+          'done',
+          `Sounds good! You're all set. If anything changes, reach back out anytime and we'll be here. Thanks for choosing ${name}.`
+        );
+      }
+      return advance(
+        'offer-callback',
+        `Thanks for that context — this looks like something our shipping specialist should handle directly so we can dig into the carrier details and get it resolved fast. Can I have someone give you a quick callback?`
+      );
+    }
+
+    case 'offer-callback': {
+      if (sentiment === 'negative') {
+        return advance(
+          'done',
+          `Totally understand. If you change your mind, just message us back and we'll set it up. Thanks for reaching out to ${name}!`
+        );
+      }
+      return advance(
+        'awaiting-phone',
+        `Great. What's the best phone number to reach you at?`
+      );
+    }
+
+    case 'awaiting-phone': {
+      const phone = extractPhone(userMessage);
+      if (!phone) {
+        return advance(
+          'awaiting-phone',
+          `I want to make sure I get this right — could you share your phone number including area code? (e.g. 805-555-0142)`
+        );
+      }
+      return advance(
+        'awaiting-time',
+        `Perfect — ${phone}. When's a good time for the callback? Something like "this afternoon" or "tomorrow morning" works.`,
+        { extractedInfo: [...state.extractedInfo, { phone }] }
+      );
+    }
+
+    case 'awaiting-time': {
+      const when = userMessage.trim();
+      const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone || 'your number on file';
+      return advance(
+        'confirmed',
+        `All set. I've scheduled a callback from a ${name} shipping specialist ${when.toLowerCase().startsWith('at ') || when.toLowerCase().startsWith('in ') || when.toLowerCase().startsWith('on ') ? when : 'for ' + when} at ${phoneInfo}. You'll get a text confirmation shortly. Thanks for your patience!`
+      );
+    }
+
+    case 'confirmed':
+    case 'done':
+      return advance('done', `Thanks for chatting with ${name}. Have a great day!`);
+
+    case 'intro':
+    default:
+      return advance(
+        'awaiting-number',
+        `Hi! Thanks for reaching out to ${name}. I'm an AI agent — do you have your order or tracking number handy?`
+      );
+  }
+}
+
 }
