@@ -487,20 +487,14 @@ export function getScenarioMessages(scenario: DemoScenario): string[] {
 
 type ShippingPhase =
   | 'intro'
-  | 'awaiting-number'
-  | 'lookup-result'
-  | 'probe-issue'
+  | 'identify'
+  | 'awaiting-request'
+  | 'gave-tracking'
   | 'offer-callback'
   | 'awaiting-phone'
   | 'awaiting-time'
   | 'confirmed'
   | 'done';
-
-function extractTrackingNumber(msg: string): string | null {
-  const cleaned = msg.replace(/[\s-]/g, '');
-  const match = cleaned.match(/[A-Z0-9]{8,}/i);
-  return match ? match[0].toUpperCase() : null;
-}
 
 function extractPhone(msg: string): string | null {
   const digits = msg.replace(/\D/g, '');
@@ -511,12 +505,29 @@ function extractPhone(msg: string): string | null {
   return null;
 }
 
+function extractName(msg: string): string | null {
+  const m = msg.match(/(?:i'?m|this is|my name is|it'?s)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i)
+    || msg.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\.?$/);
+  return m ? m[1] : null;
+}
+
+function detectTrackingRequest(msg: string): boolean {
+  return /(track|tracking|shipping|shipment|order|package|delivery|where.*is|status|eta|when.*arriv|when.*get)/i.test(msg);
+}
+
+function generateFakeTracking(): { number: string; eta: string } {
+  const num = '1Z' + Math.random().toString(36).slice(2, 8).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+  const days = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Monday'];
+  const day = days[Math.floor(Math.random() * days.length)];
+  return { number: num, eta: `${day} between 2 PM and 6 PM` };
+}
+
 function getShippingAgentMessage(
   config: BusinessConfig,
   state: ConversationState,
   userMessage?: string
 ): { message: string; newState: ConversationState } {
-  const name = capitalizeWords(config.companyName);
+  const companyName = capitalizeWords(config.companyName);
   const phase = (state.lastTopic || 'intro') as ShippingPhase;
   const answers = userMessage ? [...state.userAnswers, userMessage] : state.userAnswers;
 
@@ -533,76 +544,98 @@ function getShippingAgentMessage(
     },
   });
 
-  // Opening — no user input
+  // Opening — no user input yet
   if (!userMessage) {
     return advance(
-      'awaiting-number',
-      `Hi! Thanks for reaching out to ${name}. I'm an AI agent — I can help you check on a shipment. Do you have your order or tracking number handy?`
+      'identify',
+      `Hi! Thanks for reaching out to ${companyName}. I'm an AI agent — before I can pull anything up, can I get your name and the email or order number on the account?`
     );
   }
 
   const sentiment = detectSentiment(userMessage);
 
   switch (phase) {
-    case 'awaiting-number': {
-      const tracking = extractTrackingNumber(userMessage);
-      if (!tracking) {
-        if (sentiment === 'negative') {
-          return advance(
-            'offer-callback',
-            `No problem — I don't need it to help. Would you like me to have a live support specialist give you a quick callback instead?`
-          );
-        }
+    case 'identify': {
+      const nm = extractName(userMessage);
+      const hasEmail = /@/.test(userMessage);
+      const hasOrder = /\b[A-Z0-9-]{5,}\b/i.test(userMessage) || /\d{4,}/.test(userMessage);
+      const info = { ...(nm ? { name: nm } : {}), ...(hasEmail ? { email: 'yes' } : {}), ...(hasOrder ? { order: 'yes' } : {}) };
+      const newInfo = [...state.extractedInfo, info];
+
+      // Need at least a name AND one identifier (email/order)
+      if (!nm && !hasEmail && !hasOrder) {
         return advance(
-          'awaiting-number',
-          `No worries — a tracking number usually starts with a few letters or digits (like 1Z999AA1... or TRK-482910). Could you double-check your confirmation email and share it?`
+          'identify',
+          `No worries — just to make sure I'm looking at the right account, could you share your name along with the email address or order number you used?`,
+          { extractedInfo: newInfo }
         );
       }
-      const statuses = [
-        `it's currently in transit and last scanned in Memphis, TN about 3 hours ago. Estimated delivery is tomorrow by 8 PM`,
-        `it's out for delivery today with the local courier — expected between 2 PM and 6 PM`,
-        `it's been held at the local sorting facility since yesterday morning — that's flagged as unusual`,
-      ];
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      if (!nm) {
+        return advance(
+          'identify',
+          `Got it — thanks. And who am I chatting with? Just your first name is fine.`,
+          { extractedInfo: newInfo }
+        );
+      }
+      if (!hasEmail && !hasOrder) {
+        return advance(
+          'identify',
+          `Thanks, ${nm}! Do you also have the email address or order number tied to the account so I can pull it up?`,
+          { extractedInfo: newInfo }
+        );
+      }
+
       return advance(
-        'probe-issue',
-        `Got it — pulling up ${tracking} now… Looks like ${status}. Is there something specific about this shipment I can help with?`
+        'awaiting-request',
+        `Perfect — thanks, ${nm}. I've got your account pulled up. What can I help you with today?`,
+        { extractedInfo: newInfo }
       );
     }
 
-    case 'probe-issue': {
+    case 'awaiting-request': {
+      if (detectTrackingRequest(userMessage)) {
+        const t = generateFakeTracking();
+        return advance(
+          'gave-tracking',
+          `Sure thing — your tracking number is ${t.number}. It's currently in transit and the estimated delivery is ${t.eta}. Anything else I can help you with?`,
+          { extractedInfo: [...state.extractedInfo, { tracking: t.number }] }
+        );
+      }
+      if (sentiment === 'negative') {
+        return advance('done', `No problem! Thanks for reaching out to ${companyName} — have a great day.`);
+      }
+      // Any other request — go straight to callback offer
+      return advance(
+        'offer-callback',
+        `That's a great question — let me get one of our specialists to reach out directly so they can take care of it end-to-end. Can I schedule a quick callback for you?`
+      );
+    }
+
+    case 'gave-tracking': {
       if (sentiment === 'negative') {
         return advance(
           'done',
-          `Sounds good! You're all set. If anything changes, reach back out anytime and we'll be here. Thanks for choosing ${name}.`
+          `You're all set then! If anything comes up, just message us back. Thanks for choosing ${companyName}.`
         );
       }
+      // User has more questions → escalate to callback
       return advance(
         'offer-callback',
-        `Thanks for that context — this looks like something our shipping specialist should handle directly so we can dig into the carrier details and get it resolved fast. Can I have someone give you a quick callback?`
+        `Got it — that's something our shipping specialist can look into more deeply. Would you like me to schedule a quick callback so they can help you directly?`
       );
     }
 
     case 'offer-callback': {
       if (sentiment === 'negative') {
-        return advance(
-          'done',
-          `Totally understand. If you change your mind, just message us back and we'll set it up. Thanks for reaching out to ${name}!`
-        );
+        return advance('done', `Totally understand. If you change your mind, just message us back and we'll set it up. Thanks!`);
       }
-      return advance(
-        'awaiting-phone',
-        `Great. What's the best phone number to reach you at?`
-      );
+      return advance('awaiting-phone', `Great. What's the best phone number to reach you at?`);
     }
 
     case 'awaiting-phone': {
       const phone = extractPhone(userMessage);
       if (!phone) {
-        return advance(
-          'awaiting-phone',
-          `I want to make sure I get this right — could you share your phone number including area code? (e.g. 805-555-0142)`
-        );
+        return advance('awaiting-phone', `Could you share your phone number including area code? (e.g. 805-555-0142)`);
       }
       return advance(
         'awaiting-time',
@@ -614,23 +647,24 @@ function getShippingAgentMessage(
     case 'awaiting-time': {
       const when = userMessage.trim();
       const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone || 'your number on file';
+      const prefix = /^(at |in |on |around |after |before )/i.test(when) ? when : `for ${when}`;
       return advance(
         'confirmed',
-        `All set. I've scheduled a callback from a ${name} shipping specialist ${when.toLowerCase().startsWith('at ') || when.toLowerCase().startsWith('in ') || when.toLowerCase().startsWith('on ') ? when : 'for ' + when} at ${phoneInfo}. You'll get a text confirmation shortly. Thanks for your patience!`
+        `All set. I've scheduled a callback from a ${companyName} specialist ${prefix} at ${phoneInfo}. You'll get a text confirmation shortly. Thanks for your patience!`
       );
     }
 
     case 'confirmed':
     case 'done':
-      return advance('done', `Thanks for chatting with ${name}. Have a great day!`);
+      return advance('done', `Thanks for chatting with ${companyName}. Have a great day!`);
 
     case 'intro':
     default:
       return advance(
-        'awaiting-number',
-        `Hi! Thanks for reaching out to ${name}. I'm an AI agent — do you have your order or tracking number handy?`
+        'identify',
+        `Hi! Thanks for reaching out to ${companyName}. Can I get your name and the email or order number on the account?`
       );
   }
 }
 
-}
+

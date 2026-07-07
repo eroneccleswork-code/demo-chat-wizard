@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Video } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, MessageSquare, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Globe, Building2, Target, Zap, Radio, Search, Check, X, MessageSquare, Plus, Trash2, Package } from 'lucide-react';
 import InvocaLogo from './InvocaLogo';
 import { BusinessConfig } from '@/lib/types';
 import { generateMockPages } from '@/lib/mock-pages';
@@ -42,6 +42,7 @@ export default function SetupForm() {
   const [enableRecording, setEnableRecording] = useState(true);
   const [customQuestions, setCustomQuestions] = useState<string[]>([]);
   const [showCustomQuestions, setShowCustomQuestions] = useState(false);
+  const [erpLookback, setErpLookback] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +65,7 @@ export default function SetupForm() {
       presencePage: presencePage || undefined,
       enableRecording,
       customQuestions: userQuestions.length > 0 ? userQuestions : aiQuestions.length > 0 ? aiQuestions : undefined,
+      flowType: erpLookback ? 'shipping' : 'default',
     };
 
     navigate('/demo', { state: { config: finalConfig, scrapedAd } });
@@ -331,6 +333,24 @@ export default function SetupForm() {
                 )}
               </motion.div>
             )}
+          </div>
+
+          {/* ERP Lookback toggle */}
+          <div className="glass-surface rounded-xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Package className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <span className="text-sm font-medium">ERP Lookback</span>
+                <p className="text-xs text-muted-foreground">Swap the flow to shipping-tracking + callback escalation</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setErpLookback(v => !v)}
+              className={`relative w-11 h-6 rounded-full transition-colors ${erpLookback ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${erpLookback ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
           </div>
 
           {/* Record Pitch toggle */}
