@@ -613,7 +613,7 @@ function getShippingAgentMessage(
       }
       return advance(
         'offer-callback',
-        `Would you like to chat with a live agent?`
+        `I'm really sorry to hear that — I know how frustrating it is when a package doesn't show up when expected. Would you like to chat with a live agent who can dig into the delay for you?`
       );
     }
 
