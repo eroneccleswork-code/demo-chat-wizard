@@ -8,6 +8,7 @@ export interface BusinessConfig {
   enableRecording?: boolean;
   customQuestions?: string[];
   phoneNumber?: string;
+  flowType?: 'default' | 'shipping';
 }
 
 export interface WebsiteInsights {

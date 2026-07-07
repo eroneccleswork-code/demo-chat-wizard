@@ -13,6 +13,7 @@ import CallJourneySetup from "./pages/CallJourneySetup.tsx";
 import CallJourneyPage from "./pages/CallJourneyPage.tsx";
 import IntegrationsPage from "./pages/IntegrationsPage.tsx";
 import HomeServiceSetup from "./pages/HomeServiceSetup.tsx";
+import ShippingSetup from "./pages/ShippingSetup.tsx";
 import HomeServiceDemo from "./pages/HomeServiceDemo.tsx";
 import VoiceSetup from "./pages/VoiceSetup.tsx";
 import VoiceDemo from "./pages/VoiceDemo.tsx";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/setup" element={<Setup />} />
             <Route path="/journey-setup" element={<JourneySetup />} />
+            <Route path="/shipping-setup" element={<ShippingSetup />} />
             <Route path="/journey" element={<Journey />} />
             <Route path="/call-journey-setup" element={<CallJourneySetup />} />
             <Route path="/call-journey" element={<CallJourneyPage />} />
