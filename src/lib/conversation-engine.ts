@@ -487,12 +487,12 @@ export function getScenarioMessages(scenario: DemoScenario): string[] {
 
 type ShippingPhase =
   | 'intro'
-  | 'identify'
   | 'awaiting-request'
+  | 'awaiting-contact'
+  | 'confirm-product'
   | 'gave-tracking'
   | 'offer-callback'
-  | 'awaiting-phone'
-  | 'awaiting-time'
+  | 'awaiting-confirm-callback'
   | 'confirmed'
   | 'done';
 
@@ -506,20 +506,25 @@ function extractPhone(msg: string): string | null {
 }
 
 function extractName(msg: string): string | null {
-  const m = msg.match(/(?:i'?m|this is|my name is|it'?s)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i)
-    || msg.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\.?$/);
-  return m ? m[1] : null;
+  const cleaned = msg.replace(/[0-9()+\-.]/g, ' ').replace(/\s+/g, ' ').trim();
+  const m = cleaned.match(/(?:i'?m|this is|my name is|it'?s|name is)\s+([A-Za-z]+)/i)
+    || cleaned.match(/^([A-Za-z]+)(?:\s+[A-Za-z]+)?/);
+  if (!m) return null;
+  const name = m[1];
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 }
 
-function detectTrackingRequest(msg: string): boolean {
-  return /(track|tracking|shipping|shipment|order|package|delivery|where.*is|status|eta|when.*arriv|when.*get)/i.test(msg);
+function pickProductName(config: BusinessConfig): string {
+  const ctx = (config.customContext || '') + ' ' + (config.industry || '');
+  const match = ctx.match(/\b([A-Z][a-zA-Z]{3,}(?:[A-Z][a-zA-Z]*)+)\b/);
+  if (match) return match[1];
+  const fallbacks = ['PanelPilotACE', 'SmartSensor Pro', 'DataLogger X1', 'ProSeries 240'];
+  const seed = config.companyName.length;
+  return fallbacks[seed % fallbacks.length];
 }
 
-function generateFakeTracking(): { number: string; eta: string } {
-  const num = '1Z' + Math.random().toString(36).slice(2, 8).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
-  const days = ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Monday'];
-  const day = days[Math.floor(Math.random() * days.length)];
-  return { number: num, eta: `${day} between 2 PM and 6 PM` };
+function generateTrackingNumber(): string {
+  return Math.floor(10000000000 + Math.random() * 89999999999).toString();
 }
 
 function getShippingAgentMessage(
@@ -544,113 +549,82 @@ function getShippingAgentMessage(
     },
   });
 
-  // Opening — no user input yet
   if (!userMessage) {
     return advance(
-      'identify',
-      `Hi! Thanks for reaching out to ${companyName}. I'm an AI agent — before I can pull anything up, can I get your name and the email or order number on the account?`
+      'awaiting-request',
+      `Hi! Thanks for reaching out to ${companyName}. How can I help?`
     );
   }
 
   const sentiment = detectSentiment(userMessage);
+  const isYes = /\b(yes|yeah|yep|yup|sure|correct|that'?s? right|please|ok|okay|sounds good)\b/i.test(userMessage);
+  const isNo = /\b(no|nope|nah|not really)\b/i.test(userMessage);
 
   switch (phase) {
-    case 'identify': {
-      const nm = extractName(userMessage);
-      const hasEmail = /@/.test(userMessage);
-      const hasOrder = /\b[A-Z0-9-]{5,}\b/i.test(userMessage) || /\d{4,}/.test(userMessage);
-      const info = { ...(nm ? { name: nm } : {}), ...(hasEmail ? { email: 'yes' } : {}), ...(hasOrder ? { order: 'yes' } : {}) };
-      const newInfo = [...state.extractedInfo, info];
-
-      // Need at least a name AND one identifier (email/order)
-      if (!nm && !hasEmail && !hasOrder) {
-        return advance(
-          'identify',
-          `No worries — just to make sure I'm looking at the right account, could you share your name along with the email address or order number you used?`,
-          { extractedInfo: newInfo }
-        );
-      }
-      if (!nm) {
-        return advance(
-          'identify',
-          `Got it — thanks. And who am I chatting with? Just your first name is fine.`,
-          { extractedInfo: newInfo }
-        );
-      }
-      if (!hasEmail && !hasOrder) {
-        return advance(
-          'identify',
-          `Thanks, ${nm}! Do you also have the email address or order number tied to the account so I can pull it up?`,
-          { extractedInfo: newInfo }
-        );
-      }
-
+    case 'awaiting-request': {
       return advance(
-        'awaiting-request',
-        `Perfect — thanks, ${nm}. I've got your account pulled up. What can I help you with today?`,
-        { extractedInfo: newInfo }
+        'awaiting-contact',
+        `Sure — happy to help. Can I get your name and phone number so I can pull up your account?`
       );
     }
 
-    case 'awaiting-request': {
-      if (detectTrackingRequest(userMessage)) {
-        const t = generateFakeTracking();
+    case 'awaiting-contact': {
+      const name = extractName(userMessage);
+      const phone = extractPhone(userMessage);
+      const info: Record<string, string> = {};
+      if (name) info.name = name;
+      if (phone) info.phone = phone;
+      const newInfo = [...state.extractedInfo, info];
+
+      if (!name || !phone) {
         return advance(
-          'gave-tracking',
-          `Sure thing — your tracking number is ${t.number}. It's currently in transit and the estimated delivery is ${t.eta}. Anything else I can help you with?`,
-          { extractedInfo: [...state.extractedInfo, { tracking: t.number }] }
+          'awaiting-contact',
+          `Just need both your name and a phone number to look you up — mind sending them together? (e.g. "Alex 805-555-0142")`,
+          { extractedInfo: newInfo }
         );
       }
-      if (sentiment === 'negative') {
-        return advance('done', `No problem! Thanks for reaching out to ${companyName} — have a great day.`);
-      }
-      // Any other request — go straight to callback offer
+
+      const product = pickProductName(config);
       return advance(
-        'offer-callback',
-        `That's a great question — let me get one of our specialists to reach out directly so they can take care of it end-to-end. Can I schedule a quick callback for you?`
+        'confirm-product',
+        `Perfect, thanks ${name}. I see a few order numbers on your account — are you looking for tracking on your ${product} order?`,
+        { extractedInfo: [...newInfo, { product }] }
+      );
+    }
+
+    case 'confirm-product': {
+      if (isNo) {
+        return advance(
+          'offer-callback',
+          `No problem — let me get one of our specialists to reach out so they can sort out the right order. Would you like to chat with a live agent?`
+        );
+      }
+      const trackingNum = generateTrackingNumber();
+      return advance(
+        'gave-tracking',
+        `Perfect — here is your tracking number: ${trackingNum}. ETA for delivery is July 9th by 8:20 AM EST. Anything else I can help with?`,
+        { extractedInfo: [...state.extractedInfo, { tracking: trackingNum }] }
       );
     }
 
     case 'gave-tracking': {
-      if (sentiment === 'negative') {
-        return advance(
-          'done',
-          `You're all set then! If anything comes up, just message us back. Thanks for choosing ${companyName}.`
-        );
+      if (isNo || /^(no thanks|all good|that'?s? it|nothing else)/i.test(userMessage.trim())) {
+        return advance('done', `You're all set. Thanks for reaching out to ${companyName} — have a great day!`);
       }
-      // User has more questions → escalate to callback
       return advance(
         'offer-callback',
-        `Got it — that's something our shipping specialist can look into more deeply. Would you like me to schedule a quick callback so they can help you directly?`
+        `Would you like to chat with a live agent?`
       );
     }
 
     case 'offer-callback': {
-      if (sentiment === 'negative') {
-        return advance('done', `Totally understand. If you change your mind, just message us back and we'll set it up. Thanks!`);
+      if (isNo || sentiment === 'negative' && !isYes) {
+        return advance('done', `No problem. If you change your mind, just reply here anytime. Thanks!`);
       }
-      return advance('awaiting-phone', `Great. What's the best phone number to reach you at?`);
-    }
-
-    case 'awaiting-phone': {
-      const phone = extractPhone(userMessage);
-      if (!phone) {
-        return advance('awaiting-phone', `Could you share your phone number including area code? (e.g. 805-555-0142)`);
-      }
-      return advance(
-        'awaiting-time',
-        `Perfect — ${phone}. When's a good time for the callback? Something like "this afternoon" or "tomorrow morning" works.`,
-        { extractedInfo: [...state.extractedInfo, { phone }] }
-      );
-    }
-
-    case 'awaiting-time': {
-      const when = userMessage.trim();
-      const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone || 'your number on file';
-      const prefix = /^(at |in |on |around |after |before )/i.test(when) ? when : `for ${when}`;
+      const phoneInfo = state.extractedInfo.find(i => i.phone)?.phone;
       return advance(
         'confirmed',
-        `All set. I've scheduled a callback from a ${companyName} specialist ${prefix} at ${phoneInfo}. You'll get a text confirmation shortly. Thanks for your patience!`
+        `Great — connecting you now. A ${companyName} specialist will call you${phoneInfo ? ` at ${phoneInfo}` : ''} in the next couple of minutes.`
       );
     }
 
@@ -661,8 +635,8 @@ function getShippingAgentMessage(
     case 'intro':
     default:
       return advance(
-        'identify',
-        `Hi! Thanks for reaching out to ${companyName}. Can I get your name and the email or order number on the account?`
+        'awaiting-request',
+        `Hi! Thanks for reaching out to ${companyName}. How can I help?`
       );
   }
 }
