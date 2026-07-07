@@ -341,8 +341,12 @@ export function getNextAgentMessage(
   state: ConversationState,
   userMessage?: string
 ): { message: string; newState: ConversationState } {
+  if (config.flowType === 'shipping') {
+    return getShippingAgentMessage(config, state, userMessage);
+  }
   const steps = getQualificationSteps(config);
   const name = capitalizeWords(config.companyName);
+
 
   // Opening message — no user input yet
   if (state.phase === 'intro' && !userMessage) {
