@@ -15,7 +15,9 @@ const USE_CASES = [
       companyName: 'Banner Health',
       websiteUrl: 'https://www.bannerhealth.com',
     },
+  },
   {
+
     label: 'IFM for Healthcare | TV Ad',
     active: true,
     path: '/home-service-setup' as const,
