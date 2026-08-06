@@ -186,6 +186,72 @@ export default function HomeServiceTvAd({
             className="relative aspect-video w-full overflow-hidden rounded-[14px]"
             style={{ background: `linear-gradient(135deg, ${brand.primary} 0%, ${brand.secondary} 60%, ${brand.primary} 100%)` }}
           >
+            {/* Pre-roll: local station break */}
+            <AnimatePresence>
+              {phase === 'preroll' && (
+                <motion.div
+                  key="preroll"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 z-30 bg-[#0a0d14] flex flex-col"
+                  style={{ fontFamily: 'system-ui, sans-serif' }}
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#1b2a4a,transparent_60%),radial-gradient(circle_at_75%_80%,#3a1220,transparent_55%)]" />
+                  <motion.div
+                    animate={{ x: ['-30%', '130%'] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                    className="absolute inset-y-0 w-1/4 bg-white/5 blur-2xl pointer-events-none"
+                  />
+
+                  {/* Station bug */}
+                  <div className="absolute top-4 left-5 flex items-center gap-2">
+                    <span className="px-2 py-1 rounded bg-[#1b3a8f] text-white text-[13px] font-black tracking-tight">FOX</span>
+                    <span className="text-white text-[13px] font-bold tracking-wide">2</span>
+                    <span className="text-white/50 text-[10px] uppercase tracking-[0.22em]">KASA · Albuquerque, NM</span>
+                  </div>
+                  <div className="absolute top-4 right-5 flex items-center gap-3 text-white/60 text-xs tabular-nums">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
+                    </span>
+                    <span>Ad break :{String(Math.max(0, Math.ceil(PREROLL_SECONDS - pt))).padStart(2, '0')}</span>
+                  </div>
+
+                  <div className="relative flex-1 flex flex-col items-center justify-center text-center px-10">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={prerollIdx}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4 }}
+                      >
+                        <p className="text-white/50 text-[11px] uppercase tracking-[0.3em] mb-3">{prerollScene.kicker}</p>
+                        <p className="text-white text-3xl md:text-4xl font-black tracking-tight">{prerollScene.headline}</p>
+                        <p className="text-white/60 text-base mt-3 max-w-xl mx-auto">{prerollScene.sub}</p>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="relative px-6 pb-5">
+                    <div className="flex items-center justify-between">
+                      <p className="text-white/40 text-[11px]">Your spot airs next</p>
+                      <button
+                        onClick={() => setPhase('spot')}
+                        className="text-white/70 hover:text-white text-xs border border-white/20 rounded-full px-3 py-1.5 transition-colors"
+                      >
+                        Skip ad break →
+                      </button>
+                    </div>
+                    <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden mt-3">
+                      <div className="h-full rounded-full bg-white/50" style={{ width: `${(pt / PREROLL_SECONDS) * 100}%` }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Brand backdrop */}
             {backdrop && (
               <img
