@@ -181,9 +181,9 @@ export default function HomeServiceTvAd({
     >
       <div className="w-full max-w-5xl">
         {/* TV bezel */}
-        <div className="rounded-[22px] bg-[#15191f] p-3 shadow-[0_40px_100px_rgba(0,0,0,0.7)] border border-white/10">
+        <div className="rounded-[26px] bg-gradient-to-b from-[#20252c] via-[#12161b] to-[#0b0e12] p-2.5 pb-2 shadow-[0_50px_120px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)] border border-black/60 ring-1 ring-white/5">
           <div
-            className="relative aspect-video w-full overflow-hidden rounded-[14px]"
+            className="relative aspect-video w-full overflow-hidden rounded-[16px] ring-1 ring-black/80 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.6)]"
             style={{ background: `linear-gradient(135deg, ${brand.primary} 0%, ${brand.secondary} 60%, ${brand.primary} 100%)` }}
           >
             {/* Pre-roll: local station break */}
