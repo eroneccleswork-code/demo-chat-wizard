@@ -69,14 +69,19 @@ export default function HomeServiceSetup() {
             className="mb-6 flex flex-col items-center"
           >
             <InvocaLogo size="lg" className="mb-3" />
-            <span className="text-sm font-semibold text-primary">IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}</span>
+            <span className="text-sm font-semibold text-primary">
+              IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}{isTv ? ' · TV' : ''}
+            </span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
-            Live Search-to-Site Journey
+            {isTv ? 'Live TV-to-Call Journey' : 'Live Search-to-Site Journey'}
           </h1>
           <p className="text-muted-foreground">
-            Enter a search keyword and company URL to simulate the full customer journey — from Google search to their real website.
+            {isTv
+              ? 'Enter a company URL to simulate the full offline journey — from a TV spot with an Invoca tracking number to the call and their real website.'
+              : 'Enter a search keyword and company URL to simulate the full customer journey — from Google search to their real website.'}
           </p>
+
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
