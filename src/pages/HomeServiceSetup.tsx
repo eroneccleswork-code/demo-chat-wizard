@@ -17,6 +17,7 @@ export default function HomeServiceSetup() {
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
   const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
+  const [originalNumber, setOriginalNumber] = useState('(505) 555-0198');
 
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
