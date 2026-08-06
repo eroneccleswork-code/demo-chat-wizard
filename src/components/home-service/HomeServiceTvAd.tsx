@@ -101,9 +101,31 @@ export default function HomeServiceTvAd({
   const activeIdx = scenes.reduce((acc, s, i) => (t >= s.at ? i : acc), 0);
   const active = scenes[activeIdx];
 
+  // Pre-roll clock (local station break before the brand spot)
+  useEffect(() => {
+    if (phase !== 'preroll' || !playing) return;
+    let last = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      setPt(prev => {
+        const next = prev + dt;
+        if (next >= PREROLL_SECONDS) {
+          setPhase('spot');
+          return PREROLL_SECONDS;
+        }
+        return next;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, playing]);
+
   // Playback clock
   useEffect(() => {
-    if (!playing || dialing) return;
+    if (phase !== 'spot' || !playing || dialing) return;
     let last = performance.now();
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
@@ -113,7 +135,7 @@ export default function HomeServiceTvAd({
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [playing, dialing]);
+  }, [phase, playing, dialing]);
 
   // Dial animation then hand off to the call
   useEffect(() => {
