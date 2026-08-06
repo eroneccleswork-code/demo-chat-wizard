@@ -11,7 +11,7 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals, channel, trackingNumber, branding } = (location.state as any) || {};
+  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals, channel, trackingNumber, originalNumber, branding } = (location.state as any) || {};
   const isTv = channel === 'tv';
 
 
