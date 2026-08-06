@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string } | null) || {};
+  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string; channel?: 'search' | 'tv' } | null) || {};
   const industry = preset.industry || 'Home Services';
+  const channel = preset.channel || 'search';
+  const isTv = channel === 'tv';
   const isHealthcare = industry.toLowerCase().includes('health');
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
+  const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
+
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [showCustomSignals, setShowCustomSignals] = useState(false);
@@ -35,11 +39,14 @@ export default function HomeServiceSetup() {
         websiteUrl,
         companyName,
         industry,
+        channel,
+        trackingNumber,
         enableRecording,
         scrapedAd: analysis.scrapedAd,
         customSignals: activeCustom,
       },
     });
+
   };
 
   return (
@@ -62,14 +69,19 @@ export default function HomeServiceSetup() {
             className="mb-6 flex flex-col items-center"
           >
             <InvocaLogo size="lg" className="mb-3" />
-            <span className="text-sm font-semibold text-primary">IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}</span>
+            <span className="text-sm font-semibold text-primary">
+              IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}{isTv ? ' · TV' : ''}
+            </span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
-            Live Search-to-Site Journey
+            {isTv ? 'Live TV-to-Call Journey' : 'Live Search-to-Site Journey'}
           </h1>
           <p className="text-muted-foreground">
-            Enter a search keyword and company URL to simulate the full customer journey — from Google search to their real website.
+            {isTv
+              ? 'Enter a company URL to simulate the full offline journey — from a TV spot with an Invoca tracking number to the call and their real website.'
+              : 'Enter a search keyword and company URL to simulate the full customer journey — from Google search to their real website.'}
           </p>
+
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -107,6 +119,24 @@ export default function HomeServiceSetup() {
                 className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
+
+            {isTv && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-muted-foreground" />
+                  Invoca Tracking Number (on-screen)
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={e => setTrackingNumber(e.target.value)}
+                  placeholder="(833) 555-0142"
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+            )}
+
+
 
             {/* Record toggle */}
             <div className="flex items-center justify-between py-2">

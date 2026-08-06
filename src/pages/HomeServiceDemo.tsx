@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
+import HomeServiceTvAd from '@/components/home-service/HomeServiceTvAd';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
 
@@ -10,7 +11,9 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals } = (location.state as any) || {};
+  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals, channel, trackingNumber } = (location.state as any) || {};
+  const isTv = channel === 'tv';
+
 
   const [step, setStep] = useState<Step>('google');
   const [isRecording, setIsRecording] = useState(false);
@@ -50,14 +53,27 @@ export default function HomeServiceDemo() {
 
       <AnimatePresence mode="wait">
         {step === 'google' && (
-          <HomeServiceGoogle
-            key="google"
-            domain={domain}
-            companyName={displayName}
-            onClickAd={() => setStep('website')}
-            scrapedAd={scrapedAd}
-          />
+          isTv ? (
+            <HomeServiceTvAd
+              key="tv"
+              companyName={displayName}
+              domain={domain}
+              industry={industry}
+              trackingNumber={trackingNumber || '(833) 555-0142'}
+              tagline={scrapedAd?.description}
+              onCall={() => setStep('website')}
+            />
+          ) : (
+            <HomeServiceGoogle
+              key="google"
+              domain={domain}
+              companyName={displayName}
+              onClickAd={() => setStep('website')}
+              scrapedAd={scrapedAd}
+            />
+          )
         )}
+
         {step === 'website' && (
           <HomeServiceWebsite
             key="website"
