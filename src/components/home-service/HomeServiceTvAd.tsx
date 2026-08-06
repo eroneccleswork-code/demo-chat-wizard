@@ -160,13 +160,14 @@ export default function HomeServiceTvAd({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'Enter') {
         if (phase === 'preroll') { setPhase('spot'); return; }
+        if (!swapped) { setSwapped(true); return; }
         setDialing(true);
       }
       if (e.key === ' ') { e.preventDefault(); setPlaying(p => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase]);
+  }, [phase, swapped]);
 
   const remaining = Math.max(0, Math.ceil(SPOT_SECONDS - t));
   const pct = (t / SPOT_SECONDS) * 100;
