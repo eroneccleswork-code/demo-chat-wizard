@@ -8,11 +8,15 @@ import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string } | null) || {};
+  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string; channel?: 'search' | 'tv' } | null) || {};
   const industry = preset.industry || 'Home Services';
+  const channel = preset.channel || 'search';
+  const isTv = channel === 'tv';
   const isHealthcare = industry.toLowerCase().includes('health');
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
+  const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
+
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
   const [showCustomSignals, setShowCustomSignals] = useState(false);
