@@ -155,15 +155,20 @@ export default function HomeServiceTvAd({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'Enter') setDialing(true);
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (phase === 'preroll') { setPhase('spot'); return; }
+        setDialing(true);
+      }
       if (e.key === ' ') { e.preventDefault(); setPlaying(p => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [phase]);
 
   const remaining = Math.max(0, Math.ceil(SPOT_SECONDS - t));
   const pct = (t / SPOT_SECONDS) * 100;
+  const prerollIdx = PREROLL_SCENES.reduce((acc, s, i) => (pt >= s.at ? i : acc), 0);
+  const prerollScene = PREROLL_SCENES[prerollIdx];
 
   return (
     <motion.div
