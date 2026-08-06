@@ -60,6 +60,7 @@ export default function HomeServiceDemo() {
               domain={domain}
               industry={industry}
               trackingNumber={trackingNumber || '(833) 555-0142'}
+              originalNumber={originalNumber || '(505) 555-0198'}
               tagline={scrapedAd?.description}
               branding={branding}
               onCall={() => setStep('website')}
