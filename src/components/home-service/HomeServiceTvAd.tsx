@@ -14,6 +14,28 @@ interface Props {
 }
 
 const SPOT_SECONDS = 30;
+const PREROLL_SECONDS = 12;
+
+const PREROLL_SCENES = [
+  {
+    at: 0,
+    kicker: 'KASA FOX 2 · Albuquerque',
+    headline: 'News at 6 will return',
+    sub: 'Stay with FOX 2 New Mexico for weather on the nines.',
+  },
+  {
+    at: 4,
+    kicker: 'Paid Advertisement',
+    headline: 'Sandia Peak Auto Group',
+    sub: '0% APR for 60 months on all 2026 models. Se habla español.',
+  },
+  {
+    at: 8,
+    kicker: 'Coming up next',
+    headline: 'Albuquerque Weather Authority',
+    sub: 'Your seven-day forecast, after these messages.',
+  },
+];
 
 function hexOrFallback(v: string | undefined, fallback: string) {
   return v && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim()) ? v.trim() : fallback;
@@ -28,6 +50,8 @@ export default function HomeServiceTvAd({
   branding,
   onCall,
 }: Props) {
+  const [phase, setPhase] = useState<'preroll' | 'spot'>('preroll');
+  const [pt, setPt] = useState(0);
   const [t, setT] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(false);
@@ -77,9 +101,31 @@ export default function HomeServiceTvAd({
   const activeIdx = scenes.reduce((acc, s, i) => (t >= s.at ? i : acc), 0);
   const active = scenes[activeIdx];
 
+  // Pre-roll clock (local station break before the brand spot)
+  useEffect(() => {
+    if (phase !== 'preroll' || !playing) return;
+    let last = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const dt = (now - last) / 1000;
+      last = now;
+      setPt(prev => {
+        const next = prev + dt;
+        if (next >= PREROLL_SECONDS) {
+          setPhase('spot');
+          return PREROLL_SECONDS;
+        }
+        return next;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [phase, playing]);
+
   // Playback clock
   useEffect(() => {
-    if (!playing || dialing) return;
+    if (phase !== 'spot' || !playing || dialing) return;
     let last = performance.now();
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
@@ -89,7 +135,7 @@ export default function HomeServiceTvAd({
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [playing, dialing]);
+  }, [phase, playing, dialing]);
 
   // Dial animation then hand off to the call
   useEffect(() => {
@@ -109,15 +155,20 @@ export default function HomeServiceTvAd({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight' || e.key === 'Enter') setDialing(true);
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (phase === 'preroll') { setPhase('spot'); return; }
+        setDialing(true);
+      }
       if (e.key === ' ') { e.preventDefault(); setPlaying(p => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [phase]);
 
   const remaining = Math.max(0, Math.ceil(SPOT_SECONDS - t));
   const pct = (t / SPOT_SECONDS) * 100;
+  const prerollIdx = PREROLL_SCENES.reduce((acc, s, i) => (pt >= s.at ? i : acc), 0);
+  const prerollScene = PREROLL_SCENES[prerollIdx];
 
   return (
     <motion.div
@@ -135,6 +186,72 @@ export default function HomeServiceTvAd({
             className="relative aspect-video w-full overflow-hidden rounded-[14px]"
             style={{ background: `linear-gradient(135deg, ${brand.primary} 0%, ${brand.secondary} 60%, ${brand.primary} 100%)` }}
           >
+            {/* Pre-roll: local station break */}
+            <AnimatePresence>
+              {phase === 'preroll' && (
+                <motion.div
+                  key="preroll"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 z-30 bg-[#0a0d14] flex flex-col"
+                  style={{ fontFamily: 'system-ui, sans-serif' }}
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#1b2a4a,transparent_60%),radial-gradient(circle_at_75%_80%,#3a1220,transparent_55%)]" />
+                  <motion.div
+                    animate={{ x: ['-30%', '130%'] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                    className="absolute inset-y-0 w-1/4 bg-white/5 blur-2xl pointer-events-none"
+                  />
+
+                  {/* Station bug */}
+                  <div className="absolute top-4 left-5 flex items-center gap-2">
+                    <span className="px-2 py-1 rounded bg-[#1b3a8f] text-white text-[13px] font-black tracking-tight">FOX</span>
+                    <span className="text-white text-[13px] font-bold tracking-wide">2</span>
+                    <span className="text-white/50 text-[10px] uppercase tracking-[0.22em]">KASA · Albuquerque, NM</span>
+                  </div>
+                  <div className="absolute top-4 right-5 flex items-center gap-3 text-white/60 text-xs tabular-nums">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> LIVE
+                    </span>
+                    <span>Ad break :{String(Math.max(0, Math.ceil(PREROLL_SECONDS - pt))).padStart(2, '0')}</span>
+                  </div>
+
+                  <div className="relative flex-1 flex flex-col items-center justify-center text-center px-10">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={prerollIdx}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.4 }}
+                      >
+                        <p className="text-white/50 text-[11px] uppercase tracking-[0.3em] mb-3">{prerollScene.kicker}</p>
+                        <p className="text-white text-3xl md:text-4xl font-black tracking-tight">{prerollScene.headline}</p>
+                        <p className="text-white/60 text-base mt-3 max-w-xl mx-auto">{prerollScene.sub}</p>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="relative px-6 pb-5">
+                    <div className="flex items-center justify-between">
+                      <p className="text-white/40 text-[11px]">Your spot airs next</p>
+                      <button
+                        onClick={() => setPhase('spot')}
+                        className="text-white/70 hover:text-white text-xs border border-white/20 rounded-full px-3 py-1.5 transition-colors"
+                      >
+                        Skip ad break →
+                      </button>
+                    </div>
+                    <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden mt-3">
+                      <div className="h-full rounded-full bg-white/50" style={{ width: `${(pt / PREROLL_SECONDS) * 100}%` }} />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Brand backdrop */}
             {backdrop && (
               <img
