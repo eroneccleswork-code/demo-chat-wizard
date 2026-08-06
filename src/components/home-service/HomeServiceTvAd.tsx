@@ -159,6 +159,14 @@ export default function HomeServiceTvAd({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (!started) {
+        if (e.key === 'ArrowRight' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setStarted(true);
+          setPlaying(true);
+        }
+        return;
+      }
       if (e.key === 'ArrowRight' || e.key === 'Enter') {
         if (phase === 'preroll') { setPhase('spot'); return; }
         if (!swapped) { setSwapped(true); return; }
@@ -168,7 +176,8 @@ export default function HomeServiceTvAd({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase, swapped]);
+  }, [phase, swapped, started]);
+
 
   const remaining = Math.max(0, Math.ceil(SPOT_SECONDS - t));
   const pct = (t / SPOT_SECONDS) * 100;
