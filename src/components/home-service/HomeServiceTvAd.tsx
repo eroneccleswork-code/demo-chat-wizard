@@ -181,9 +181,9 @@ export default function HomeServiceTvAd({
     >
       <div className="w-full max-w-5xl">
         {/* TV bezel */}
-        <div className="rounded-[22px] bg-[#15191f] p-3 shadow-[0_40px_100px_rgba(0,0,0,0.7)] border border-white/10">
+        <div className="rounded-[26px] bg-gradient-to-b from-[#20252c] via-[#12161b] to-[#0b0e12] p-2.5 pb-2 shadow-[0_50px_120px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.12)] border border-black/60 ring-1 ring-white/5">
           <div
-            className="relative aspect-video w-full overflow-hidden rounded-[14px]"
+            className="relative aspect-video w-full overflow-hidden rounded-[16px] ring-1 ring-black/80 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.6)]"
             style={{ background: `linear-gradient(135deg, ${brand.primary} 0%, ${brand.secondary} 60%, ${brand.primary} 100%)` }}
           >
             {/* Pre-roll: local station break */}
@@ -234,7 +234,7 @@ export default function HomeServiceTvAd({
                     </AnimatePresence>
                   </div>
 
-                  <div className="relative px-6 pb-5">
+                  <div className="relative px-6 pb-6">
                     <div className="flex items-center justify-between">
                       <p className="text-white/40 text-[11px]">Your spot airs next</p>
                       <button
@@ -244,10 +244,8 @@ export default function HomeServiceTvAd({
                         Skip ad break →
                       </button>
                     </div>
-                    <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden mt-3">
-                      <div className="h-full rounded-full bg-white/50" style={{ width: `${(pt / PREROLL_SECONDS) * 100}%` }} />
-                    </div>
                   </div>
+
                 </motion.div>
               )}
             </AnimatePresence>
@@ -358,49 +356,38 @@ export default function HomeServiceTvAd({
                 </motion.div>
               )}
             </AnimatePresence>
+            {/* Glass reflection + subtle scanlines */}
+            <div className="pointer-events-none absolute inset-0 z-40 bg-[linear-gradient(115deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.03)_18%,transparent_38%)]" />
+            <div className="pointer-events-none absolute inset-0 z-40 opacity-[0.06] bg-[repeating-linear-gradient(180deg,#fff_0px,#fff_1px,transparent_1px,transparent_3px)]" />
+            <div className="pointer-events-none absolute inset-0 z-40 shadow-[inset_0_0_120px_rgba(0,0,0,0.55)]" />
           </div>
 
-          {/* Player controls */}
-          <div className="px-3 pt-3 pb-1">
-            <div className="h-1.5 w-full rounded-full bg-white/10 overflow-hidden cursor-pointer"
-              onClick={e => {
-                const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                setT(((e.clientX - rect.left) / rect.width) * SPOT_SECONDS);
-              }}
-            >
-              <div className="h-full rounded-full" style={{ width: `${pct}%`, background: brand.accent }} />
-            </div>
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex items-center gap-3">
-                <button onClick={() => setPlaying(p => !p)} className="text-white/80 hover:text-white transition-colors">
-                  {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                </button>
-                <button onClick={() => setMuted(m => !m)} className="text-white/80 hover:text-white transition-colors">
-                  {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </button>
-                <div className="flex items-center gap-1.5 ml-2">
-                  {scenes.map((s, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setT(s.at)}
-                      className={`h-1.5 rounded-full transition-all ${i === activeIdx ? 'w-6' : 'w-3 bg-white/25'}`}
-                      style={i === activeIdx ? { background: brand.accent } : undefined}
-                      aria-label={`Scene ${i + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-              <span className="text-white/40 text-[11px] tabular-nums">
-                00:{String(Math.floor(t)).padStart(2, '0')} / 00:{SPOT_SECONDS}
-              </span>
+          {/* Bezel chin */}
+          <div className="flex items-center justify-between px-2 pt-3 pb-1">
+            <span className="text-white/25 text-[11px] font-semibold tracking-[0.35em] uppercase">Vistara</span>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setPlaying(p => !p)} className="text-white/40 hover:text-white/80 transition-colors">
+                {playing ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+              </button>
+              <button onClick={() => setMuted(m => !m)} className="text-white/40 hover:text-white/80 transition-colors">
+                {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+              </button>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)]" />
             </div>
           </div>
         </div>
 
-        <p className="text-center text-white/40 text-xs mt-5">
+        {/* TV stand */}
+        <div className="flex flex-col items-center">
+          <div className="w-28 h-5 bg-gradient-to-b from-[#15191f] to-[#0d1116] rounded-b-md" />
+          <div className="w-72 h-2.5 rounded-full bg-gradient-to-b from-[#1b2027] to-[#0a0d11] shadow-[0_18px_40px_rgba(0,0,0,0.7)]" />
+        </div>
+
+        <p className="text-center text-white/40 text-xs mt-6">
           Click the on-screen number to place the call (space = play/pause, → = call now).
         </p>
       </div>
+
     </motion.div>
   );
 }
