@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
-import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
+import { analyzeCompanyWebsite, fetchBranding } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ export default function HomeServiceSetup() {
   const industry = preset.industry || 'Home Services';
   const channel = preset.channel || 'search';
   const isTv = channel === 'tv';
-  const isHealthcare = industry.toLowerCase().includes('health');
+  const isHealthcare = /health|dental/i.test(industry);
+  const verticalLabel = /dental/i.test(industry) ? 'Dental' : isHealthcare ? 'Healthcare' : 'Home Service';
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
   const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
@@ -32,7 +33,10 @@ export default function HomeServiceSetup() {
     if (!isValid) return;
     setIsLaunching(true);
 
-    const analysis = await analyzeCompanyWebsite(websiteUrl, companyName, industry);
+    const [analysis, branding] = await Promise.all([
+      analyzeCompanyWebsite(websiteUrl, companyName, industry),
+      isTv ? fetchBranding(websiteUrl) : Promise.resolve(null),
+    ]);
 
     navigate('/home-service-demo', {
       state: {
@@ -43,6 +47,7 @@ export default function HomeServiceSetup() {
         trackingNumber,
         enableRecording,
         scrapedAd: analysis.scrapedAd,
+        branding,
         customSignals: activeCustom,
       },
     });
@@ -70,7 +75,7 @@ export default function HomeServiceSetup() {
           >
             <InvocaLogo size="lg" className="mb-3" />
             <span className="text-sm font-semibold text-primary">
-              IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}{isTv ? ' · TV' : ''}
+              IFM for {verticalLabel}{isTv ? ' · TV' : ''}
             </span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">

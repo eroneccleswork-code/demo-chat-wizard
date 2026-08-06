@@ -10,9 +10,46 @@ export interface ScrapeResult {
   websiteMarkdown: string;
 }
 
+export interface BrandProfile {
+  logo?: string;
+  favicon?: string;
+  ogImage?: string;
+  colors?: {
+    primary?: string;
+    secondary?: string;
+    accent?: string;
+    background?: string;
+    textPrimary?: string;
+    textSecondary?: string;
+  };
+  fontFamily?: string;
+}
+
 export interface SetupAnalysis {
   scrapedAd: ScrapeResult['scrapedAd'];
   aiQuestions: string[];
+  branding: BrandProfile | null;
+}
+
+export async function fetchBranding(websiteUrl: string): Promise<BrandProfile | null> {
+  try {
+    const brandingPromise = firecrawlApi.scrape(websiteUrl, { formats: ['branding'] });
+    const timeoutPromise = new Promise<any>((resolve) =>
+      setTimeout(() => resolve({ success: false }), 20000)
+    );
+    const res: any = await Promise.race([brandingPromise, timeoutPromise]);
+    const b = res?.branding || res?.data?.branding;
+    if (!b) return null;
+    return {
+      logo: b.images?.logo || b.logo,
+      favicon: b.images?.favicon,
+      ogImage: b.images?.ogImage,
+      colors: b.colors,
+      fontFamily: b.typography?.fontFamilies?.heading || b.fonts?.[0]?.family,
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function analyzeCompanyWebsite(
@@ -80,5 +117,5 @@ export async function analyzeCompanyWebsite(
     console.warn('Failed to generate AI questions, using defaults:', err);
   }
 
-  return { scrapedAd, aiQuestions };
+  return { scrapedAd, aiQuestions, branding: null };
 }

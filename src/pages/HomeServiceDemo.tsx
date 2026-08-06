@@ -11,7 +11,7 @@ type Step = 'google' | 'website';
 export default function HomeServiceDemo() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals, channel, trackingNumber } = (location.state as any) || {};
+  const { websiteUrl, companyName: passedName, industry, enableRecording, scrapedAd, customSignals, channel, trackingNumber, branding } = (location.state as any) || {};
   const isTv = channel === 'tv';
 
 
@@ -61,6 +61,7 @@ export default function HomeServiceDemo() {
               industry={industry}
               trackingNumber={trackingNumber || '(833) 555-0142'}
               tagline={scrapedAd?.description}
+              branding={branding}
               onCall={() => setStep('website')}
             />
           ) : (

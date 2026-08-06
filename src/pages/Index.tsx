@@ -30,6 +30,17 @@ const USE_CASES = [
   },
 
   {
+    label: 'IFM for Dental | TV Ad',
+    active: true,
+    path: '/home-service-setup' as const,
+    state: {
+      industry: 'Dental',
+      companyName: 'Bright Smile Dental',
+      websiteUrl: 'https://www.aspendental.com',
+      channel: 'tv',
+    },
+  },
+  {
     label: 'IFM for Home Service',
     active: true,
     path: '/home-service-setup' as const,
