@@ -14,6 +14,28 @@ interface Props {
 }
 
 const SPOT_SECONDS = 30;
+const PREROLL_SECONDS = 12;
+
+const PREROLL_SCENES = [
+  {
+    at: 0,
+    kicker: 'KASA FOX 2 · Albuquerque',
+    headline: 'News at 6 will return',
+    sub: 'Stay with FOX 2 New Mexico for weather on the nines.',
+  },
+  {
+    at: 4,
+    kicker: 'Paid Advertisement',
+    headline: 'Sandia Peak Auto Group',
+    sub: '0% APR for 60 months on all 2026 models. Se habla español.',
+  },
+  {
+    at: 8,
+    kicker: 'Coming up next',
+    headline: 'Albuquerque Weather Authority',
+    sub: 'Your seven-day forecast, after these messages.',
+  },
+];
 
 function hexOrFallback(v: string | undefined, fallback: string) {
   return v && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim()) ? v.trim() : fallback;
