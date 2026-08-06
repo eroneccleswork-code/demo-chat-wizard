@@ -12,7 +12,8 @@ export default function HomeServiceSetup() {
   const industry = preset.industry || 'Home Services';
   const channel = preset.channel || 'search';
   const isTv = channel === 'tv';
-  const isHealthcare = industry.toLowerCase().includes('health');
+  const isHealthcare = /health|dental/i.test(industry);
+  const verticalLabel = /dental/i.test(industry) ? 'Dental' : isHealthcare ? 'Healthcare' : 'Home Service';
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
   const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
@@ -74,7 +75,7 @@ export default function HomeServiceSetup() {
           >
             <InvocaLogo size="lg" className="mb-3" />
             <span className="text-sm font-semibold text-primary">
-              IFM for {isHealthcare ? 'Healthcare' : 'Home Service'}{isTv ? ' · TV' : ''}
+              IFM for {verticalLabel}{isTv ? ' · TV' : ''}
             </span>
           </motion.div>
           <h1 className="text-3xl font-semibold tracking-tight mb-2">
