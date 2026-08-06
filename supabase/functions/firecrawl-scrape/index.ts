@@ -38,7 +38,9 @@ Deno.serve(async (req) => {
 
     let response: Response;
     try {
-      response = await fetch('https://api.firecrawl.dev/v1/scrape', {
+      const formats = options?.formats || ['markdown'];
+      const useV2 = formats.some((f: any) => typeof f === 'string' && ['branding', 'summary'].includes(f));
+      response = await fetch(`https://api.firecrawl.dev/${useV2 ? 'v2' : 'v1'}/scrape`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -46,7 +48,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           url: formattedUrl,
-          formats: options?.formats || ['markdown'],
+          formats,
           onlyMainContent: options?.onlyMainContent ?? true,
           waitFor: options?.waitFor,
           location: options?.location,
