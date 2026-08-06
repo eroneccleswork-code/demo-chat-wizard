@@ -39,11 +39,14 @@ export default function HomeServiceSetup() {
         websiteUrl,
         companyName,
         industry,
+        channel,
+        trackingNumber,
         enableRecording,
         scrapedAd: analysis.scrapedAd,
         customSignals: activeCustom,
       },
     });
+
   };
 
   return (
