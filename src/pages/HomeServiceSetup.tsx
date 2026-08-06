@@ -120,6 +120,24 @@ export default function HomeServiceSetup() {
               />
             </div>
 
+            {isTv && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-muted-foreground" />
+                  Invoca Tracking Number (on-screen)
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={e => setTrackingNumber(e.target.value)}
+                  placeholder="(833) 555-0142"
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+            )}
+
+
+
             {/* Record toggle */}
             <div className="flex items-center justify-between py-2">
               <label className="text-sm font-medium flex items-center gap-2">
