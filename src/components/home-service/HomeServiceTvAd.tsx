@@ -8,6 +8,7 @@ interface Props {
   domain: string;
   industry?: string;
   trackingNumber: string;
+  originalNumber?: string;
   tagline?: string;
   branding?: BrandProfile | null;
   onCall: () => void;
