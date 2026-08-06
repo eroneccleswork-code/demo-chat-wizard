@@ -190,7 +190,33 @@ export default function HomeServiceTvAd({
             className="relative aspect-video w-full overflow-hidden rounded-[16px] ring-1 ring-black/80 shadow-[inset_0_0_0_2px_rgba(0,0,0,0.6)]"
             style={{ background: `linear-gradient(135deg, ${brand.primary} 0%, ${brand.secondary} 60%, ${brand.primary} 100%)` }}
           >
+            {/* Start gate: click play to launch the broadcast */}
+            <AnimatePresence>
+              {!started && (
+                <motion.div
+                  key="start-gate"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-[#05070a]"
+                >
+                  <p className="text-white/40 text-[11px] uppercase tracking-[0.32em]">Live broadcast · Commercial break</p>
+                  <motion.button
+                    onClick={() => { setStarted(true); setPlaying(true); }}
+                    whileHover={{ scale: 1.06 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="flex items-center justify-center w-20 h-20 rounded-full bg-white/10 ring-1 ring-white/25 backdrop-blur-sm"
+                    aria-label="Play"
+                  >
+                    <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
+                  </motion.button>
+                  <p className="text-white/30 text-xs">Press play to start</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Pre-roll: local station break */}
+
             <AnimatePresence>
               {phase === 'preroll' && (
                 <motion.div
