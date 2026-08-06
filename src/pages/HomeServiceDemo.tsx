@@ -53,14 +53,27 @@ export default function HomeServiceDemo() {
 
       <AnimatePresence mode="wait">
         {step === 'google' && (
-          <HomeServiceGoogle
-            key="google"
-            domain={domain}
-            companyName={displayName}
-            onClickAd={() => setStep('website')}
-            scrapedAd={scrapedAd}
-          />
+          isTv ? (
+            <HomeServiceTvAd
+              key="tv"
+              companyName={displayName}
+              domain={domain}
+              industry={industry}
+              trackingNumber={trackingNumber || '(833) 555-0142'}
+              tagline={scrapedAd?.description}
+              onCall={() => setStep('website')}
+            />
+          ) : (
+            <HomeServiceGoogle
+              key="google"
+              domain={domain}
+              companyName={displayName}
+              onClickAd={() => setStep('website')}
+              scrapedAd={scrapedAd}
+            />
+          )
         )}
+
         {step === 'website' && (
           <HomeServiceWebsite
             key="website"
