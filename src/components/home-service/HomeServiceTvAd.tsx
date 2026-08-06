@@ -234,7 +234,7 @@ export default function HomeServiceTvAd({
                     </AnimatePresence>
                   </div>
 
-                  <div className="relative px-6 pb-5">
+                  <div className="relative px-6 pb-6">
                     <div className="flex items-center justify-between">
                       <p className="text-white/40 text-[11px]">Your spot airs next</p>
                       <button
@@ -244,10 +244,8 @@ export default function HomeServiceTvAd({
                         Skip ad break →
                       </button>
                     </div>
-                    <div className="h-1 w-full rounded-full bg-white/10 overflow-hidden mt-3">
-                      <div className="h-full rounded-full bg-white/50" style={{ width: `${(pt / PREROLL_SECONDS) * 100}%` }} />
-                    </div>
                   </div>
+
                 </motion.div>
               )}
             </AnimatePresence>
