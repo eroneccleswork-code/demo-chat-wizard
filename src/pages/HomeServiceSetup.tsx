@@ -17,6 +17,7 @@ export default function HomeServiceSetup() {
   const [websiteUrl, setWebsiteUrl] = useState(preset.websiteUrl || 'https://www.renewalbyandersen.com');
   const [companyName, setCompanyName] = useState(preset.companyName || 'Renewal by Andersen');
   const [trackingNumber, setTrackingNumber] = useState('(833) 555-0142');
+  const [originalNumber, setOriginalNumber] = useState('(505) 555-0198');
 
   const [enableRecording, setEnableRecording] = useState(false);
   const [isLaunching, setIsLaunching] = useState(false);
@@ -45,6 +46,7 @@ export default function HomeServiceSetup() {
         industry,
         channel,
         trackingNumber,
+        originalNumber,
         enableRecording,
         scrapedAd: analysis.scrapedAd,
         branding,
@@ -136,6 +138,22 @@ export default function HomeServiceSetup() {
                   value={trackingNumber}
                   onChange={e => setTrackingNumber(e.target.value)}
                   placeholder="(833) 555-0142"
+                  className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+            )}
+
+            {isTv && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Tv className="w-4 h-4 text-muted-foreground" />
+                  Business Number (before tracking)
+                </label>
+                <input
+                  type="text"
+                  value={originalNumber}
+                  onChange={e => setOriginalNumber(e.target.value)}
+                  placeholder="(505) 555-0198"
                   className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>

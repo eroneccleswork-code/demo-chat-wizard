@@ -8,6 +8,7 @@ interface Props {
   domain: string;
   industry?: string;
   trackingNumber: string;
+  originalNumber?: string;
   tagline?: string;
   branding?: BrandProfile | null;
   onCall: () => void;
@@ -46,10 +47,12 @@ export default function HomeServiceTvAd({
   domain,
   industry,
   trackingNumber,
+  originalNumber = '(505) 555-0198',
   tagline,
   branding,
   onCall,
 }: Props) {
+  const [swapped, setSwapped] = useState(false);
   const [phase, setPhase] = useState<'preroll' | 'spot'>('preroll');
   const [pt, setPt] = useState(0);
   const [t, setT] = useState(0);
@@ -157,13 +160,14 @@ export default function HomeServiceTvAd({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight' || e.key === 'Enter') {
         if (phase === 'preroll') { setPhase('spot'); return; }
+        if (!swapped) { setSwapped(true); return; }
         setDialing(true);
       }
       if (e.key === ' ') { e.preventDefault(); setPlaying(p => !p); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [phase]);
+  }, [phase, swapped]);
 
   const remaining = Math.max(0, Math.ceil(SPOT_SECONDS - t));
   const pct = (t / SPOT_SECONDS) * 100;
@@ -305,33 +309,62 @@ export default function HomeServiceTvAd({
               </AnimatePresence>
             </div>
 
-            {/* Lower third with Invoca tracking number */}
+            {/* Lower third: business number swaps to Invoca tracking number */}
             <div className="absolute bottom-0 left-0 right-0">
               <div className="bg-gradient-to-t from-black/85 to-transparent pt-20 pb-5 px-6">
                 <div className="flex items-end justify-between gap-6">
                   <div>
-                    <p className="text-white/60 text-[11px] uppercase tracking-[0.22em] mb-1">Call now</p>
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={swapped ? 'lbl-tracked' : 'lbl-orig'}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-white/60 text-[11px] uppercase tracking-[0.22em] mb-1"
+                      >
+                        {swapped ? 'Invoca tracking number' : 'Call now'}
+                      </motion.p>
+                    </AnimatePresence>
                     <motion.button
-                      onClick={() => setDialing(true)}
+                      onClick={() => (swapped ? setDialing(true) : setSwapped(true))}
                       whileHover={{ scale: 1.03 }}
                       whileTap={{ scale: 0.98 }}
                       animate={{ opacity: [1, 0.72, 1] }}
                       transition={{ opacity: { duration: 1.6, repeat: Infinity } }}
                       className="flex items-center gap-3 text-white"
                     >
-                      <span className="flex items-center justify-center w-11 h-11 rounded-full" style={{ background: brand.accent }}>
+                      <span
+                        className="flex items-center justify-center w-11 h-11 rounded-full transition-colors"
+                        style={{ background: swapped ? brand.accent : 'rgba(255,255,255,0.2)' }}
+                      >
                         <Phone className="w-5 h-5 text-white" />
                       </span>
-                      <span className="text-3xl md:text-[42px] font-black tracking-wider tabular-nums">{trackingNumber}</span>
+                      <span className="relative block h-[46px] md:h-[54px] overflow-hidden">
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.span
+                            key={swapped ? 'tracked' : 'orig'}
+                            initial={{ y: 40, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -40, opacity: 0 }}
+                            transition={{ duration: 0.35 }}
+                            className="block text-3xl md:text-[42px] leading-[46px] md:leading-[54px] font-black tracking-wider tabular-nums"
+                          >
+                            {swapped ? trackingNumber : originalNumber}
+                          </motion.span>
+                        </AnimatePresence>
+                      </span>
                     </motion.button>
                   </div>
                   <div className="text-right">
                     <p className="text-white/90 text-sm font-semibold">{domain}</p>
-                    <p className="text-white/45 text-[11px] mt-1">Invoca tracking number · TV attribution</p>
+                    <p className="text-white/45 text-[11px] mt-1">
+                      {swapped ? 'Invoca tracking number · TV attribution' : 'Click the number to insert Invoca tracking'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
+
 
             {/* Dialing overlay */}
             <AnimatePresence>
