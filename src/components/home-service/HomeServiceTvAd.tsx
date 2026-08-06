@@ -47,10 +47,12 @@ export default function HomeServiceTvAd({
   domain,
   industry,
   trackingNumber,
+  originalNumber = '(505) 555-0198',
   tagline,
   branding,
   onCall,
 }: Props) {
+  const [swapped, setSwapped] = useState(false);
   const [phase, setPhase] = useState<'preroll' | 'spot'>('preroll');
   const [pt, setPt] = useState(0);
   const [t, setT] = useState(0);
