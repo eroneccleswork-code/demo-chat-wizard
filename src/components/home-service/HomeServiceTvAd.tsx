@@ -50,6 +50,8 @@ export default function HomeServiceTvAd({
   branding,
   onCall,
 }: Props) {
+  const [phase, setPhase] = useState<'preroll' | 'spot'>('preroll');
+  const [pt, setPt] = useState(0);
   const [t, setT] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(false);
