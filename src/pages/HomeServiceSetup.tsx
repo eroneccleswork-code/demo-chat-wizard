@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
-import { analyzeCompanyWebsite } from '@/lib/setup-analysis';
+import { analyzeCompanyWebsite, fetchBranding } from '@/lib/setup-analysis';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
@@ -32,7 +32,10 @@ export default function HomeServiceSetup() {
     if (!isValid) return;
     setIsLaunching(true);
 
-    const analysis = await analyzeCompanyWebsite(websiteUrl, companyName, industry);
+    const [analysis, branding] = await Promise.all([
+      analyzeCompanyWebsite(websiteUrl, companyName, industry),
+      isTv ? fetchBranding(websiteUrl) : Promise.resolve(null),
+    ]);
 
     navigate('/home-service-demo', {
       state: {
@@ -43,6 +46,7 @@ export default function HomeServiceSetup() {
         trackingNumber,
         enableRecording,
         scrapedAd: analysis.scrapedAd,
+        branding,
         customSignals: activeCustom,
       },
     });
