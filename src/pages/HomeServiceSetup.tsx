@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
