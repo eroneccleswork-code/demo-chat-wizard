@@ -1,59 +1,10 @@
 import { useMemo, useState } from 'react';
+import { buildLeads, jobsFor, TRUTH_LABEL, type Lead } from '@/lib/lsa-leads';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Bell, ChevronDown, Search, Play, Check, X, Sparkles, ArrowRight } from 'lucide-react';
 
 type Mode = 'manual' | 'invoca';
-
-interface Lead {
-  id: string;
-  name: string;
-  jobType: string;
-  location: string;
-  completed: string;
-  leadType: 'Phone' | 'Message';
-  chargeStatus: string;
-  received: string;
-  lastActivity: string;
-  duration: string;
-  /** what Invoca knows that the LSA console does not */
-  truth: 'booked' | 'qualified' | 'spam' | 'existing' | 'not-serviceable';
-}
-
-const HOME_JOBS = ['Roof repair', 'Roof installation', 'Drain cleaning', 'Water heater repair', 'AC tune-up', 'Garbage disposal repair', 'Leak detection', 'Furnace repair'];
-
-const NAMES = [
-  'Marcus Webb', 'Dana Ruiz', 'Priya Natarajan', 'Tom Callahan', 'Elaine Foster',
-  'Jordan Mireles', 'Sofia Bennett', 'Ray Okafor', 'Hannah Lindqvist', 'Victor Pham',
-  'Cheryl Dawson', 'Andre Salas',
-];
-
-const TRUTHS: Lead['truth'][] = ['booked', 'qualified', 'spam', 'booked', 'existing', 'qualified', 'spam', 'booked', 'not-serviceable', 'qualified', 'booked', 'spam'];
-
-function buildLeads(jobs: string[]): Lead[] {
-  const dates = ['Mar 29', 'Mar 29', 'Mar 29', 'Mar 28', 'Mar 28', 'Mar 27', 'Mar 27', 'Mar 26', 'Mar 26', 'Feb 21', 'Mar 12', 'Mar 11'];
-  return NAMES.map((name, i) => ({
-    id: `lead-${i}`,
-    name,
-    jobType: i % 5 === 3 ? '-' : jobs[i % jobs.length],
-    location: '-',
-    completed: dates[i],
-    leadType: i === 10 ? 'Message' : 'Phone',
-    chargeStatus: 'Charged',
-    received: dates[Math.min(i + 1, dates.length - 1)],
-    lastActivity: dates[i],
-    duration: ['4:12', '0:38', '6:47', '2:05', '0:22', '5:31', '1:14', '7:02', '0:51', '3:44', '—', '0:19'][i],
-    truth: TRUTHS[i],
-  }));
-}
-
-const TRUTH_LABEL: Record<Lead['truth'], { label: string; tone: string }> = {
-  booked: { label: 'Appointment Booked', tone: 'bg-[#E6F4EA] text-[#137333]' },
-  qualified: { label: 'Qualified Lead', tone: 'bg-[#E8F0FE] text-[#1967D2]' },
-  spam: { label: 'Spam — dispute filed', tone: 'bg-[#FCE8E6] text-[#C5221F]' },
-  existing: { label: 'Existing customer — dispute filed', tone: 'bg-[#FEF7E0] text-[#B06000]' },
-  'not-serviceable': { label: 'Out of area — dispute filed', tone: 'bg-[#FEF7E0] text-[#B06000]' },
-};
 
 export default function LsaLeads() {
   const location = useLocation();
@@ -62,11 +13,7 @@ export default function LsaLeads() {
   const companyName: string = state.companyName || 'Sherlock Plumbing';
   const industry: string = state.industry || 'Home Services';
 
-  const jobs = useMemo(() => {
-    if (/dental/i.test(industry)) return ['New patient exam', 'Cleaning', 'Emergency visit', 'Whitening consult', 'Implant consult'];
-    if (/health/i.test(industry)) return ['New patient visit', 'Specialist referral', 'Urgent care', 'Annual physical'];
-    return HOME_JOBS;
-  }, [industry]);
+  const jobs = useMemo(() => jobsFor(industry), [industry]);
 
   const leads = useMemo(() => buildLeads(jobs), [jobs]);
 
@@ -235,10 +182,10 @@ export default function LsaLeads() {
             : 'Invoca listens to each call and files the disputes for you.'}
         </span>
         <button
-          onClick={() => navigate('/invoca', { state: { companyName, industry } })}
+          onClick={() => navigate('/invoca/lsa-report', { state: { companyName, industry, customSignals: state.customSignals } })}
           className="flex items-center gap-2 text-sm text-[#1A73E8] hover:underline"
         >
-          Continue to Invoca <ArrowRight className="w-4 h-4" />
+          See these leads in Invoca <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>

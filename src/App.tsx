@@ -19,6 +19,7 @@ import VoiceDemo from "./pages/VoiceDemo.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import LsaLeads from "./pages/LsaLeads.tsx";
 import InvocaDashboard from "./pages/invoca/InvocaDashboard.tsx";
+import InvocaLsaReport from "./pages/invoca/InvocaLsaReport";
 import InvocaCallReport from "./pages/invoca/InvocaCallReport.tsx";
 import InvocaCallReview from "./pages/invoca/InvocaCallReview.tsx";
 import InvocaIntegrations from "./pages/invoca/InvocaIntegrations.tsx";
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/voice-demo" element={<VoiceDemo />} />
             <Route path="/lsa-leads" element={<LsaLeads />} />
             <Route path="/invoca" element={<InvocaDashboard />} />
+            <Route path="/invoca/lsa-report" element={<InvocaLsaReport />} />
             <Route path="/invoca/call-report" element={<InvocaCallReport />} />
             <Route path="/invoca/call-review" element={<InvocaCallReview />} />
             <Route path="/invoca/integrations" element={<InvocaIntegrations />} />
