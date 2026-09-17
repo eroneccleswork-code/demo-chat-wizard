@@ -19,7 +19,7 @@ interface Props {
   companyName: string;
   industry?: string;
   onClickAd: () => void;
-  scrapedAd?: { description?: string; metaTitle?: string } | null;
+  scrapedAd?: { description?: string; metaTitle?: string; sitelinks?: string[] } | null;
 }
 
 const GoogleLogo = ({ className }: { className?: string }) => (
@@ -38,13 +38,14 @@ const AVATAR_COLORS = ['#1a73e8', '#188038', '#c5221f', '#e37400', '#7b1fa2', '#
 const LOGO_CACHE_KEY = 'lsa-logo-status-v1';
 const loadedLogoUrls = new Set<string>();
 const failedLogoUrls = new Set<string>();
+const logoPreloadPromises = new Map<string, Promise<void>>();
 
-// Restore which logos previously loaded (or failed) so repeat runs paint instantly.
+// Restore known failures only. Successful URLs must still be decoded into this page's
+// image cache before results are allowed to appear.
 try {
   const raw = localStorage.getItem(LOGO_CACHE_KEY);
   if (raw) {
     const parsed = JSON.parse(raw) as { ok?: string[]; bad?: string[] };
-    parsed.ok?.forEach(u => loadedLogoUrls.add(u));
     parsed.bad?.forEach(u => failedLogoUrls.add(u));
   }
 } catch {
@@ -74,28 +75,36 @@ function preloadLogo(host: string) {
   if (!host) return Promise.resolve();
   const src = logoUrl(host);
   if (loadedLogoUrls.has(src) || failedLogoUrls.has(src)) return Promise.resolve();
+  const existing = logoPreloadPromises.get(src);
+  if (existing) return existing;
 
-  return new Promise<void>(resolve => {
+  const promise = new Promise<void>(resolve => {
     const image = new Image();
     image.decoding = 'async';
+    let settled = false;
+    const finish = (loaded: boolean) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      if (loaded) loadedLogoUrls.add(src);
+      else failedLogoUrls.add(src);
+      persistLogoStatus();
+      resolve();
+    };
+    const timeout = window.setTimeout(() => finish(false), 5000);
     image.onload = () => {
-      loadedLogoUrls.add(src);
-      persistLogoStatus();
-      resolve();
+      void image.decode().catch(() => undefined).finally(() => finish(true));
     };
-    image.onerror = () => {
-      failedLogoUrls.add(src);
-      persistLogoStatus();
-      resolve();
-    };
+    image.onerror = () => finish(false);
     image.src = src;
   });
+  logoPreloadPromises.set(src, promise);
+  return promise;
 }
 
-// Never block the UI for more than a moment: whatever has not arrived falls back to the initial badge.
-function preloadBusinessLogos(businesses: LsaBusiness[], timeoutMs = 1200) {
-  const all = Promise.all(businesses.map(b => preloadLogo(hostOf(b.website || ''))));
-  return Promise.race([all, new Promise<void>(res => window.setTimeout(res, timeoutMs))]);
+// Results stay hidden until every logo is decoded or has a stable initial fallback.
+function preloadBusinessLogos(businesses: LsaBusiness[]) {
+  return Promise.all(businesses.map(b => preloadLogo(hostOf(b.website || '')))).then(() => undefined);
 }
 
 function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
@@ -187,12 +196,14 @@ function QuoteModal({
   business,
   category,
   host,
+  services,
   onClose,
   onSend,
 }: {
   business: LsaBusiness;
   category: string;
   host: string;
+  services: string[];
   onClose: () => void;
   onSend: () => void;
 }) {
@@ -214,12 +225,6 @@ function QuoteModal({
       window.removeEventListener('keydown', onKey, true);
     };
   }, [onClose]);
-
-  const services = /dent/i.test(category)
-    ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
-    : /clinic|health/i.test(category)
-      ? ['Urgent care visit', 'New patient exam', 'Lab work', 'Telehealth']
-      : ['Emergency repair', 'Installation', 'Maintenance / tune-up', 'Free estimate'];
 
   return (
     <div className="absolute inset-0 z-30 flex items-start justify-center bg-black/40 pt-10 px-4" onClick={onClose}>
@@ -317,6 +322,8 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
   const [searchQuery, setSearchQuery] = useState('');
   const [quoteFor, setQuoteFor] = useState<LsaBusiness | null>(null);
   const [started, setStarted] = useState(false);
+  const [startRequested, setStartRequested] = useState(false);
+  const [resultsReady, setResultsReady] = useState(false);
   const [data, setData] = useState(() => fallbackData(companyName, domain, industry));
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -331,10 +338,6 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
   useEffect(() => {
     if (!started) inputRef.current?.focus();
   }, [started]);
-
-  useEffect(() => {
-    void preloadBusinessLogos(data.businesses);
-  }, [data.businesses]);
 
   useEffect(() => {
     let cancelled = false;
@@ -353,11 +356,14 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
           await preloadBusinessLogos(nextData.businesses);
           if (cancelled) return;
           setData(nextData);
-          setSearchQuery(q => q || '');
+          setResultsReady(true);
+          return;
         }
       } catch {
         /* keep fallback */
       }
+      await preloadBusinessLogos(fallbackData(companyName, domain, industry).businesses);
+      if (!cancelled) setResultsReady(true);
     })();
     return () => {
       cancelled = true;
@@ -365,7 +371,21 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (startRequested && resultsReady) setStarted(true);
+  }, [startRequested, resultsReady]);
+
   const results = data.businesses;
+  const genericServices = /dent/i.test(data.category)
+    ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
+    : /clinic|health/i.test(data.category)
+      ? ['Urgent care visit', 'New patient exam', 'Lab work', 'Telehealth']
+      : ['Emergency repair', 'Installation', 'Maintenance / tune-up', 'Free estimate'];
+  const ignoredServiceLabels = /^(home|about|contact|locations?|resources?|blog|reviews?|financing|careers?|login)$/i;
+  const organizationServices = (scrapedAd?.sitelinks || [])
+    .map(item => item.replace(/\s*[|–—-]\s*.*$/, '').trim())
+    .filter(item => item.length >= 3 && item.length <= 48 && !ignoredServiceLabels.test(item));
+  const serviceOptions = [...new Set([...organizationServices, ...genericServices])].slice(0, 5);
 
   return (
     <motion.div
@@ -394,7 +414,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
             <form
               onSubmit={e => {
                 e.preventDefault();
-                if (searchQuery.trim()) setStarted(true);
+                if (searchQuery.trim()) setStartRequested(true);
               }}
               className="w-full max-w-[584px] px-4"
             >
@@ -411,8 +431,8 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
                 <Camera className="w-5 h-5 text-blue-500" />
               </div>
               <div className="flex items-center justify-center gap-3 mt-6">
-                <button type="submit" className="px-5 py-2 bg-gray-100 border border-transparent hover:border-gray-300 rounded text-sm text-gray-700">
-                  Google Search
+                <button type="submit" className="px-5 py-2 bg-gray-100 border border-transparent hover:border-gray-300 rounded text-sm text-gray-700 min-w-[118px]">
+                  {startRequested && !resultsReady ? 'Searching…' : 'Google Search'}
                 </button>
                 <button type="button" className="px-5 py-2 bg-gray-100 border border-transparent hover:border-gray-300 rounded text-sm text-gray-700">
                   I'm Feeling Lucky
@@ -584,6 +604,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
           business={quoteFor}
           category={data.category}
           host={(quoteFor.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}
+          services={serviceOptions}
           onClose={() => setQuoteFor(null)}
           onSend={() => {
             setQuoteFor(null);
