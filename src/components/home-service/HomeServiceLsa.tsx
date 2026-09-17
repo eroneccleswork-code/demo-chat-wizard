@@ -258,6 +258,11 @@ export function prefetchLsaData({
           services: Array.isArray(res.services) ? res.services : [],
           businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
         } as LsaData;
+        try {
+          localStorage.setItem(`${LSA_DATA_KEY}:${key}`, JSON.stringify(nextData));
+        } catch {
+          /* ignore */
+        }
         await preloadBusinessLogos(nextData.businesses);
         return nextData;
       }
