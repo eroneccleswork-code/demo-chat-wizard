@@ -246,7 +246,7 @@ function QuoteModal({
             value={name}
             onChange={e => setName(e.target.value.slice(0, 50))}
             placeholder="Name"
-            className="w-full max-w-[400px] border border-gray-400 rounded-lg px-3 py-3 text-[15px] outline-none focus:border-blue-600"
+            className="w-full max-w-[400px] border border-gray-400 rounded-lg px-3 py-3 text-[15px] text-gray-900 outline-none focus:border-blue-600"
           />
           <p className="text-[11px] text-gray-500 mb-5 max-w-[400px] text-right">{name.length}/50</p>
 
