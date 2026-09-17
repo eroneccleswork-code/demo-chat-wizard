@@ -466,12 +466,19 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
 
                       <div className="flex items-start gap-5 flex-shrink-0 pt-1">
                         {i % 3 !== 2 && (
-                          <div className="flex flex-col items-center w-[54px]">
-                            <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setQuoteFor(b);
+                            }}
+                            className="flex flex-col items-center w-[54px]"
+                          >
+                            <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-blue-50">
                               <MessageSquareText className="w-4 h-4 text-blue-600" />
                             </span>
                             <span className="text-[11px] text-blue-700 mt-1 text-center leading-tight">Get quote</span>
-                          </div>
+                          </button>
                         )}
                         <div className="flex flex-col items-center w-[54px]">
                           <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
