@@ -194,14 +194,12 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
 
 function QuoteModal({
   business,
-  category,
   host,
   services,
   onClose,
   onSend,
 }: {
   business: LsaBusiness;
-  category: string;
   host: string;
   services: string[];
   onClose: () => void;
@@ -602,7 +600,6 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
       {quoteFor && (
         <QuoteModal
           business={quoteFor}
-          category={data.category}
           host={(quoteFor.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}
           services={serviceOptions}
           onClose={() => setQuoteFor(null)}
