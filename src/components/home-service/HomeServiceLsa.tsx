@@ -35,8 +35,42 @@ const GoogleLogo = ({ className }: { className?: string }) => (
 
 const AVATAR_COLORS = ['#1a73e8', '#188038', '#c5221f', '#e37400', '#7b1fa2', '#00796b', '#5f6368', '#ad1457'];
 
+const loadedLogoUrls = new Set<string>();
+
+function logoUrl(host: string) {
+  return `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+}
+
+function preloadLogo(host: string) {
+  if (!host) return Promise.resolve();
+  const src = logoUrl(host);
+  if (loadedLogoUrls.has(src)) return Promise.resolve();
+
+  return new Promise<void>(resolve => {
+    const image = new Image();
+    const finish = () => resolve();
+    image.onload = () => {
+      loadedLogoUrls.add(src);
+      finish();
+    };
+    image.onerror = finish;
+    image.src = src;
+  });
+}
+
+function preloadBusinessLogos(businesses: LsaBusiness[]) {
+  return Promise.all(
+    businesses.map(business => {
+      const host = (business.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+      return preloadLogo(host);
+    })
+  );
+}
+
 function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
   const [failed, setFailed] = useState(false);
+  const src = host ? logoUrl(host) : '';
+  const [loaded, setLoaded] = useState(() => Boolean(src && loadedLogoUrls.has(src)));
   const initials = name
     .replace(/[^a-zA-Z ]/g, '')
     .split(' ')
@@ -46,28 +80,29 @@ function BizAvatar({ name, host, className = '' }: { name: string; host: string;
     .join('');
   const color = AVATAR_COLORS[(name.charCodeAt(0) + name.length) % AVATAR_COLORS.length];
 
-  if (!host || failed) {
-    return (
-      <div
-        className={`flex items-center justify-center font-semibold text-white select-none ${className}`}
-        style={{ backgroundColor: color }}
-      >
-        {initials || '?'}
-      </div>
-    );
-  }
-
   return (
-    <img
-      src={`https://www.google.com/s2/favicons?domain=${host}&sz=128`}
-      alt=""
-      loading="eager"
-      decoding="sync"
-      // @ts-expect-error fetchpriority is valid HTML
-      fetchpriority="high"
-      onError={() => setFailed(true)}
-      className={className}
-    />
+    <div
+      className={`relative flex items-center justify-center overflow-hidden font-semibold text-white select-none ${className}`}
+      style={{ backgroundColor: color }}
+    >
+      <span className={loaded && !failed ? 'invisible' : ''}>{initials || '?'}</span>
+      {host && !failed && (
+        <img
+          src={src}
+          alt=""
+          loading="eager"
+          decoding="sync"
+          // @ts-expect-error fetchpriority is valid HTML
+          fetchpriority="high"
+          onLoad={() => {
+            loadedLogoUrls.add(src);
+            setLoaded(true);
+          }}
+          onError={() => setFailed(true)}
+          className={`absolute inset-0 h-full w-full object-contain bg-white p-2 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        />
+      )}
+    </div>
   );
 }
 
@@ -132,6 +167,10 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
   }, [started]);
 
   useEffect(() => {
+    void preloadBusinessLogos(data.businesses);
+  }, [data.businesses]);
+
+  useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
@@ -139,12 +178,15 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
           body: { companyName, industry, websiteMarkdown: scrapedAd?.description || '' },
         });
         if (!cancelled && !error && res?.success && Array.isArray(res.businesses)) {
-          setData({
+          const nextData = {
             query: res.query,
             location: res.location,
             category: res.category,
             businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
-          });
+          };
+          await preloadBusinessLogos(nextData.businesses);
+          if (cancelled) return;
+          setData(nextData);
           setSearchQuery(q => q || '');
         }
       } catch {
