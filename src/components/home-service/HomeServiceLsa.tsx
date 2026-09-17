@@ -33,6 +33,44 @@ const GoogleLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const AVATAR_COLORS = ['#1a73e8', '#188038', '#c5221f', '#e37400', '#7b1fa2', '#00796b', '#5f6368', '#ad1457'];
+
+function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  const initials = name
+    .replace(/[^a-zA-Z ]/g, '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase())
+    .join('');
+  const color = AVATAR_COLORS[(name.charCodeAt(0) + name.length) % AVATAR_COLORS.length];
+
+  if (!host || failed) {
+    return (
+      <div
+        className={`flex items-center justify-center font-semibold text-white select-none ${className}`}
+        style={{ backgroundColor: color }}
+      >
+        {initials || '?'}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={`https://www.google.com/s2/favicons?domain=${host}&sz=128`}
+      alt=""
+      loading="eager"
+      decoding="sync"
+      // @ts-expect-error fetchpriority is valid HTML
+      fetchpriority="high"
+      onError={() => setFailed(true)}
+      className={className}
+    />
+  );
+}
+
 function Stars({ rating }: { rating: number }) {
   return (
     <span className="text-[#e7711b] tracking-[-0.5px] text-[11px]">
@@ -246,10 +284,10 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
                       onClick={isCompany ? onClickAd : undefined}
                       className={`flex gap-3 py-3 ${isCompany ? 'cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg' : ''}`}
                     >
-                      <img
-                        src={`https://www.google.com/s2/favicons?domain=${host}&sz=128`}
-                        alt=""
-                        className="w-[52px] h-[52px] rounded-lg object-cover bg-gray-100 border border-gray-200 flex-shrink-0 p-2"
+                      <BizAvatar
+                        name={b.name}
+                        host={host}
+                        className="w-[52px] h-[52px] rounded-lg object-contain bg-white border border-gray-200 flex-shrink-0 p-2 text-[15px]"
                       />
                       <div className="flex-1 min-w-0">
                         <p className={`text-[15px] truncate ${isCompany ? 'text-[#1a0dab] hover:underline' : 'text-gray-900'}`}>
@@ -308,7 +346,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
               <div className="pt-4 border-t border-gray-200">
                 <h3 className="text-[15px] text-gray-900 mb-3">Sponsored Results</h3>
                 <div className="flex items-center gap-3 mb-1">
-                  <img src={`https://www.google.com/s2/favicons?domain=${hostname}&sz=64`} alt="" className="w-7 h-7 rounded-full border border-gray-200" />
+                  <BizAvatar name={companyName} host={hostname} className="w-7 h-7 rounded-full border border-gray-200 bg-white object-contain p-1 text-[10px]" />
                   <div>
                     <p className="text-sm text-gray-900 font-medium">{companyName}</p>
                     <p className="text-xs text-gray-500">https://{hostname}</p>
