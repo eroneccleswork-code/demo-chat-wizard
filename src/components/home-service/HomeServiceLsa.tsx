@@ -176,6 +176,11 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
     query,
     location: 'Encinitas, CA 92024',
     category: cat,
+    services: /dental/i.test(industry || '')
+      ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
+      : /health/i.test(industry || '')
+        ? ['Urgent care visit', 'New patient exam', 'Lab work', 'Telehealth']
+        : ['Emergency repair', 'Installation', 'Maintenance / tune-up', 'Free estimate'],
     businesses: [
       { name: companyName, rating: 4.9, reviewCount: '4.4K', yearsInBusiness: 24, attribute: 'Family owned', hours: 'Open 24 hours', phone: '(619) 555-0142', website: domain },
       ...names.map((n, i) => ({
@@ -349,6 +354,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
             query: res.query,
             location: res.location,
             category: res.category,
+            services: Array.isArray(res.services) ? res.services : [],
             businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
           };
           await preloadBusinessLogos(nextData.businesses);
@@ -383,7 +389,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
   const organizationServices = (scrapedAd?.sitelinks || [])
     .map(item => item.replace(/\s*[|–—-]\s*.*$/, '').trim())
     .filter(item => item.length >= 3 && item.length <= 48 && !ignoredServiceLabels.test(item));
-  const serviceOptions = [...new Set([...organizationServices, ...genericServices])].slice(0, 5);
+  const serviceOptions = [...new Set([...(data.services || []), ...organizationServices, ...genericServices])].slice(0, 5);
 
   return (
     <motion.div
