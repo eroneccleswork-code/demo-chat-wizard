@@ -35,41 +35,72 @@ const GoogleLogo = ({ className }: { className?: string }) => (
 
 const AVATAR_COLORS = ['#1a73e8', '#188038', '#c5221f', '#e37400', '#7b1fa2', '#00796b', '#5f6368', '#ad1457'];
 
+const LOGO_CACHE_KEY = 'lsa-logo-status-v1';
 const loadedLogoUrls = new Set<string>();
+const failedLogoUrls = new Set<string>();
+
+// Restore which logos previously loaded (or failed) so repeat runs paint instantly.
+try {
+  const raw = localStorage.getItem(LOGO_CACHE_KEY);
+  if (raw) {
+    const parsed = JSON.parse(raw) as { ok?: string[]; bad?: string[] };
+    parsed.ok?.forEach(u => loadedLogoUrls.add(u));
+    parsed.bad?.forEach(u => failedLogoUrls.add(u));
+  }
+} catch {
+  /* ignore */
+}
+
+function persistLogoStatus() {
+  try {
+    localStorage.setItem(
+      LOGO_CACHE_KEY,
+      JSON.stringify({ ok: [...loadedLogoUrls].slice(-200), bad: [...failedLogoUrls].slice(-200) })
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
+export function hostOf(website: string) {
+  return (website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+}
 
 function logoUrl(host: string) {
-  return `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+  return `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
 }
 
 function preloadLogo(host: string) {
   if (!host) return Promise.resolve();
   const src = logoUrl(host);
-  if (loadedLogoUrls.has(src)) return Promise.resolve();
+  if (loadedLogoUrls.has(src) || failedLogoUrls.has(src)) return Promise.resolve();
 
   return new Promise<void>(resolve => {
     const image = new Image();
-    const finish = () => resolve();
+    image.decoding = 'async';
     image.onload = () => {
       loadedLogoUrls.add(src);
-      finish();
+      persistLogoStatus();
+      resolve();
     };
-    image.onerror = finish;
+    image.onerror = () => {
+      failedLogoUrls.add(src);
+      persistLogoStatus();
+      resolve();
+    };
     image.src = src;
   });
 }
 
-function preloadBusinessLogos(businesses: LsaBusiness[]) {
-  return Promise.all(
-    businesses.map(business => {
-      const host = (business.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-      return preloadLogo(host);
-    })
-  );
+// Never block the UI for more than a moment: whatever has not arrived falls back to the initial badge.
+function preloadBusinessLogos(businesses: LsaBusiness[], timeoutMs = 1200) {
+  const all = Promise.all(businesses.map(b => preloadLogo(hostOf(b.website || ''))));
+  return Promise.race([all, new Promise<void>(res => window.setTimeout(res, timeoutMs))]);
 }
 
 function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
-  const [failed, setFailed] = useState(false);
   const src = host ? logoUrl(host) : '';
+  const [failed, setFailed] = useState(() => Boolean(src && failedLogoUrls.has(src)));
   const [loaded, setLoaded] = useState(() => Boolean(src && loadedLogoUrls.has(src)));
   const initials = name
     .replace(/[^a-zA-Z ]/g, '')
@@ -98,7 +129,11 @@ function BizAvatar({ name, host, className = '' }: { name: string; host: string;
             loadedLogoUrls.add(src);
             setLoaded(true);
           }}
-          onError={() => setFailed(true)}
+          onError={() => {
+            failedLogoUrls.add(src);
+            persistLogoStatus();
+            setFailed(true);
+          }}
           className={`absolute inset-0 h-full w-full object-contain bg-white p-2 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
