@@ -64,7 +64,7 @@ export default function InvocaLsaReport() {
         <line x1="12.6" y1="15.6" x2="15" y2="18" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     ) },
-    { key: 'outcome', sortable: true, w: 230, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
+    { key: 'outcome', sortable: true, w: 300, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
       const s = signalsFor(r);
       return (
         <span className={`inline-block text-[12px] font-semibold rounded px-2 py-[3px] ${
@@ -76,8 +76,8 @@ export default function InvocaLsaReport() {
     } },
     { key: 'time', sortable: true, w: 170, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
     { key: 'name', sortable: true, w: 170, head: 'Caller Name', cell: r => r.name },
-    { key: 'caller', w: 150, head: 'Caller ID', cell: r => r.callerId },
-    { key: 'city', sortable: true, w: 160, head: 'Caller Location', cell: r => r.city },
+    { key: 'caller', w: 170, head: 'Caller ID', cell: r => r.callerId },
+    { key: 'city', sortable: true, w: 190, head: 'Caller Location', cell: r => r.city },
     { key: 'src', w: 150, head: 'Marketing Source', cell: () => 'Google LSA' },
     { key: 'med', w: 150, head: 'Marketing Medium', cell: () => 'Local Services Ad' },
     { key: 'camp', sortable: true, w: 230, head: 'Marketing Campaign', cell: r => r.campaign },
