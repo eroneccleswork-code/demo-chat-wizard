@@ -24,7 +24,7 @@ const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' 
   }`}>{label}</span>
 );
 
-type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Lead) => React.ReactNode; align?: 'left' | 'center' };
+type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Lead) => React.ReactNode; align?: 'left' | 'center'; sortable?: boolean };
 
 export default function InvocaLsaReport() {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function InvocaLsaReport() {
         <line x1="12.6" y1="15.6" x2="15" y2="18" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     ) },
-    { key: 'outcome', w: 230, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
+    { key: 'outcome', sortable: true, w: 230, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
       const s = signalsFor(r);
       return (
         <span className={`inline-block text-[12px] font-semibold rounded px-2 py-[3px] ${
@@ -74,16 +74,16 @@ export default function InvocaLsaReport() {
         </span>
       );
     } },
-    { key: 'time', w: 170, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
-    { key: 'name', w: 170, head: 'Caller Name', cell: r => r.name },
+    { key: 'time', sortable: true, w: 170, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
+    { key: 'name', sortable: true, w: 170, head: 'Caller Name', cell: r => r.name },
     { key: 'caller', w: 150, head: 'Caller ID', cell: r => r.callerId },
-    { key: 'city', w: 160, head: 'Caller Location', cell: r => r.city },
+    { key: 'city', sortable: true, w: 160, head: 'Caller Location', cell: r => r.city },
     { key: 'src', w: 150, head: 'Marketing Source', cell: () => 'Google LSA' },
     { key: 'med', w: 150, head: 'Marketing Medium', cell: () => 'Local Services Ad' },
-    { key: 'camp', w: 230, head: 'Marketing Campaign', cell: r => r.campaign },
+    { key: 'camp', sortable: true, w: 230, head: 'Marketing Campaign', cell: r => r.campaign },
     { key: 'term', w: 160, head: 'Search Term', cell: r => r.keyword },
-    { key: 'job', w: 180, head: home ? 'Job Type' : 'Reason for Call', cell: r => r.jobType },
-    { key: 'dur', w: 150, head: 'Connected Duration', cell: r => r.duration },
+    { key: 'job', sortable: true, w: 180, head: home ? 'Job Type' : 'Reason for Call', cell: r => r.jobType },
+    { key: 'dur', sortable: true, w: 150, head: 'Connected Duration', cell: r => r.duration },
     { key: 'qual', w: 170, head: <>Qualified Call<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).qualified} />, align: 'center' },
     { key: 'conv', w: 190, head: <>Appointment Booked<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).converted} />, align: 'center' },
     { key: 'newc', w: 190, head: <>{home ? 'New Customer' : 'New Patient'}<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).newCustomer} />, align: 'center' },
