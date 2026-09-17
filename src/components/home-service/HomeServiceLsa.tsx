@@ -91,7 +91,7 @@ function preloadLogo(host: string) {
       persistLogoStatus();
       resolve();
     };
-    const timeout = window.setTimeout(() => finish(false), 5000);
+    const timeout = window.setTimeout(() => finish(false), 1500);
     image.onload = () => {
       void image.decode().catch(() => undefined).finally(() => finish(true));
     };
@@ -200,6 +200,7 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
 type LsaData = ReturnType<typeof fallbackData>;
 
 const prefetchCache = new Map<string, Promise<LsaData>>();
+const LSA_DATA_KEY = 'lsa-data-v1';
 
 function hostnameOf(domain: string) {
   try {
@@ -230,6 +231,21 @@ export function prefetchLsaData({
 
   const promise = (async (): Promise<LsaData> => {
     const hostname = hostnameOf(domain);
+
+    // Instant path: reuse the last generated listings for this company.
+    try {
+      const raw = localStorage.getItem(`${LSA_DATA_KEY}:${key}`);
+      if (raw) {
+        const saved = JSON.parse(raw) as LsaData;
+        if (saved?.businesses?.length) {
+          await preloadBusinessLogos(saved.businesses);
+          return saved;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
     try {
       const { data: res, error } = await supabase.functions.invoke('lsa-competitors', {
         body: { companyName, industry, websiteMarkdown: websiteMarkdown || '' },
@@ -242,6 +258,11 @@ export function prefetchLsaData({
           services: Array.isArray(res.services) ? res.services : [],
           businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
         } as LsaData;
+        try {
+          localStorage.setItem(`${LSA_DATA_KEY}:${key}`, JSON.stringify(nextData));
+        } catch {
+          /* ignore */
+        }
         await preloadBusinessLogos(nextData.businesses);
         return nextData;
       }
