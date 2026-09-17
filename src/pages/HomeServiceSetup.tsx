@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { analyzeCompanyWebsite, fetchBranding } from '@/lib/setup-analysis';
+import { prefetchLsaData } from '@/components/home-service/HomeServiceLsa';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
@@ -29,10 +30,23 @@ export default function HomeServiceSetup() {
   const activeCustom = customSignals.filter(s => s.trim());
   const firingSignals = ['Qualified Call', 'Converted Call', verifySignal, ...activeCustom];
 
+  // Warm the LSA listings + logos as soon as the setup screen opens with a preset company.
+  useEffect(() => {
+    if (channel === 'lsa' && websiteUrl && companyName) {
+      void prefetchLsaData({ companyName, domain: websiteUrl, industry });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
     setIsLaunching(true);
+
+    if (channel === 'lsa') {
+      // Start competitor fetch + logo decoding now so the search screen has zero lag.
+      void prefetchLsaData({ companyName, domain: websiteUrl, industry });
+    }
 
     const [analysis, branding] = await Promise.all([
       analyzeCompanyWebsite(websiteUrl, companyName, industry),
