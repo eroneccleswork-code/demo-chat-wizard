@@ -163,7 +163,22 @@ function QuoteModal({
 }) {
   const [message, setMessage] = useState('');
   const [name, setName] = useState('');
+  const [service, setService] = useState('');
   const [contact, setContact] = useState<'sms' | 'email'>('sms');
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => messageRef.current?.focus(), 120);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      e.stopPropagation();
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('keydown', onKey, true);
+    };
+  }, [onClose]);
 
   const services = /dent/i.test(category)
     ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
