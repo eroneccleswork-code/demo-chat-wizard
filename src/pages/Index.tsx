@@ -97,25 +97,21 @@ export default function Index() {
           </motion.h1>
 
           <div className="space-y-3">
-            {USE_CASES.map((uc, i) => (
+            {USE_CASES.filter(uc => uc.state?.channel === 'lsa').map((uc, i) => (
               <motion.button
                 key={i}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
-                onClick={() => uc.active && uc.path && navigate(uc.path, uc.state ? { state: uc.state } : undefined)}
-                disabled={!uc.active}
-                className={`w-full flex items-center justify-between px-6 py-4 border border-foreground/20 rounded-sm text-left transition-all ${
-                  uc.active
-                    ? 'hover:bg-foreground/5 hover:border-foreground/40 cursor-pointer'
-                    : 'opacity-50 cursor-not-allowed'
-                }`}
+                transition={{ duration: 0.4, delay: 0.2 }}
+                onClick={() => navigate(uc.path, uc.state ? { state: uc.state } : undefined)}
+                className="w-full flex items-center justify-between px-6 py-4 border border-foreground/20 rounded-sm text-left transition-all hover:bg-foreground/5 hover:border-foreground/40 cursor-pointer"
               >
                 <span className="text-sm md:text-base font-medium text-foreground">{uc.label}</span>
-                {uc.active && <ArrowRight className="w-4 h-4 text-foreground/50" />}
+                <ArrowRight className="w-4 h-4 text-foreground/50" />
               </motion.button>
             ))}
           </div>
+
         </div>
 
         {/* Right side — hero image */}
@@ -136,6 +132,20 @@ export default function Index() {
           />
         </motion.div>
       </div>
+
+      {/* Other demos — small, bottom corner */}
+      <div className="mt-16 flex flex-wrap gap-x-4 gap-y-1 opacity-40 hover:opacity-90 transition-opacity">
+        {USE_CASES.filter(uc => uc.state?.channel !== 'lsa').map((uc, i) => (
+          <button
+            key={i}
+            onClick={() => navigate(uc.path, uc.state ? { state: uc.state } : undefined)}
+            className="text-[10px] text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+          >
+            {uc.label}
+          </button>
+        ))}
+      </div>
     </div>
+
   );
 }
