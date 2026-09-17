@@ -72,7 +72,7 @@ export default function HomeServiceDemo() {
               domain={domain}
               companyName={displayName}
               industry={industry}
-              onClickAd={() => setStep('website')}
+              onClickAd={() => navigate('/lsa-leads', { state: { companyName: displayName, industry, customSignals } })}
               scrapedAd={scrapedAd}
             />
           ) : (
