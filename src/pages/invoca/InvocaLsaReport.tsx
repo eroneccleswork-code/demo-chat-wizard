@@ -24,7 +24,7 @@ const Pill = ({ label, tone = 'gray' }: { label: string; tone?: 'gray' | 'blue' 
   }`}>{label}</span>
 );
 
-type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Lead) => React.ReactNode; align?: 'left' | 'center' };
+type Col = { key: string; w: number; head: React.ReactNode; cell: (r: Lead) => React.ReactNode; align?: 'left' | 'center'; sortable?: boolean };
 
 export default function InvocaLsaReport() {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function InvocaLsaReport() {
         <line x1="12.6" y1="15.6" x2="15" y2="18" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     ) },
-    { key: 'outcome', w: 230, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
+    { key: 'outcome', sortable: true, w: 300, head: <>Lead Outcome<Pill label="AI" tone="blue" /></>, cell: r => {
       const s = signalsFor(r);
       return (
         <span className={`inline-block text-[12px] font-semibold rounded px-2 py-[3px] ${
@@ -74,16 +74,16 @@ export default function InvocaLsaReport() {
         </span>
       );
     } },
-    { key: 'time', w: 170, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
-    { key: 'name', w: 170, head: 'Caller Name', cell: r => r.name },
-    { key: 'caller', w: 150, head: 'Caller ID', cell: r => r.callerId },
-    { key: 'city', w: 160, head: 'Caller Location', cell: r => r.city },
+    { key: 'time', sortable: true, w: 170, head: <>Call Start Time <span className="text-[#2D6CDF]">↑</span></>, cell: r => r.time },
+    { key: 'name', sortable: true, w: 170, head: 'Caller Name', cell: r => r.name },
+    { key: 'caller', w: 170, head: 'Caller ID', cell: r => r.callerId },
+    { key: 'city', sortable: true, w: 190, head: 'Caller Location', cell: r => r.city },
     { key: 'src', w: 150, head: 'Marketing Source', cell: () => 'Google LSA' },
     { key: 'med', w: 150, head: 'Marketing Medium', cell: () => 'Local Services Ad' },
-    { key: 'camp', w: 230, head: 'Marketing Campaign', cell: r => r.campaign },
+    { key: 'camp', sortable: true, w: 230, head: 'Marketing Campaign', cell: r => r.campaign },
     { key: 'term', w: 160, head: 'Search Term', cell: r => r.keyword },
-    { key: 'job', w: 180, head: home ? 'Job Type' : 'Reason for Call', cell: r => r.jobType },
-    { key: 'dur', w: 150, head: 'Connected Duration', cell: r => r.duration },
+    { key: 'job', sortable: true, w: 180, head: home ? 'Job Type' : 'Reason for Call', cell: r => r.jobType },
+    { key: 'dur', sortable: true, w: 150, head: 'Connected Duration', cell: r => r.duration },
     { key: 'qual', w: 170, head: <>Qualified Call<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).qualified} />, align: 'center' },
     { key: 'conv', w: 190, head: <>Appointment Booked<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).converted} />, align: 'center' },
     { key: 'newc', w: 190, head: <>{home ? 'New Customer' : 'New Patient'}<Pill label="RULE" /></>, cell: r => <Check on={signalsFor(r).newCustomer} />, align: 'center' },
@@ -132,32 +132,30 @@ export default function InvocaLsaReport() {
             <button className="bg-[#2D6CDF] text-white rounded p-2"><Plus className="w-4 h-4" /></button>
           </div>
 
-          {/* Summary tiles — qualified vs not, at a glance */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          {/* Inline filter links, styled like report quick filters */}
+          <div className="flex items-center gap-4 mb-5 text-[13px]">
             {[
-              { key: 'all' as const, label: 'LSA Leads Analyzed', value: leads.length, sub: 'Every call scored automatically', tone: 'text-[#0F2540]' },
-              { key: 'qualified' as const, label: 'Qualified', value: qualifiedCount, sub: 'Real jobs worth paying for', tone: 'text-[#137333]' },
-              { key: 'unqualified' as const, label: 'Not Qualified', value: unqualifiedCount, sub: 'Spam, existing or out of area — disputed', tone: 'text-[#C5221F]' },
+              { key: 'all' as const, label: `All Leads (${leads.length})` },
+              { key: 'qualified' as const, label: `Qualified (${qualifiedCount})` },
+              { key: 'unqualified' as const, label: `Not Qualified (${unqualifiedCount})` },
             ].map(t => (
               <button
                 key={t.key}
                 onClick={() => setFilter(t.key)}
-                className={`text-left rounded-[10px] border px-5 py-4 bg-white transition-colors ${
-                  filter === t.key ? 'border-[#2D6CDF] shadow-[0_1px_3px_rgba(15,37,64,0.12)]' : 'border-[#EAECEF] hover:border-[#C9D3E0]'
+                className={`pb-1 border-b-2 transition-colors ${
+                  filter === t.key ? 'border-[#2D6CDF] text-[#0F2540] font-semibold' : 'border-transparent text-[#5B6B7E] hover:text-[#0F2540]'
                 }`}
               >
-                <div className="text-[12px] text-[#5B6B7E]">{t.label}</div>
-                <div className={`text-[30px] font-semibold leading-tight ${t.tone}`}>{t.value}</div>
-                <div className="text-[11px] text-[#8A97A6]">{t.sub}</div>
+                {t.label}
               </button>
             ))}
           </div>
         </div>
 
         <div className="border-t border-[#E5E7EB] pl-6 pr-6">
-          <div className="flex items-center justify-between py-3">
-            <div className="text-sm font-semibold text-[#0F2540]">Total Leads: {rows.length}</div>
-            <div className="text-sm text-[#2D6CDF]">
+          <div className="flex items-center justify-between py-4">
+            <div className="text-[15px] font-semibold text-[#0F2540]">Total Interactions: {rows.length}</div>
+            <div className="text-[15px] text-[#2D6CDF]">
               <span className="hover:underline cursor-pointer">Edit Columns</span>
               <span className="text-gray-300 mx-2">|</span>
               <span className="hover:underline cursor-pointer">Reset Sorting</span>
@@ -165,40 +163,41 @@ export default function InvocaLsaReport() {
           </div>
         </div>
 
-        <div className="overflow-x-auto bg-white border-t border-[#E5E7EB]">
+        <div className="overflow-x-auto bg-white">
           <div style={{ width: totalW }}>
-            <div className="flex border-b border-[#E5E7EB] bg-white sticky top-0 z-10">
+            <div className="flex bg-white sticky top-0 z-10">
               {cols.map(c => (
                 <div
                   key={c.key}
                   style={{ width: c.w }}
-                  className={`shrink-0 overflow-hidden px-6 py-2.5 text-[12px] font-semibold text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                  className={`shrink-0 overflow-hidden px-6 pb-3 text-[14px] font-semibold text-[#0F2540] flex items-center gap-1.5 ${c.align === 'center' ? 'justify-center' : ''}`}
                 >
-                  {c.head}
+                  <span className="truncate">{c.head}</span>
+                  {c.sortable && (
+                    <svg viewBox="0 0 10 14" className="w-[9px] h-[13px] shrink-0 text-[#9AA4B2]" fill="currentColor">
+                      <path d="M5 0l3.5 4.5h-7z" /><path d="M5 14l3.5-4.5h-7z" />
+                    </svg>
+                  )}
                 </div>
               ))}
             </div>
-            {rows.map((r, i) => {
-              const s = signalsFor(r);
-              return (
-                <div
-                  key={r.id}
-                  onClick={() => navigate('/invoca/call-review')}
-                  className={`flex border-b border-[#F3F4F6] hover:bg-[#F8FAFC] cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFBFC]'}`}
-                  style={{ boxShadow: `inset 4px 0 0 0 ${s.qualified ? '#5FBC63' : '#E8837D'}` }}
-                >
-                  {cols.map(c => (
-                    <div
-                      key={c.key}
-                      style={{ width: c.w }}
-                      className={`shrink-0 px-6 py-5 text-[14px] text-[#0F2540] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
-                    >
-                      {c.cell(r)}
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+            {rows.map((r, i) => (
+              <div
+                key={r.id}
+                onClick={() => navigate('/invoca/call-review')}
+                className={`flex cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-[#F7F8F9]'} hover:bg-[#EEF4FC]`}
+              >
+                {cols.map(c => (
+                  <div
+                    key={c.key}
+                    style={{ width: c.w }}
+                    className={`shrink-0 px-6 py-[22px] text-[15px] text-[#3C4043] truncate ${c.align === 'center' ? 'text-center' : 'text-left'}`}
+                  >
+                    {c.cell(r)}
+                  </div>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
 
