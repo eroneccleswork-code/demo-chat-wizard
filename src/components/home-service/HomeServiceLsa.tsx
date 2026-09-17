@@ -91,7 +91,7 @@ function preloadLogo(host: string) {
       persistLogoStatus();
       resolve();
     };
-    const timeout = window.setTimeout(() => finish(false), 5000);
+    const timeout = window.setTimeout(() => finish(false), 1500);
     image.onload = () => {
       void image.decode().catch(() => undefined).finally(() => finish(true));
     };
