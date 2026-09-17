@@ -525,6 +525,19 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
           </div>
         </div>
       )}
+
+      {quoteFor && (
+        <QuoteModal
+          business={quoteFor}
+          category={data.category}
+          host={(quoteFor.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}
+          onClose={() => setQuoteFor(null)}
+          onSend={() => {
+            setQuoteFor(null);
+            onClickAd();
+          }}
+        />
+      )}
     </motion.div>
   );
 }
