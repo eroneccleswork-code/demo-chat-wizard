@@ -99,8 +99,8 @@ function preloadBusinessLogos(businesses: LsaBusiness[], timeoutMs = 1200) {
 }
 
 function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
-  const [failed, setFailed] = useState(false);
   const src = host ? logoUrl(host) : '';
+  const [failed, setFailed] = useState(() => Boolean(src && failedLogoUrls.has(src)));
   const [loaded, setLoaded] = useState(() => Boolean(src && loadedLogoUrls.has(src)));
   const initials = name
     .replace(/[^a-zA-Z ]/g, '')
