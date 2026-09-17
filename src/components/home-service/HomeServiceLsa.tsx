@@ -200,6 +200,7 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
 type LsaData = ReturnType<typeof fallbackData>;
 
 const prefetchCache = new Map<string, Promise<LsaData>>();
+const LSA_DATA_KEY = 'lsa-data-v1';
 
 function hostnameOf(domain: string) {
   try {
