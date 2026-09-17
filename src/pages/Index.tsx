@@ -50,6 +50,17 @@ const USE_CASES = [
       websiteUrl: 'https://www.renewalbyandersen.com',
     },
   },
+  {
+    label: 'IFM for Home Service | Google Local Services Ad',
+    active: true,
+    path: '/home-service-setup' as const,
+    state: {
+      industry: 'Home Services',
+      companyName: 'Sherlock Plumbing',
+      websiteUrl: 'https://www.sherlockplumbing.com',
+      channel: 'lsa',
+    },
+  },
   { label: 'AI Voice Agent | Cart & Service Calls', active: true, path: '/voice-setup' as const, state: undefined as any },
 ];
 
