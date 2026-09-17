@@ -35,6 +35,11 @@ export default function HomeServiceSetup() {
     if (!isValid) return;
     setIsLaunching(true);
 
+    if (channel === 'lsa') {
+      // Start competitor fetch + logo decoding now so the search screen has zero lag.
+      void prefetchLsaData({ companyName, domain: websiteUrl, industry });
+    }
+
     const [analysis, branding] = await Promise.all([
       analyzeCompanyWebsite(websiteUrl, companyName, industry),
       isTv ? fetchBranding(websiteUrl) : Promise.resolve(null),
