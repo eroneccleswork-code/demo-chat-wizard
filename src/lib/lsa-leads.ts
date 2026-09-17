@@ -28,9 +28,50 @@ const HOME_JOBS = [
   'AC tune-up', 'Garbage disposal repair', 'Leak detection', 'Furnace repair',
 ];
 
-export function jobsFor(industry?: string) {
-  if (/dent/i.test(industry || '')) return ['New patient exam', 'Cleaning', 'Emergency visit', 'Whitening consult', 'Implant consult'];
-  if (/health/i.test(industry || '')) return ['New patient visit', 'Specialist referral', 'Urgent care', 'Annual physical'];
+/** Trade-specific job lists keyed by words found in the company name / industry. */
+const TRADE_JOBS: { test: RegExp; jobs: string[] }[] = [
+  { test: /dent|ortho|smile/i, jobs: ['New patient exam', 'Cleaning', 'Emergency visit', 'Whitening consult', 'Implant consult'] },
+  { test: /health|clinic|medical|care/i, jobs: ['New patient visit', 'Specialist referral', 'Urgent care', 'Annual physical'] },
+  { test: /plumb|drain|rooter|sewer/i, jobs: ['Drain cleaning', 'Water heater repair', 'Leak detection', 'Toilet repair', 'Sewer line inspection', 'Garbage disposal repair'] },
+  { test: /hvac|heating|air|furnace|cooling|climate/i, jobs: ['AC repair', 'AC tune-up', 'Furnace repair', 'New system install', 'Duct cleaning', 'Thermostat install'] },
+  { test: /roof|gutter/i, jobs: ['Roof repair', 'Roof installation', 'Leak inspection', 'Gutter replacement', 'Storm damage repair'] },
+  { test: /electric|amp|volt|wiring/i, jobs: ['Panel upgrade', 'Outlet repair', 'Lighting install', 'EV charger install', 'Whole-home rewire'] },
+  { test: /blind|shade|shutter|window treat/i, jobs: ['Blinds installation', 'Shutter consult', 'Motorized shades', 'Window measure', 'Shade repair'] },
+  { test: /window|door|andersen|glass/i, jobs: ['Window replacement', 'Patio door install', 'Free in-home estimate', 'Glass repair', 'Window measure'] },
+  { test: /pest|termite|exterminat/i, jobs: ['Ant treatment', 'Termite inspection', 'Rodent control', 'Quarterly service', 'Bed bug treatment'] },
+  { test: /landscap|lawn|tree|garden/i, jobs: ['Lawn maintenance', 'Tree trimming', 'Irrigation repair', 'Landscape design', 'Sod install'] },
+  { test: /garage/i, jobs: ['Garage door repair', 'Spring replacement', 'Opener install', 'New door quote', 'Track alignment'] },
+  { test: /clean|maid|janitor/i, jobs: ['Deep clean', 'Recurring clean', 'Move-out clean', 'Carpet cleaning', 'Window cleaning'] },
+  { test: /solar/i, jobs: ['Solar consult', 'Panel install', 'Battery add-on', 'System repair', 'Roof assessment'] },
+  { test: /appliance/i, jobs: ['Refrigerator repair', 'Washer repair', 'Oven repair', 'Dishwasher install', 'Dryer service'] },
+  { test: /pool|spa/i, jobs: ['Weekly service', 'Pump repair', 'Heater repair', 'Green pool recovery', 'Filter clean'] },
+  { test: /floor|carpet|tile/i, jobs: ['Flooring estimate', 'Tile install', 'Carpet replacement', 'Hardwood refinish', 'Subfloor repair'] },
+];
+
+/** Services scraped for this brand, cached by the LSA screen. */
+function cachedBrandServices(companyName?: string): string[] {
+  if (typeof window === 'undefined' || !companyName) return [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || !key.startsWith('lsa-data-v1:')) continue;
+      if (!key.toLowerCase().includes(companyName.toLowerCase())) continue;
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+      const services: unknown = saved?.services;
+      if (Array.isArray(services) && services.length >= 3) {
+        return services.filter((s): s is string => typeof s === 'string' && s.length > 2).slice(0, 6);
+      }
+    }
+  } catch { /* ignore */ }
+  return [];
+}
+
+export function jobsFor(industry?: string, companyName?: string) {
+  const scraped = cachedBrandServices(companyName);
+  if (scraped.length >= 3) return scraped;
+  const haystack = `${companyName || ''} ${industry || ''}`;
+  const match = TRADE_JOBS.find(t => t.test.test(haystack));
+  if (match) return match.jobs;
   return HOME_JOBS;
 }
 
