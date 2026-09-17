@@ -17,6 +17,7 @@ import HomeServiceDemo from "./pages/HomeServiceDemo.tsx";
 import VoiceSetup from "./pages/VoiceSetup.tsx";
 import VoiceDemo from "./pages/VoiceDemo.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import LsaLeads from "./pages/LsaLeads.tsx";
 import InvocaDashboard from "./pages/invoca/InvocaDashboard.tsx";
 import InvocaCallReport from "./pages/invoca/InvocaCallReport.tsx";
 import InvocaCallReview from "./pages/invoca/InvocaCallReview.tsx";
