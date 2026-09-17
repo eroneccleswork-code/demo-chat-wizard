@@ -30,6 +30,14 @@ export default function HomeServiceSetup() {
   const activeCustom = customSignals.filter(s => s.trim());
   const firingSignals = ['Qualified Call', 'Converted Call', verifySignal, ...activeCustom];
 
+  // Warm the LSA listings + logos as soon as the setup screen opens with a preset company.
+  useEffect(() => {
+    if (channel === 'lsa' && websiteUrl && companyName) {
+      void prefetchLsaData({ companyName, domain: websiteUrl, industry });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
