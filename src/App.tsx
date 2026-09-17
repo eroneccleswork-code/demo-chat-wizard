@@ -45,6 +45,7 @@ const App = () => (
             <Route path="/home-service-demo" element={<HomeServiceDemo />} />
             <Route path="/voice-setup" element={<VoiceSetup />} />
             <Route path="/voice-demo" element={<VoiceDemo />} />
+            <Route path="/lsa-leads" element={<LsaLeads />} />
             <Route path="/invoca" element={<InvocaDashboard />} />
             <Route path="/invoca/call-report" element={<InvocaCallReport />} />
             <Route path="/invoca/call-review" element={<InvocaCallReview />} />
