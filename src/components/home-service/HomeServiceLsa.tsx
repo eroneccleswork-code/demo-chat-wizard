@@ -230,6 +230,21 @@ export function prefetchLsaData({
 
   const promise = (async (): Promise<LsaData> => {
     const hostname = hostnameOf(domain);
+
+    // Instant path: reuse the last generated listings for this company.
+    try {
+      const raw = localStorage.getItem(`${LSA_DATA_KEY}:${key}`);
+      if (raw) {
+        const saved = JSON.parse(raw) as LsaData;
+        if (saved?.businesses?.length) {
+          await preloadBusinessLogos(saved.businesses);
+          return saved;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
     try {
       const { data: res, error } = await supabase.functions.invoke('lsa-competitors', {
         body: { companyName, industry, websiteMarkdown: websiteMarkdown || '' },
