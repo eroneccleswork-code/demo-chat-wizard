@@ -148,8 +148,121 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
   };
 }
 
+function QuoteModal({
+  business,
+  category,
+  host,
+  onClose,
+  onSend,
+}: {
+  business: LsaBusiness;
+  category: string;
+  host: string;
+  onClose: () => void;
+  onSend: () => void;
+}) {
+  const [message, setMessage] = useState('');
+  const [name, setName] = useState('');
+  const [contact, setContact] = useState<'sms' | 'email'>('sms');
+
+  const services = /dent/i.test(category)
+    ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
+    : /clinic|health/i.test(category)
+      ? ['Urgent care visit', 'New patient exam', 'Lab work', 'Telehealth']
+      : ['Emergency repair', 'Installation', 'Maintenance / tune-up', 'Free estimate'];
+
+  return (
+    <div className="absolute inset-0 z-30 flex items-start justify-center bg-black/40 pt-10 px-4" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        onClick={e => e.stopPropagation()}
+        className="w-full max-w-[600px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[85%]"
+      >
+        <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-200">
+          <button onClick={onClose} className="text-gray-600 text-xl leading-none">←</button>
+          <h3 className="text-[19px] text-gray-900">Send request to {business.name}</h3>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5">
+          <div className="flex gap-4 mb-6">
+            <BizAvatar
+              name={business.name}
+              host={host}
+              className="w-[70px] h-[70px] rounded-lg border border-gray-200 bg-white p-2 text-[16px] flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-[17px] text-gray-900">{business.name}</p>
+              <p className="text-[13px] text-gray-700 flex items-center gap-1">
+                {business.rating.toFixed(1)} <Stars rating={business.rating} /> ({business.reviewCount})
+              </p>
+              <p className="text-[13px] text-gray-600 flex items-center gap-1.5 mt-0.5">
+                <MessageSquareText className="w-3.5 h-3.5 text-blue-600" /> Typically replies in 15 min
+              </p>
+              <p className="text-[13px] text-gray-600 mt-0.5">Contacted by 37 people in the last week</p>
+            </div>
+          </div>
+
+          <label className="block text-[15px] text-gray-800 mb-2">Your message</label>
+          <textarea
+            value={message}
+            onChange={e => setMessage(e.target.value.slice(0, 600))}
+            placeholder="Give details like what you need done and how soon you need it"
+            className="w-full h-28 border border-gray-400 rounded-lg p-3 text-[15px] outline-none focus:border-blue-600 resize-none"
+          />
+          <p className="text-right text-xs text-gray-500 mb-4">{message.length}/600</p>
+
+          <label className="block text-[15px] text-gray-800 mb-2">Service (optional)</label>
+          <select
+            defaultValue=""
+            className="w-full border border-gray-400 rounded-lg px-3 py-3 text-[15px] text-gray-700 outline-none focus:border-blue-600 mb-5 bg-white"
+          >
+            <option value="" disabled>Choose the service you need</option>
+            {services.map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <label className="block text-[15px] text-gray-800 mb-2">Name</label>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value.slice(0, 50))}
+            placeholder="Name"
+            className="w-full max-w-[400px] border border-gray-400 rounded-lg px-3 py-3 text-[15px] outline-none focus:border-blue-600"
+          />
+          <p className="text-[11px] text-gray-500 mb-5 max-w-[400px] text-right">{name.length}/50</p>
+
+          <p className="text-[15px] text-gray-800 mb-3">How would you like to hear back?</p>
+          {(['sms', 'email'] as const).map(opt => (
+            <button
+              key={opt}
+              onClick={() => setContact(opt)}
+              className="flex items-center gap-3 mb-3 text-[15px] text-gray-800"
+            >
+              <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${contact === opt ? 'border-blue-600' : 'border-gray-500'}`}>
+                {contact === opt && <span className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
+              </span>
+              {opt === 'sms' ? 'SMS or phone call' : 'Email'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex gap-4 px-6 py-4 border-t border-gray-200">
+          <button onClick={onClose} className="flex-1 py-3 rounded-full border border-gray-300 text-blue-700 text-[15px] font-medium">
+            No thanks
+          </button>
+          <button onClick={onSend} className="flex-1 py-3 rounded-full bg-[#1a73e8] text-white text-[15px] font-medium">
+            Send
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function HomeServiceLsa({ domain, companyName, industry, onClickAd, scrapedAd }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [quoteFor, setQuoteFor] = useState<LsaBusiness | null>(null);
   const [started, setStarted] = useState(false);
   const [data, setData] = useState(() => fallbackData(companyName, domain, industry));
   const inputRef = useRef<HTMLInputElement>(null);
@@ -207,7 +320,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.3 }}
-      className="w-full h-screen bg-white flex flex-col"
+      className="relative w-full h-screen bg-white flex flex-col"
     >
       {!started && (
         <div className="flex-1 flex flex-col">
@@ -353,12 +466,19 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
 
                       <div className="flex items-start gap-5 flex-shrink-0 pt-1">
                         {i % 3 !== 2 && (
-                          <div className="flex flex-col items-center w-[54px]">
-                            <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setQuoteFor(b);
+                            }}
+                            className="flex flex-col items-center w-[54px]"
+                          >
+                            <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-blue-50">
                               <MessageSquareText className="w-4 h-4 text-blue-600" />
                             </span>
                             <span className="text-[11px] text-blue-700 mt-1 text-center leading-tight">Get quote</span>
-                          </div>
+                          </button>
                         )}
                         <div className="flex flex-col items-center w-[54px]">
                           <span className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center">
@@ -404,6 +524,19 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
             </motion.div>
           </div>
         </div>
+      )}
+
+      {quoteFor && (
+        <QuoteModal
+          business={quoteFor}
+          category={data.category}
+          host={(quoteFor.website || '').replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]}
+          onClose={() => setQuoteFor(null)}
+          onSend={() => {
+            setQuoteFor(null);
+            onClickAd();
+          }}
+        />
       )}
     </motion.div>
   );
