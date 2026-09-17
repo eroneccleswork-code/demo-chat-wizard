@@ -37,7 +37,8 @@ Rules:
 - attribute is one of: "Family owned", "Local business", "Woman owned business", "Free in-home estimate", "Veteran owned".
 - hours is "Open 24 hours" or "Open now".
 - phone is a plausible formatted US number.
-- Keep the category short and plural (e.g. "Plumbers", "Dentists", "Window contractors").`;
+- Keep the category short and plural (e.g. "Plumbers", "Dentists", "Window contractors").
+- Return 4 short customer-facing services that this specific company offers. Derive them from its website content when available; never return generic unrelated services.`;
 
     const userPrompt = `Company: ${companyName}
 Industry: ${industry || 'Home Services'}
@@ -68,6 +69,12 @@ ${websiteMarkdown ? `Website content:\n${String(websiteMarkdown).slice(0, 2000)}
                   query: { type: 'string' },
                   location: { type: 'string' },
                   category: { type: 'string' },
+                  services: {
+                    type: 'array',
+                    minItems: 4,
+                    maxItems: 4,
+                    items: { type: 'string' },
+                  },
                   businesses: {
                     type: 'array',
                     minItems: 8,
@@ -89,7 +96,7 @@ ${websiteMarkdown ? `Website content:\n${String(websiteMarkdown).slice(0, 2000)}
                     },
                   },
                 },
-                required: ['query', 'location', 'category', 'businesses'],
+                required: ['query', 'location', 'category', 'services', 'businesses'],
                 additionalProperties: false,
               },
             },
