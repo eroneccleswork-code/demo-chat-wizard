@@ -197,6 +197,66 @@ function fallbackData(companyName: string, domain: string, industry?: string) {
   };
 }
 
+type LsaData = ReturnType<typeof fallbackData>;
+
+const prefetchCache = new Map<string, Promise<LsaData>>();
+
+function hostnameOf(domain: string) {
+  try {
+    return new URL(domain.startsWith('http') ? domain : `https://${domain}`).hostname.replace(/^www\./, '');
+  } catch {
+    return domain;
+  }
+}
+
+/**
+ * Fetches competitors and fully decodes every logo. Safe to call early (e.g. from setup),
+ * so the results screen has zero logo lag when the demo reaches the search step.
+ */
+export function prefetchLsaData({
+  companyName,
+  domain,
+  industry,
+  websiteMarkdown,
+}: {
+  companyName: string;
+  domain: string;
+  industry?: string;
+  websiteMarkdown?: string;
+}): Promise<LsaData> {
+  const key = `${companyName}|${domain}|${industry || ''}`;
+  const cached = prefetchCache.get(key);
+  if (cached) return cached;
+
+  const promise = (async (): Promise<LsaData> => {
+    const hostname = hostnameOf(domain);
+    try {
+      const { data: res, error } = await supabase.functions.invoke('lsa-competitors', {
+        body: { companyName, industry, websiteMarkdown: websiteMarkdown || '' },
+      });
+      if (!error && res?.success && Array.isArray(res.businesses)) {
+        const nextData = {
+          query: res.query,
+          location: res.location,
+          category: res.category,
+          services: Array.isArray(res.services) ? res.services : [],
+          businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
+        } as LsaData;
+        await preloadBusinessLogos(nextData.businesses);
+        return nextData;
+      }
+    } catch {
+      /* fall through to fallback */
+    }
+    const fb = fallbackData(companyName, domain, industry);
+    await preloadBusinessLogos(fb.businesses);
+    return fb;
+  })();
+
+  prefetchCache.set(key, promise);
+  return promise;
+}
+
 function QuoteModal({
   business,
   host,
