@@ -132,6 +132,20 @@ export default function Index() {
           />
         </motion.div>
       </div>
+
+      {/* Other demos — small, bottom corner */}
+      <div className="mt-16 flex flex-wrap gap-x-4 gap-y-1 opacity-40 hover:opacity-90 transition-opacity">
+        {USE_CASES.filter(uc => uc.state?.channel !== 'lsa').map((uc, i) => (
+          <button
+            key={i}
+            onClick={() => navigate(uc.path, uc.state ? { state: uc.state } : undefined)}
+            className="text-[10px] text-muted-foreground hover:text-foreground underline underline-offset-2 transition-colors"
+          >
+            {uc.label}
+          </button>
+        ))}
+      </div>
     </div>
+
   );
 }
