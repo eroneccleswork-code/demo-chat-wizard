@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Globe, Video, Building, Zap, Plus, Trash2, CheckCircle2, Tv } from 'lucide-react';
 import InvocaLogo from '@/components/InvocaLogo';
 import { analyzeCompanyWebsite, fetchBranding } from '@/lib/setup-analysis';
+import { prefetchLsaData } from '@/components/home-service/HomeServiceLsa';
 
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
