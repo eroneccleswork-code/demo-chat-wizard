@@ -94,6 +94,9 @@ export default function HomeServiceDemo() {
             companyName={displayName}
             industry={industry}
             customSignals={customSignals}
+            onNext={channel === 'lsa'
+              ? () => navigate('/lsa-leads', { state: { companyName: displayName, industry, customSignals } })
+              : undefined}
           />
         )}
       </AnimatePresence>

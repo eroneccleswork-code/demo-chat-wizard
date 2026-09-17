@@ -62,6 +62,7 @@ const USE_CASES = [
     },
   },
   { label: 'AI Voice Agent | Cart & Service Calls', active: true, path: '/voice-setup' as const, state: undefined as any },
+  { label: 'LSA Leads | Manual vs Automated', active: true, path: '/lsa-leads' as const, state: undefined as any },
 ];
 
 export default function Index() {
