@@ -13,7 +13,7 @@ export default function LsaLeads() {
   const companyName: string = state.companyName || 'Sherlock Plumbing';
   const industry: string = state.industry || 'Home Services';
 
-  const jobs = useMemo(() => jobsFor(industry), [industry]);
+  const jobs = useMemo(() => jobsFor(industry, companyName), [industry, companyName]);
 
   const leads = useMemo(() => buildLeads(jobs), [jobs]);
 

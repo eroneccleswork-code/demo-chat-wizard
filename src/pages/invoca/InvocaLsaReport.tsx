@@ -51,7 +51,7 @@ export default function InvocaLsaReport() {
   const industry: string = ctx?.industry || 'Home Services';
   const host: string = (ctx?.domain || `${company.replace(/[^A-Za-z]/g, '')}.com`).replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-  const leads = useMemo(() => buildLeads(jobsFor(industry)), [industry]);
+  const leads = useMemo(() => buildLeads(jobsFor(industry, company)), [industry, company]);
 
   const rows = useMemo(() => leads.map((l, i) => {
     const job = l.jobType && l.jobType !== '-' ? l.jobType : 'Service request';
