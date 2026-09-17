@@ -320,7 +320,7 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.3 }}
-      className="w-full h-screen bg-white flex flex-col"
+      className="relative w-full h-screen bg-white flex flex-col"
     >
       {!started && (
         <div className="flex-1 flex flex-col">
