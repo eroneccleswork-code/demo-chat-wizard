@@ -129,7 +129,11 @@ function BizAvatar({ name, host, className = '' }: { name: string; host: string;
             loadedLogoUrls.add(src);
             setLoaded(true);
           }}
-          onError={() => setFailed(true)}
+          onError={() => {
+            failedLogoUrls.add(src);
+            persistLogoStatus();
+            setFailed(true);
+          }}
           className={`absolute inset-0 h-full w-full object-contain bg-white p-2 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       )}
