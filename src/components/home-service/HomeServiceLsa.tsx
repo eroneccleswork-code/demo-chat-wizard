@@ -345,29 +345,15 @@ export default function HomeServiceLsa({ domain, companyName, industry, onClickA
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        const { data: res, error } = await supabase.functions.invoke('lsa-competitors', {
-          body: { companyName, industry, websiteMarkdown: scrapedAd?.description || '' },
-        });
-        if (!cancelled && !error && res?.success && Array.isArray(res.businesses)) {
-          const nextData = {
-            query: res.query,
-            location: res.location,
-            category: res.category,
-            services: Array.isArray(res.services) ? res.services : [],
-            businesses: [{ ...res.businesses[0], name: companyName, website: hostname }, ...res.businesses.slice(1)],
-          };
-          await preloadBusinessLogos(nextData.businesses);
-          if (cancelled) return;
-          setData(nextData);
-          setResultsReady(true);
-          return;
-        }
-      } catch {
-        /* keep fallback */
-      }
-      await preloadBusinessLogos(fallbackData(companyName, domain, industry).businesses);
-      if (!cancelled) setResultsReady(true);
+      const next = await prefetchLsaData({
+        companyName,
+        domain,
+        industry,
+        websiteMarkdown: scrapedAd?.description || '',
+      });
+      if (cancelled) return;
+      setData(next);
+      setResultsReady(true);
     })();
     return () => {
       cancelled = true;
