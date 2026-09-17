@@ -33,6 +33,44 @@ const GoogleLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const AVATAR_COLORS = ['#1a73e8', '#188038', '#c5221f', '#e37400', '#7b1fa2', '#00796b', '#5f6368', '#ad1457'];
+
+function BizAvatar({ name, host, className = '' }: { name: string; host: string; className?: string }) {
+  const [failed, setFailed] = useState(false);
+  const initials = name
+    .replace(/[^a-zA-Z ]/g, '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(w => w[0]?.toUpperCase())
+    .join('');
+  const color = AVATAR_COLORS[(name.charCodeAt(0) + name.length) % AVATAR_COLORS.length];
+
+  if (!host || failed) {
+    return (
+      <div
+        className={`flex items-center justify-center font-semibold text-white select-none ${className}`}
+        style={{ backgroundColor: color }}
+      >
+        {initials || '?'}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={`https://www.google.com/s2/favicons?domain=${host}&sz=128`}
+      alt=""
+      loading="eager"
+      decoding="sync"
+      // @ts-expect-error fetchpriority is valid HTML
+      fetchpriority="high"
+      onError={() => setFailed(true)}
+      className={className}
+    />
+  );
+}
+
 function Stars({ rating }: { rating: number }) {
   return (
     <span className="text-[#e7711b] tracking-[-0.5px] text-[11px]">
