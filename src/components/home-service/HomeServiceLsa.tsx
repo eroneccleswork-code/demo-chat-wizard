@@ -163,7 +163,22 @@ function QuoteModal({
 }) {
   const [message, setMessage] = useState('');
   const [name, setName] = useState('');
+  const [service, setService] = useState('');
   const [contact, setContact] = useState<'sms' | 'email'>('sms');
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const t = window.setTimeout(() => messageRef.current?.focus(), 120);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      e.stopPropagation();
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('keydown', onKey, true);
+    };
+  }, [onClose]);
 
   const services = /dent/i.test(category)
     ? ['Routine cleaning', 'Emergency visit', 'Teeth whitening', 'Implants consult']
@@ -205,19 +220,22 @@ function QuoteModal({
 
           <label className="block text-[15px] text-gray-800 mb-2">Your message</label>
           <textarea
+            ref={messageRef}
             value={message}
+            autoFocus
             onChange={e => setMessage(e.target.value.slice(0, 600))}
             placeholder="Give details like what you need done and how soon you need it"
-            className="w-full h-28 border border-gray-400 rounded-lg p-3 text-[15px] outline-none focus:border-blue-600 resize-none"
+            className="w-full h-28 border border-gray-400 rounded-lg p-3 text-[15px] text-gray-900 outline-none focus:border-blue-600 resize-none"
           />
           <p className="text-right text-xs text-gray-500 mb-4">{message.length}/600</p>
 
           <label className="block text-[15px] text-gray-800 mb-2">Service (optional)</label>
           <select
-            defaultValue=""
+            value={service}
+            onChange={e => setService(e.target.value)}
             className="w-full border border-gray-400 rounded-lg px-3 py-3 text-[15px] text-gray-700 outline-none focus:border-blue-600 mb-5 bg-white"
           >
-            <option value="" disabled>Choose the service you need</option>
+            <option value="">Choose the service you need</option>
             {services.map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
@@ -228,7 +246,7 @@ function QuoteModal({
             value={name}
             onChange={e => setName(e.target.value.slice(0, 50))}
             placeholder="Name"
-            className="w-full max-w-[400px] border border-gray-400 rounded-lg px-3 py-3 text-[15px] outline-none focus:border-blue-600"
+            className="w-full max-w-[400px] border border-gray-400 rounded-lg px-3 py-3 text-[15px] text-gray-900 outline-none focus:border-blue-600"
           />
           <p className="text-[11px] text-gray-500 mb-5 max-w-[400px] text-right">{name.length}/50</p>
 
