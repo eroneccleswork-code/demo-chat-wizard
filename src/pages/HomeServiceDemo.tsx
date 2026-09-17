@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import HomeServiceGoogle from '@/components/home-service/HomeServiceGoogle';
+import HomeServiceLsa from '@/components/home-service/HomeServiceLsa';
 import HomeServiceTvAd from '@/components/home-service/HomeServiceTvAd';
 import HomeServiceWebsite from '@/components/home-service/HomeServiceWebsite';
 import ScreenRecorder from '@/components/ScreenRecorder';
@@ -64,6 +65,15 @@ export default function HomeServiceDemo() {
               tagline={scrapedAd?.description}
               branding={branding}
               onCall={() => setStep('website')}
+            />
+          ) : channel === 'lsa' ? (
+            <HomeServiceLsa
+              key="lsa"
+              domain={domain}
+              companyName={displayName}
+              industry={industry}
+              onClickAd={() => setStep('website')}
+              scrapedAd={scrapedAd}
             />
           ) : (
             <HomeServiceGoogle

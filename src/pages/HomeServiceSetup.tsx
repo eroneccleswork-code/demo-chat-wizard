@@ -8,7 +8,7 @@ import { analyzeCompanyWebsite, fetchBranding } from '@/lib/setup-analysis';
 export default function HomeServiceSetup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string; channel?: 'search' | 'tv' } | null) || {};
+  const preset = (location.state as { industry?: string; companyName?: string; websiteUrl?: string; channel?: 'search' | 'tv' | 'lsa' } | null) || {};
   const industry = preset.industry || 'Home Services';
   const channel = preset.channel || 'search';
   const isTv = channel === 'tv';
